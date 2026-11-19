@@ -9,7 +9,7 @@ public class ShieldsUiServiceCollectionExtensionsTests
     public void AddShieldsUi_RegistersTheThemeServices()
     {
         using var context = new BunitContext();
-        var services = new ServiceCollection().AddSingleton(context.JSInterop.JSRuntime).AddShieldsUi();
+        var services = new ServiceCollection().AddScoped(_ => context.JSInterop.JSRuntime).AddShieldsUi();
 
         using var provider = services.BuildServiceProvider(validateScopes: true);
         using var scope = provider.CreateScope();

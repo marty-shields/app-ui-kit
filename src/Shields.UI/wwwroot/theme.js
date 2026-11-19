@@ -1,6 +1,9 @@
 (function () {
     // The script tag names the storage key, so each app keeps the key it already uses.
     var key = document.currentScript && document.currentScript.getAttribute("data-storage-key");
+    if (!key) {
+        console.warn("shields theme: the script tag has no data-storage-key, so the choice will not be saved.");
+    }
 
     function get() {
         try {

@@ -11,8 +11,10 @@ function load(storageKey, stored, storageThrows = false) {
   const writes = [];
   const attributes = {};
   const window = {};
+  const warnings = [];
   vm.runInNewContext(source, {
     window,
+    console: { warn: (message) => warnings.push(message) },
     document: {
       currentScript: { getAttribute: (name) => (name === "data-storage-key" ? storageKey : null) },
       documentElement: {
@@ -25,7 +27,7 @@ function load(storageKey, stored, storageThrows = false) {
       setItem: (k, v) => { if (storageThrows) throw new Error("denied"); writes.push(k); store[k] = v; },
     },
   });
-  return { api: window.shieldsTheme, attributes, reads, writes, store };
+  return { api: window.shieldsTheme, attributes, reads, writes, store, warnings };
 }
 
 const out = [];
@@ -53,5 +55,6 @@ out.push(`storage denied -> get ${blocked.api.get()}, set returns ${blocked.api.
 
 const keyless = load(null, { null: "dark" });
 out.push(`no key -> get ${keyless.api.get()}, set returns ${keyless.api.set("dark")}, storage touched ${keyless.reads.length + keyless.writes.length}`);
+out.push(`no key warns ${keyless.warnings.length} time, with a key warns ${set.warnings.length}`);
 
 console.log(out.join("\n"));

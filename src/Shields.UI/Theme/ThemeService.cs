@@ -14,7 +14,7 @@ public sealed class ThemeService(IJSRuntime js)
             ? preference
             : ThemePreference.System;
 
-    /// <summary>Applies the choice to the document and saves it. False when storage refused the save: the choice still applies until the app closes.</summary>
+    /// <summary>Applies the choice to the document and saves it. False when nothing was saved, because storage refused the save or the <c>theme.js</c> script tag has no <c>data-storage-key</c>: the choice still applies until the app closes.</summary>
     public async Task<bool> SetAsync(ThemePreference preference) =>
         await js.InvokeAsync<bool>("shieldsTheme.set", preference.ToString().ToLowerInvariant());
 }

@@ -18,7 +18,8 @@ stored null -> get system, data-theme none
 set dark returns true, stores dark, data-theme dark
 set system stores system, data-theme none
 storage denied -> get system, set returns false, data-theme light
-no key -> get system, set returns false, storage touched 0'
+no key -> get system, set returns false, storage touched 0
+no key warns 1 time, with a key warns 0'
 
 check "theme.js reads and writes only its own key, applies and saves the choice" "$expected" "$actual"
 finish

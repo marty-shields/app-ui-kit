@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Usage: .github/scripts/tests/run.sh
-# Runs the tests of the CI scripts (needs bash, git, python3).
+# Runs the tests of the CI scripts (needs bash, git, python3, node).
 set -uo pipefail
 cd "$(dirname "$0")" || exit
 status=0

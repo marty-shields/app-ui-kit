@@ -63,3 +63,11 @@ dotnet_diagnostic.CA1305.severity = none
 dotnet_diagnostic.CA1310.severity = none
 dotnet_diagnostic.CA1826.severity = none
 dotnet_diagnostic.CA1829.severity = none
+
+[src/Shields.UI/Theme/ThemeService.cs]
+# BL0016: an app's settings page, the only caller, catches a failed call. The service lets it through so the page can tell a failed call from a refused save (false).
+dotnet_diagnostic.BL0016.severity = none
+
+[tests/Shields.UI.Tests/Theme/SystemBarInsetWriterTests.cs]
+# BL0016: the fake IJSRuntime's InvokeAsync overload forwards to its other overload, which is no JS call.
+dotnet_diagnostic.BL0016.severity = none

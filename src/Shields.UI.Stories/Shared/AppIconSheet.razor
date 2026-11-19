@@ -1,0 +1,92 @@
+@* Shows the App's icon and splash as Android does: launcher masks, the themed icon and the light and dark splash screens. *@
+<div class="sheet">
+    <section>
+        <h2 class="heading">Launcher</h2>
+        <div class="row">
+            @foreach (var shape in Shapes)
+            {
+                @foreach (var size in Sizes)
+                {
+                    <figure class="icon">
+                        <span class="mask @shape size-@size">
+                            <img class="layer" src="@Background" alt="" />
+                            <img class="layer" src="@Foreground" alt="" />
+                        </span>
+                        <figcaption>@shape, @(size)px</figcaption>
+                    </figure>
+                }
+            }
+        </div>
+    </section>
+
+    <section>
+        <h2 class="heading">Themed icon</h2>
+        <div class="row">
+            @foreach (var (label, wallpaper) in Themed)
+            {
+                @foreach (var size in Sizes)
+                {
+                    <figure class="icon">
+                        <span class="mask circle size-@size @wallpaper">
+                            <span class="layer silhouette" style="@($"mask-image: url({Monochrome})")"></span>
+                        </span>
+                        <figcaption>@label, @(size)px</figcaption>
+                    </figure>
+                }
+            }
+        </div>
+    </section>
+
+    <section>
+        <h2 class="heading">Splash</h2>
+        <div class="row">
+            @foreach (var (label, theme, image) in Splashes)
+            {
+                <figure class="icon">
+                    <div class="splash @theme">
+                        <img class="splash-image" src="@image" alt="" />
+                    </div>
+                    <figcaption>@label</figcaption>
+                </figure>
+            }
+        </div>
+    </section>
+</div>
+
+@code {
+    private static readonly string[] Shapes = ["circle", "squircle"];
+
+    private static readonly int[] Sizes = [48, 192];
+
+    private static readonly (string Label, string Wallpaper)[] Themed =
+    [
+        ("Light wallpaper", "light-wallpaper"),
+        ("Dark wallpaper", "dark-wallpaper"),
+    ];
+
+    private (string Label, string Theme, string Image)[] Splashes =>
+    [
+        ("Light theme", "light", SplashLight),
+        ("Dark theme", "dark", SplashDark),
+    ];
+
+    /// <summary>The launcher icon's background layer, as a URL or data URI.</summary>
+    [Parameter, EditorRequired]
+    public string Background { get; set; } = "";
+
+    /// <summary>The launcher icon's foreground layer, as a URL or data URI.</summary>
+    [Parameter, EditorRequired]
+    public string Foreground { get; set; } = "";
+
+    /// <summary>The themed icon's single-colour silhouette, as a URL or data URI.</summary>
+    [Parameter, EditorRequired]
+    public string Monochrome { get; set; } = "";
+
+    /// <summary>The splash image on the light theme, as a URL or data URI.</summary>
+    [Parameter, EditorRequired]
+    public string SplashLight { get; set; } = "";
+
+    /// <summary>The splash image on the dark theme, as a URL or data URI.</summary>
+    [Parameter, EditorRequired]
+    public string SplashDark { get; set; } = "";
+}

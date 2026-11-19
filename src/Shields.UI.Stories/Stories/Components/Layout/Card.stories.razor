@@ -1,0 +1,39 @@
+@attribute [Stories("Components/Layout/Card")]
+
+<Stories TComponent="Card" Layout="typeof(ThemeLayout)">
+
+    <Story Name="No title">
+        <Template>
+            <Card TestId="card"><p class="body" data-wrap-ok>Eaten 659 of 2,100 kcal</p></Card>
+        </Template>
+    </Story>
+
+    <Story Name="Title">
+        <Template>
+            <Card Title="Weeks" TestId="card"><p class="body" data-wrap-ok>Content goes here.</p></Card>
+        </Template>
+    </Story>
+
+    <Story Name="Title and aside">
+        <Template>
+            <Card Title="Records" Aside="1 this week" TestId="card"><p class="body" data-wrap-ok>Content goes here.</p></Card>
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <Card Title="Records" Aside="1 this week"><p class="body" data-wrap-ok>Content goes here.</p></Card>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <Card Title="Records" Aside="1 this week"><p class="body" data-wrap-ok>Content goes here.</p></Card>
+            </div>
+        </Template>
+    </Story>
+
+</Stories>

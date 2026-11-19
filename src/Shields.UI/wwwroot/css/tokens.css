@@ -17,6 +17,13 @@
     --color-secondary: light-dark(#b7d5d4, #2b4444);
     --color-on-secondary: light-dark(#305252, #d4e8e7);
     --color-selected: light-dark(#b7d5d4, #2b4444);
+    /* The filled icon button's chip and the icon on it. Its own token, not --color-selected or --color-secondary,
+       so retuning those does not change the chip. */
+    --color-chip: light-dark(#6a9594, #587a7a);
+    --color-on-chip: light-dark(#141819, #ffffff);
+    /* A lighter, muted circle than the chip, with a plus that stays readable on it. */
+    --color-chip-soft: light-dark(#92b6b5, #466161);
+    --color-on-chip-soft: light-dark(#243d3d, #e4ecec);
     --color-accent: light-dark(#29494c, #acd5d2);
     --color-focus: light-dark(#488286, #8cc4c1);
     --color-danger: light-dark(#a8231c, #f2b8b5);
@@ -40,10 +47,12 @@
     --font-size-lg: 1.25rem;
     --font-size-xl: 1.5rem;
     --font-size-xxl: 2.25rem;
+    --font-size-input: 1.25rem;
     --font-weight-regular: 400;
     --font-weight-bold: 600;
     --line-height: 1.4;
     --line-height-tight: 1;
+    --letter-spacing-label: 0.08em;
 
     --space-1: 4px;
     --space-2: 8px;
@@ -58,7 +67,9 @@
     --radius-round: 50%;
 
     --touch-target: 48px;
+    --touch-target-compact: 40px;
     --border-width: 1px;
+    --border-width-error: 2px;
     --focus-width: 2px;
     --focus-offset: 2px;
     --opacity-disabled: 0.5;
@@ -67,6 +78,17 @@
     --spinner-size-small: 1.125rem;
     --spinner-width-small: 2px;
     --spinner-duration: 1s;
+    --pull-refresh-threshold: 64px;
+    --pull-refresh-return-duration: 200ms;
+    --snackbar-enter-duration: 150ms;
+    --dialog-max-width: 22rem;
+    --radio-size: 1.5rem;
+    --radio-dot-size: 0.75rem;
+    --nav-indicator-width: 4rem;
+    --nav-indicator-height: 2rem;
+    --add-button-size: 3.5rem;
+    --add-button-lift: 1.5rem;
+    --legend-swatch-size: 0.75rem;
 }
 
 /* Forces a theme on an element and its children. */

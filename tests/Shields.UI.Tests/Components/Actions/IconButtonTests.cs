@@ -171,7 +171,9 @@ public class IconButtonTests : ComponentTestBase
         var start = css.IndexOf(".soft {", StringComparison.Ordinal);
 
         Assert.That(start, Is.GreaterThanOrEqualTo(0));
-        Assert.That(css[start..css.IndexOf('}', start)], Does.Contain("background-color: var(--color-chip-soft);").And.Contain("color: var(--color-on-chip-soft);"));
+        var end = css.IndexOf('}', start);
+        Assert.That(end, Is.GreaterThan(start));
+        Assert.That(css[start..end], Does.Contain("background-color: var(--color-chip-soft);").And.Contain("color: var(--color-on-chip-soft);"));
     }
 
     [Test]
@@ -191,14 +193,16 @@ public class IconButtonTests : ComponentTestBase
     {
         var root = RepoFiles.Find("*.razor", "src", "Shields.UI").Single(f => f.EndsWith("IconButton.razor"));
         var css = File.ReadAllText(root + ".css");
-        var baseRule = css[..css.IndexOf(".compact", StringComparison.Ordinal)];
+        var compact = css.IndexOf(".compact", StringComparison.Ordinal);
         var start = css.IndexOf(".filled {", StringComparison.Ordinal);
+        Assert.That(compact, Is.GreaterThanOrEqualTo(0));
+        Assert.That(start, Is.GreaterThanOrEqualTo(0));
+        var baseRule = css[..compact];
         var filledBlock = css[start..css.IndexOf('}', start)];
 
         Assert.Multiple(() =>
         {
             Assert.That(baseRule, Does.Contain("min-width: var(--touch-target)").And.Contain("min-height: var(--touch-target)"));
-            Assert.That(start, Is.GreaterThanOrEqualTo(0));
             Assert.That(filledBlock, Does.Contain("background-color: var(--color-chip);").And.Contain("color: var(--color-on-chip);"));
         });
     }

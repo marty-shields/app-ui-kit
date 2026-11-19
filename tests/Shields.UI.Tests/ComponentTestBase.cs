@@ -10,4 +10,7 @@ public abstract class ComponentTestBase
 
     [TearDown]
     public void DisposeContext() => Context.Dispose();
+
+    /// <summary>Completes once the renderer has run what is already queued on it.</summary>
+    protected Task WaitForRendererAsync() => Context.Renderer.Dispatcher.InvokeAsync(() => { });
 }

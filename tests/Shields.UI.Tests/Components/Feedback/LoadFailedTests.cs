@@ -68,7 +68,7 @@ public class LoadFailedTests : ComponentTestBase
     [Test]
     public void FocusFails_LogsAWarningWithEvent3301AndKeepsTheError()
     {
-        var logger = new RecordingLogger();
+        var logger = new RecordingLogger<LoadFailed>();
         Context.Services.AddSingleton<ILogger<LoadFailed>>(logger);
         Context.JSInterop.SetupVoid("Blazor._internal.domWrapper.focus", _ => true).SetException(new JSException("Focus failed"));
 
@@ -86,7 +86,7 @@ public class LoadFailedTests : ComponentTestBase
     [Test]
     public void FocusAfterDisconnect_LogsNothingAndKeepsTheError()
     {
-        var logger = new RecordingLogger();
+        var logger = new RecordingLogger<LoadFailed>();
         Context.Services.AddSingleton<ILogger<LoadFailed>>(logger);
         Context.JSInterop.SetupVoid("Blazor._internal.domWrapper.focus", _ => true).SetException(new JSDisconnectedException("Gone"));
 
@@ -108,23 +108,4 @@ public class LoadFailedTests : ComponentTestBase
 
     private IReadOnlyList<JSRuntimeInvocation> Focuses() =>
         Context.JSInterop.Invocations["Blazor._internal.domWrapper.focus"];
-
-    private sealed class RecordingLogger : ILogger<LoadFailed>
-    {
-        private readonly List<(int Id, LogLevel Level, string Message)> records = [];
-
-        public IReadOnlyList<(int Id, LogLevel Level, string Message)> Records => records;
-
-        public Exception? LastException { get; private set; }
-
-        public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
-
-        public bool IsEnabled(LogLevel logLevel) => true;
-
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
-        {
-            records.Add((eventId.Id, logLevel, formatter(state, exception)));
-            LastException = exception;
-        }
-    }
 }

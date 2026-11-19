@@ -24,7 +24,12 @@ dotnet build src/WorkoutLog.UI     -p:UseKitSource=true -p:KitPath=$KIT -p:Resto
 
 Without `-p:RestoreLockedMode=false` the restore stops with `NU1004: A new project reference to Shields.UI was found ... The packages lock file is inconsistent with the project dependencies`.
 
-The trial also ran one site with both apps' screen stories. The host no longer has that opt-in (`CalorieTrackerPath`, `WorkoutLogPath`, the native SQLite removal and the separate lock file); the patches stay here as the starting point for the app-side work. Each app's `*.UI.ScreenStories` library can be added to a host's `Assemblies` list.
+The trial also ran one site with both apps' screen stories. The host no longer has that opt-in (`CalorieTrackerPath`, `WorkoutLogPath`, the native SQLite removal and the separate lock file); the patches stay here as the starting point for the app-side work. Each app's `*.UI.ScreenStories` library can be added to a host's `Assemblies` list, but the wiring that opt-in had is gone and must be redone (see the host files in commit `cd10a7a`):
+
+- a `ProjectReference` from the host to each ScreenStories project;
+- each library's `Add...Stories()` call in the host's service registration;
+- removal of the `e_sqlite3` native `NativeFileReference` items, so the apps' SQLite native assets do not clash;
+- a separate `packages.lock.json` for that host build.
 
 ## What the patches contain
 

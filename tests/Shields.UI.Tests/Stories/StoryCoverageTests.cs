@@ -1,6 +1,8 @@
 using System.Text.RegularExpressions;
+using BlazingStory.Types;
 using Microsoft.AspNetCore.Components;
 using Shields.UI.Components.Actions;
+using Shields.UI.Stories.Shared;
 
 namespace Shields.UI.Tests.Stories;
 
@@ -8,11 +10,24 @@ public partial class StoryCoverageTests
 {
     private const string ComponentsNamespace = "Shields.UI.Components.";
 
-    private static IEnumerable<TestCaseData> Components() =>
+    private static readonly Type[] ExportedComponents =
         typeof(AppButton).Assembly.GetExportedTypes()
-            .Where(t => typeof(IComponent).IsAssignableFrom(t) && t.Namespace!.StartsWith(ComponentsNamespace))
-            .Select(t => (Group: t.Namespace!.Split('.')[^1], Name: t.Name.Split('`')[0]))
+            .Where(t => typeof(IComponent).IsAssignableFrom(t) && !t.IsAbstract)
+            .ToArray();
+
+    private static IEnumerable<TestCaseData> Components() =>
+        ExportedComponents
+            .Where(t => IsInComponents(t))
+            .Select(t => (Group: t.Namespace![ComponentsNamespace.Length..].Replace('.', '/'), Name: t.Name.Split('`')[0]))
             .Select(c => new TestCaseData(c.Group, c.Name).SetArgDisplayNames(c.Name));
+
+    private static bool IsInComponents(Type t) => t.Namespace!.StartsWith(ComponentsNamespace);
+
+    [Test]
+    public void Components_AreAllInAComponentsGroup()
+    {
+        Assert.That(ExportedComponents.Where(t => !IsInComponents(t)).Select(t => t.FullName), Is.Empty);
+    }
 
     [TestCaseSource(nameof(Components))]
     public void Component_HasOneStoriesFileInItsGroup(string group, string name)
@@ -20,6 +35,14 @@ public partial class StoryCoverageTests
         var titles = StoriesFiles("Components").Where(f => f.Component == name).Select(f => f.Title);
 
         Assert.That(titles, Is.EqualTo(new[] { $"Components/{group}/{name}" }));
+    }
+
+    [Test]
+    public void ComponentStories_ShowOnlyTheirComponent()
+    {
+        var shown = StoriesFiles("Components").SelectMany(f => f.Shown.Where(s => s != f.Component).Select(s => $"{f.Title}: {s}"));
+
+        Assert.That(shown, Is.Empty);
     }
 
     [Test]
@@ -44,7 +67,12 @@ public partial class StoryCoverageTests
         var titles = StoriesFiles("Foundations").Select(f => f.Title);
 
         Assert.That(titles, Is.EqualTo(new[] { "Foundations/Tokens" }));
-        Assert.That(RepoFiles.PathOf("src", "Shields.UI.Stories", "Stories", "Foundations", "Introduction.md"), Does.Exist);
+
+        var pages = typeof(TokenSheet).Assembly.GetTypes()
+            .Where(t => typeof(IComponent).IsAssignableFrom(t))
+            .SelectMany(t => t.GetCustomAttributes(typeof(CustomPageAttribute), false).Cast<CustomPageAttribute>())
+            .Select(a => a.Title);
+        Assert.That(pages, Has.Member("Foundations/Introduction"));
     }
 
     [Test]
@@ -67,9 +95,9 @@ public partial class StoryCoverageTests
     [GeneratedRegex("""\[Stories\("([^"]+)"\)\]""")]
     private static partial Regex StoriesTitle();
 
-    [GeneratedRegex(@"<Stories TComponent=""([A-Za-z]+)(?:<[^""]*>)?""")]
+    [GeneratedRegex(@"<Stories\b[^>]*\bTComponent=""([A-Za-z_]\w*)")]
     private static partial Regex TComponent();
 
-    [GeneratedRegex(@"<Template>\s*(?:@\{[^\n]*\}\s*)?<([A-Za-z]+)")]
+    [GeneratedRegex(@"<Template>\s*(?:@\{[^\n]*\}\s*)?<([A-Za-z_]\w*)")]
     private static partial Regex Shown();
 }

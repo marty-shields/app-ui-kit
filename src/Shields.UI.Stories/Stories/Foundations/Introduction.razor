@@ -1,0 +1,31 @@
+@attribute [CustomPage("Foundations/Introduction")]
+
+<h1>Shields UI</h1>
+
+<p>The shared UI kit for the Calorie Tracker and Workout Log apps: design tokens, base styles, general components and this stories site.</p>
+
+<h2>Where it lives</h2>
+<table>
+    <thead><tr><th>Item</th><th>Location</th></tr></thead>
+    <tbody>
+        <tr><td>Tokens</td><td><code>src/Shields.UI/wwwroot/css/tokens.css</code> (CSS custom properties)</td></tr>
+        <tr><td>Components</td><td><code>src/Shields.UI/Components/&lt;Group&gt;/</code> (Razor components with scoped <code>.razor.css</code>)</td></tr>
+        <tr><td>Stories and these pages</td><td><code>src/Shields.UI.Stories/Stories/</code>: <code>Foundations/</code> and <code>Components/&lt;Group&gt;/</code></td></tr>
+    </tbody>
+</table>
+
+<h2>Sections</h2>
+<ul>
+    <li><strong>Foundations</strong>: this page and <a href="./?path=/story/foundations-tokens--all-tokens">Tokens</a>.</li>
+    <li><strong>Components</strong>: one folder per group, with one stories file per component. Each story is one visual state.</li>
+</ul>
+
+<h2>Rules</h2>
+<ul>
+    <li>Light and dark themes. <code>data-theme="light"</code> or <code>"dark"</code> forces a theme on an element; component stories have a System / Light / Dark switch.</li>
+    <li>Components use tokens only; no hard-coded colours or sizes. Story-only chrome (phone frame, theme switch) is exempt.</li>
+    <li>A component or token that only one app needs stays in that app's repo.</li>
+</ul>
+
+<h2>Checks</h2>
+<p>Tests in <code>Shields.UI.Tests</code> fail when a public component in <code>Shields.UI</code> is outside <code>Components/&lt;Group&gt;/</code> or has no stories file.</p>

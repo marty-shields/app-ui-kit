@@ -1,0 +1,42 @@
+@attribute [Stories("Components/Feedback/Snackbar")]
+
+<Stories TComponent="Snackbar" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Message only">
+        <Template>
+            @foreach (var theme in Themes)
+            {
+                <div class="themed" data-theme="@theme">
+                    <Snackbar Message="Entry added to Lunch" Duration="Timeout.InfiniteTimeSpan" TestId="@($"message-{theme}")" />
+                </div>
+            }
+        </Template>
+    </Story>
+
+    <Story Name="With action">
+        <Template>
+            @foreach (var theme in Themes)
+            {
+                <div class="themed" data-theme="@theme">
+                    <Snackbar Message="Entry deleted" ActionLabel="Undo" OnAction="@(() => { })" Duration="Timeout.InfiniteTimeSpan" TestId="@($"action-{theme}")" />
+                </div>
+            }
+        </Template>
+    </Story>
+
+    <Story Name="Two lines">
+        <Template>
+            @foreach (var theme in Themes)
+            {
+                <div class="themed" data-theme="@theme">
+                    <Snackbar Message="Single-Arm Dumbbell Romanian Deadlift set 10 deleted from this workout" ActionLabel="Undo" OnAction="@(() => { })" Duration="Timeout.InfiniteTimeSpan" TestId="@($"two-lines-{theme}")" />
+                </div>
+            }
+        </Template>
+    </Story>
+
+</Stories>
+
+@code {
+    private static readonly string[] Themes = ["light", "dark"];
+}

@@ -26,6 +26,8 @@ public partial class EventIdTests
         Assert.That(Enum.GetValues<KitEvent>().ToDictionary(e => e, e => (int)e), Is.EqualTo(new Dictionary<KitEvent, int>
         {
             [KitEvent.LoadFailedFocusFailed] = 3301,
+            [KitEvent.UndoFocusFailed] = 3901,
+            [KitEvent.UndoFocusCheckFailed] = 3902,
         }));
 
     [TestCaseSource(nameof(SourceFiles))]

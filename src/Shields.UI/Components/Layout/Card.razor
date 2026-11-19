@@ -1,6 +1,6 @@
-<div class="card" data-testid="@TestId">
-    @if (Title is not null)
-    {
+@if (Title is not null)
+{
+    <section class="card" data-testid="@TestId">
         <div class="header">
             <h2 class="title">@Title</h2>
             @if (Aside is not null)
@@ -8,9 +8,15 @@
                 <span class="aside" data-testid="@(TestId is null ? null : $"{TestId}-aside")">@Aside</span>
             }
         </div>
-    }
-    @ChildContent
-</div>
+        @ChildContent
+    </section>
+}
+else
+{
+    <div class="card" data-testid="@TestId">
+        @ChildContent
+    </div>
+}
 
 @code {
     /// <summary>Heading of the card. Null shows a plain card with no heading, and no aside.</summary>

@@ -26,10 +26,16 @@
 }
 
 .text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     font-variant-numeric: tabular-nums;
 }
 
 .detail {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     color: var(--color-text-muted);
     font-size: var(--font-size-sm);
     font-variant-numeric: tabular-nums;
@@ -37,11 +43,14 @@
 
 .chevron {
     display: flex;
+    flex-shrink: 0;
 }
 
 .aside {
+    flex-shrink: 0;
     margin-left: auto;
     padding: 0 var(--space-2);
     color: var(--color-text-muted);
     font-size: var(--font-size-sm);
+    white-space: nowrap;
 }

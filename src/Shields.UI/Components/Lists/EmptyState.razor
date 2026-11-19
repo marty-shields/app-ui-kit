@@ -1,8 +1,8 @@
 <div class="empty" data-testid="@TestId">
-    <p class="message" data-testid="@($"{TestId}-message")">@Message</p>
+    <p class="message" data-testid="@(TestId is null ? null : $"{TestId}-message")">@Message</p>
     @if (Hint is not null)
     {
-        <p class="hint" data-testid="@($"{TestId}-hint")" data-wrap-ok>@Hint</p>
+        <p class="hint" data-testid="@(TestId is null ? null : $"{TestId}-hint")" data-wrap-ok>@Hint</p>
     }
     @ChildContent
 </div>
@@ -20,7 +20,7 @@
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
-    /// <summary>Value of the data-testid attribute.</summary>
+    /// <summary>Value of the data-testid attribute; also the prefix for <c>{TestId}-message</c> and <c>{TestId}-hint</c>. None are rendered when unset.</summary>
     [Parameter]
     public string? TestId { get; set; }
 }

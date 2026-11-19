@@ -46,6 +46,19 @@ public class CardTests : ComponentTestBase
     }
 
     [Test]
+    public void WithATitle_IsASection_AndWithoutOneADiv()
+    {
+        var titled = Context.Render<Card>(p => p.Add(x => x.Title, "Weeks"));
+        var plain = Context.Render<Card>(p => p.AddChildContent("<span>x</span>"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(titled.Find(".card").TagName, Is.EqualTo("SECTION"));
+            Assert.That(plain.Find(".card").TagName, Is.EqualTo("DIV"));
+        });
+    }
+
+    [Test]
     public void Css_TakesSurfaceBorderAndRadiusFromTokens()
     {
         var css = RepoFiles.Read("src", "Shields.UI", "Components", "Layout", "Card.razor.css");

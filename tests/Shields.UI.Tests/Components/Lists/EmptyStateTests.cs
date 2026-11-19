@@ -42,4 +42,14 @@ public class EmptyStateTests : ComponentTestBase
 
         Assert.That(cut.FindAll("[data-testid=empty-hint]"), Is.Empty);
     }
+
+    [Test]
+    public void Render_WithoutTestId_RendersNoTestIds()
+    {
+        var cut = Context.Render<EmptyState>(p => p
+            .Add(x => x.Message, "No workouts yet")
+            .Add(x => x.Hint, "Tap New Workout to log one"));
+
+        Assert.That(cut.FindAll("[data-testid]"), Is.Empty);
+    }
 }

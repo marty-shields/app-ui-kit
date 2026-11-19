@@ -117,4 +117,27 @@ public class ListRowTests : ComponentTestBase
             Assert.That(cut.Find(".row").ClassList, Does.Contain("two-line"));
         });
     }
+
+    [Test]
+    public void Css_CutsTextAndDetailWithAnEllipsis_AndKeepsAsideAndChevronWhole()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Lists", "ListRow.razor.css");
+
+        Assert.Multiple(() =>
+        {
+            foreach (var selector in new[] { ".text", ".detail" })
+            {
+                Assert.That(Rule(css, selector), Does.Contain("overflow: hidden;"), selector);
+                Assert.That(Rule(css, selector), Does.Contain("text-overflow: ellipsis;"), selector);
+                Assert.That(Rule(css, selector), Does.Contain("white-space: nowrap;"), selector);
+            }
+
+            Assert.That(Rule(css, ".aside"), Does.Contain("flex-shrink: 0;"));
+            Assert.That(Rule(css, ".aside"), Does.Contain("white-space: nowrap;"));
+            Assert.That(Rule(css, ".chevron"), Does.Contain("flex-shrink: 0;"));
+        });
+    }
+
+    private static string Rule(string css, string selector) =>
+        System.Text.RegularExpressions.Regex.Match(css, System.Text.RegularExpressions.Regex.Escape(selector) + @"\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
 }

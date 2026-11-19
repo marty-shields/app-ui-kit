@@ -1,6 +1,6 @@
 # Trial: one stories site with the kit and both apps
 
-Issue #3. The kit already carries the solution-wide build rules (`Directory.Build.props` and `.editorconfig`, copied from Workout Log); the build-rules issue (#4) adds CI and `AGENTS.md` and finishes them. The kit builds alone by default. The apps are opt-in, through two MSBuild properties that point at copies of the apps carrying a `*.UI.ScreenStories` library (one screen story each). The app-side changes are throwaway: they are kept here as patches and never committed to the app repos.
+Issue #3. The kit already carries the solution-wide build rules (`Directory.Build.props` and `.editorconfig`, copied from Workout Log); the build-rules issue (#4) adds CI and `AGENTS.md` and finishes them. The trial host loaded each app's `*.UI.ScreenStories` library (one screen story each) through MSBuild properties; that wiring is gone, so the kit's stories site builds alone. The app-side changes were throwaway: they are kept here as patches and never committed to the app repos.
 
 ## Reproduce
 
@@ -24,15 +24,7 @@ dotnet build src/WorkoutLog.UI     -p:UseKitSource=true -p:KitPath=$KIT -p:Resto
 
 Without `-p:RestoreLockedMode=false` the restore stops with `NU1004: A new project reference to Shields.UI was found ... The packages lock file is inconsistent with the project dependencies`.
 
-Build and run the combined site (http://localhost:5056):
-
-```
-dotnet run --project $KIT/src/Shields.UI.Stories.Host -p:UseKitSource=true -p:KitPath=$KIT -p:RestoreLockedMode=false -p:CalorieTrackerPath=$SCRATCH/calorie-tracker-app -p:WorkoutLogPath=$SCRATCH/workout-log-app
-```
-
-The host adds each app's story assembly to `BlazingStoryApp`, drops the native SQLite reference, and keeps its own lock file under `obj/`, so the kit's own lock files stay unchanged.
-
-These properties are real global properties on purpose. Given only the two path properties, restore works, but the apps and the kit projects are then built twice with different global properties, in parallel, and a clean build fails on a file the two builds both write (`rpswa.dswa.cache.json`). A clean build with the command above passes.
+The trial also ran one site with both apps' screen stories. The host no longer has that opt-in (`CalorieTrackerPath`, `WorkoutLogPath`, the native SQLite removal and the separate lock file); the patches stay here as the starting point for the app-side work. Each app's `*.UI.ScreenStories` library can be added to a host's `Assemblies` list.
 
 ## What the patches contain
 

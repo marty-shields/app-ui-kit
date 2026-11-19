@@ -26,9 +26,17 @@
         </Template>
     </Story>
 
+    <Story Name="Interactive">
+        <Template>
+            <SegmentedControl TValue="string" Label="Range" Options="Four" @bind-Value="range" TestId="example-range" />
+        </Template>
+    </Story>
+
 </Stories>
 
 @code {
+    private string range = "month";
+
     private static readonly IReadOnlyList<RadioOption<string>> Two =
     [
         new("list", "List", "example-tab-list"),

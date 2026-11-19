@@ -20,9 +20,17 @@
         </Template>
     </Story>
 
+    <Story Name="Interactive">
+        <Template>
+            <FilterChips TValue="string" Label="Meal" Options="Options" @bind-Value="meal" TestId="example-filter" />
+        </Template>
+    </Story>
+
 </Stories>
 
 @code {
+    private string meal = "lunch";
+
     private static readonly IReadOnlyList<RadioOption<string>> Options =
     [
         new("breakfast", "Breakfast", "example-filter-breakfast"),

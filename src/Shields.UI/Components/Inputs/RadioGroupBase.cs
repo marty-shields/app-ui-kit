@@ -7,6 +7,7 @@ public abstract class RadioGroupBase<TValue> : ComponentBase
 {
     private TValue? pickedValue;
     private bool pickSettled;
+    private string? staleRadioId;
     private bool restoreFocus;
 
     /// <summary>The radios by option index, filled by the markup's element references.</summary>
@@ -60,10 +61,17 @@ public abstract class RadioGroupBase<TValue> : ComponentBase
     {
         if (restoreFocus)
         {
-            restoreFocus = false;
             var chosen = Options.ToList().FindIndex(IsSelected);
-            if (chosen >= 0 && Radios.TryGetValue(chosen, out var radio))
+            if (chosen < 0 || !Radios.TryGetValue(chosen, out var radio))
             {
+                restoreFocus = false;
+                return;
+            }
+
+            // The references only point at the new radios once the browser has drawn them; until then they still hold the removed ones.
+            if (radio.Id != staleRadioId)
+            {
+                restoreFocus = false;
                 await radio.FocusAsync();
             }
 
@@ -78,6 +86,8 @@ public abstract class RadioGroupBase<TValue> : ComponentBase
         pickSettled = false;
         if (!EqualityComparer<TValue>.Default.Equals(pickedValue, Value))
         {
+            var chosen = Options.ToList().FindIndex(IsSelected);
+            staleRadioId = chosen >= 0 && Radios.TryGetValue(chosen, out var stale) ? stale.Id : null;
             Generation++;
             restoreFocus = true;
             StateHasChanged();

@@ -16,10 +16,25 @@ internal static partial class DesignTokens
     /// <summary>Light and dark value of a colour token: a <c>light-dark()</c> pair or one hex value for both.</summary>
     public static (Rgb Light, Rgb Dark) Colour(string name)
     {
-        var value = Declaration().Matches(TokensCss).Single(m => m.Groups[1].Value == name).Groups[2].Value.Trim();
-        var hexes = Hex().Matches(value).Select(m => Rgb.Parse(m.Value)).ToList();
-        return hexes.Count == 1 ? (hexes[0], hexes[0]) : (hexes[0], hexes[1]);
+        var value = Value(name);
+        var pair = LightDark().Match(value);
+        if (pair.Success)
+        {
+            return (ParseHex(name, pair.Groups[1].Value.Trim()), ParseHex(name, pair.Groups[2].Value.Trim()));
+        }
+
+        var single = ParseHex(name, value);
+        return (single, single);
     }
+
+    /// <summary>Trimmed value of a custom property declared in tokens.css.</summary>
+    public static string Value(string name) =>
+        Declaration().Matches(TokensCss).Single(m => m.Groups[1].Value == name).Groups[2].Value.Trim();
+
+    private static Rgb ParseHex(string name, string text) =>
+        Hex().IsMatch(text)
+            ? Rgb.Parse(text)
+            : throw new FormatException($"{name}: expected a single #rrggbb colour but found '{text}'.");
 
     /// <summary>Custom properties used through <c>var()</c> in a piece of CSS.</summary>
     public static IEnumerable<string> Uses(string css) => Use().Matches(css).Select(m => m.Groups[1].Value);
@@ -30,7 +45,10 @@ internal static partial class DesignTokens
     [GeneratedRegex(@"^\s*(--[a-z0-9-]+)\s*:([^;]*);", RegexOptions.Multiline)]
     private static partial Regex Declaration();
 
-    [GeneratedRegex("#[0-9a-fA-F]{6}")]
+    [GeneratedRegex(@"^light-dark\(([^,()]*),([^,()]*)\)$")]
+    private static partial Regex LightDark();
+
+    [GeneratedRegex("^#[0-9a-fA-F]{6}$")]
     private static partial Regex Hex();
 
     [GeneratedRegex(@"var\((--[a-z0-9-]+)")]

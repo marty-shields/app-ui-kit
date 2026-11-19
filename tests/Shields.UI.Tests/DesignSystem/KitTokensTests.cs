@@ -44,15 +44,13 @@ public class KitTokensTests
     [Test]
     public void Has_the_decided_values()
     {
-        var css = RepoFiles.Read("src", "Shields.UI", "wwwroot", "css", "tokens.css");
-
         Assert.Multiple(() =>
         {
-            Assert.That(css, Does.Contain("--color-accent: light-dark(#29494c, #acd5d2);"));
-            Assert.That(css, Does.Contain("--color-error: light-dark(#841c16, #f4c1be);"));
-            Assert.That(css, Does.Contain("--add-button-size: 3.5rem;"));
-            Assert.That(css, Does.Contain("--add-button-lift: 1.5rem;"));
-            Assert.That(css, Does.Contain("--legend-swatch-size: 0.75rem;"));
+            Assert.That(DesignTokens.Value("--color-accent"), Is.EqualTo("light-dark(#29494c, #acd5d2)"));
+            Assert.That(DesignTokens.Value("--color-error"), Is.EqualTo("light-dark(#841c16, #f4c1be)"));
+            Assert.That(DesignTokens.Value("--add-button-size"), Is.EqualTo("3.5rem"));
+            Assert.That(DesignTokens.Value("--add-button-lift"), Is.EqualTo("1.5rem"));
+            Assert.That(DesignTokens.Value("--legend-swatch-size"), Is.EqualTo("0.75rem"));
         });
     }
 

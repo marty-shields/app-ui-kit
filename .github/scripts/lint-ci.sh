@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Usage: lint-ci.sh [folder]
+# Runs shellcheck over the shell scripts in .github/scripts and actionlint (which also shellchecks each workflow's
+# run steps) over .github/workflows. Needs shellcheck on the PATH (apt install shellcheck). Downloads the pinned
+# actionlint into <folder> (default: the temp dir) and checks the archive's SHA-256 before every use, downloading
+# it again when the hash does not match.
+set -euo pipefail
+version=1.7.12
+sha=8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8
+folder="${1:-${RUNNER_TEMP:-${TMPDIR:-/tmp}}}"
+root="$(cd "$(dirname "$0")/../.." && pwd)"
+
+if ! command -v shellcheck >/dev/null; then
+  echo "::error title=Lint::shellcheck is not installed (apt install shellcheck)." >&2
+  exit 1
+fi
+
+dir="$folder/actionlint-$version"
+archive="$dir/actionlint.tar.gz"
+if ! echo "$sha  $archive" | sha256sum -c - >/dev/null 2>&1; then
+  rm -rf "$dir"
+  mkdir -p "$dir"
+  curl -fsSL -o "$archive" \
+    "https://github.com/rhysd/actionlint/releases/download/v$version/actionlint_${version}_linux_amd64.tar.gz"
+  echo "$sha  $archive" | sha256sum -c - >&2
+fi
+tar -xzf "$archive" -C "$dir" actionlint
+
+cd "$root"
+shellcheck .github/scripts/*.sh .github/scripts/tests/*.sh
+"$dir/actionlint"

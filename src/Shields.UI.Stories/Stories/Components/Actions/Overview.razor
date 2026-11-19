@@ -1,0 +1,62 @@
+@attribute [CustomPage("Components/Actions/Overview")]
+
+<h1>Actions</h1>
+
+<h2><code>AppButton</code></h2>
+<p>A button with a 48px touch target.</p>
+<table>
+    <thead><tr><th>Variant</th><th>Use for</th></tr></thead>
+    <tbody>
+        <tr><td>Primary</td><td>The main action on a screen: Save. One per screen.</td></tr>
+        <tr><td>Secondary</td><td>Other actions in the bottom bar or a card: Cancel.</td></tr>
+        <tr><td>Danger</td><td>Confirming a destructive action: Delete. Filled red.</td></tr>
+    </tbody>
+</table>
+<ul>
+    <li><code>FullWidth</code> fills the row; bottom-bar buttons use it.</li>
+    <li><code>Disabled</code> dims the button with <code>--opacity-disabled</code>.</li>
+    <li><code>Busy</code> shows a turning ring, <code>--spinner-size-small</code> across in the text colour, beside the text, sets <code>aria-busy</code> and ignores taps. The caller sets the text, e.g. "Saving…". The ring stands still when the phone asks for reduced motion.</li>
+    <li><code>data-testid</code>: <code>TestId</code>.</li>
+</ul>
+
+<h2><code>Icon</code></h2>
+<p>A Material Symbols Outlined icon (weight 400), drawn as an SVG and hidden from screen readers. <code>IconButton</code> uses it.</p>
+<ul>
+    <li><code>Name</code>: an <code>IconName</code>.</li>
+    <li><code>Tone</code>: <code>Default</code> takes the text colour; <code>Muted</code> uses <code>--color-text-muted</code>, <code>Success</code> <code>--color-success</code>, <code>Error</code> <code>--color-error</code>.</li>
+    <li><code>Size</code>: <code>Default</code> is <code>--font-size-xl</code>, <code>Small</code> is <code>--font-size-lg</code>.</li>
+    <li>Chevron: the end of a tappable row, <code>Muted</code>. ChevronLeft is the previous item in a sequence; Back is for leaving a screen.</li>
+    <li>Search: a search box, <code>Muted</code>.</li>
+    <li>Up and Down: an increase (<code>Success</code>) or decrease (<code>Error</code>).</li>
+    <li>Plus and Minus: add or remove, e.g. a stepper or an add button.</li>
+    <li>Star and StarFilled: not a favourite and a favourite.</li>
+</ul>
+
+<h2><code>IconButton</code></h2>
+<p>A button that shows an <code>Icon</code>, with a 48px touch target.</p>
+<table>
+    <thead><tr><th>Icon</th><th>Use for</th></tr></thead>
+    <tbody>
+        <tr><td>Settings</td><td>Opening Settings from a top bar.</td></tr>
+        <tr><td>Back</td><td>The back arrow in the top bar.</td></tr>
+        <tr><td>Close</td><td>Removing an item: <code>Muted</code>, <code>Small</code>.</td></tr>
+        <tr><td>Delete</td><td>Deleting something, after a confirm.</td></tr>
+        <tr><td>Check</td><td>Marking something done.</td></tr>
+        <tr><td>Edit</td><td>Opening something again to change it (<code>Muted</code>).</td></tr>
+        <tr><td>Note</td><td>Adding or editing a note (<code>Muted</code> while there is none, <code>Active</code> once there is one).</td></tr>
+        <tr><td>Star, StarFilled</td><td>Starring something as a favourite (<code>Pressed</code> says which).</td></tr>
+    </tbody>
+</table>
+<ul>
+    <li><code>AriaLabel</code> names the button.</li>
+    <li><code>Disabled</code> dims the button with <code>--opacity-disabled</code> and ignores taps; it keeps its place in the layout.</li>
+    <li>The icon is <code>--color-text</code>; on a top bar that is <code>--color-on-bar</code>. <code>Muted</code> uses <code>--color-text-muted</code>.</li>
+    <li><code>Pressed</code> makes the button a toggle: <code>aria-pressed</code> is "true" or "false". Null leaves the attribute off.</li>
+    <li><code>Active</code> fills the button with a round <code>--color-selected</code> background to show it is on.</li>
+    <li><code>Compact</code> shrinks the tap area to <code>--touch-target-compact</code> for dense rows.</li>
+    <li><code>Style</code>: <code>Plain</code> (the default) is the icon alone. <code>Filled</code> puts it on a round <code>--color-chip</code> chip with a <code>--color-on-chip</code> icon, for the main add action of a section. <code>Soft</code> puts it on a lighter round <code>--color-chip-soft</code> chip with a <code>--color-on-chip-soft</code> icon, for a secondary add action. Both ignore <code>Active</code> and <code>Muted</code> and keep the focus ring, <code>AriaLabel</code> and <code>TestId</code>; <code>Compact</code> still shrinks the chip.</li>
+    <li><code>Size</code>: <code>Default</code> is <code>--font-size-xl</code>, <code>Small</code> is <code>--font-size-lg</code>.</li>
+    <li><code>data-testid</code>: <code>TestId</code>.</li>
+</ul>
+
+<p>Stories: <a href="./?path=/docs/components-actions-appbutton--docs">AppButton</a>, <a href="./?path=/docs/components-actions-icon--docs">Icon</a>, <a href="./?path=/docs/components-actions-iconbutton--docs">IconButton</a></p>

@@ -1,6 +1,6 @@
 namespace Shields.UI.Components.Actions;
 
-/// <summary>Material Symbols icon shown by an <see cref="Icon"/>.</summary>
+/// <summary>Material Symbols icon shown by an <see cref="Icon"/> or an <see cref="IconButton"/>.</summary>
 public enum IconName
 {
     /// <summary>Gear (<c>settings</c>).</summary>

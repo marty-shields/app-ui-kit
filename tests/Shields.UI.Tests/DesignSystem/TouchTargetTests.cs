@@ -25,6 +25,22 @@ public partial class TouchTargetTests
         Assert.That(declarations, Has.Member($"min-height: {TouchTarget}"));
     }
 
+    [Test]
+    public void IconButton_IsATouchTarget_AndCompactStaysAtTheCompactTarget()
+    {
+        var css = Rules(RepoFiles.Read("src", "Shields.UI", "Components", "Actions", "IconButton.razor.css")).ToList();
+        string[] Declarations(string selector) => css.Where(r => r.Selectors.Contains(selector)).SelectMany(r => r.Declarations).ToArray();
+
+        var tokens = RepoFiles.Read("src", "Shields.UI", "wwwroot", "css", "tokens.css");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(tokens, Does.Contain("--touch-target-compact: 40px;"));
+            Assert.That(Declarations(".icon-btn"), Has.Member($"min-width: {TouchTarget}").And.Member($"min-height: {TouchTarget}"));
+            Assert.That(Declarations(".compact"), Has.Member("min-width: var(--touch-target-compact)").And.Member("min-height: var(--touch-target-compact)"));
+        });
+    }
+
     private static string? FirstClass(string attributes) =>
         Class().Match(attributes) is { Success: true } m
             ? m.Groups[1].Value.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault(c => !c.StartsWith('@'))

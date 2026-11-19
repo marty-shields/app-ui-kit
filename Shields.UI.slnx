@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Shields.UI/Shields.UI.csproj" />
+    <Project Path="src/Shields.UI.Stories/Shields.UI.Stories.csproj" />
+    <Project Path="src/Shields.UI.Stories.Host/Shields.UI.Stories.Host.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Shields.UI.Tests/Shields.UI.Tests.csproj" />
+  </Folder>
+</Solution>

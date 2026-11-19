@@ -1,0 +1,24 @@
+@using System.Reflection
+@using static BlazingStory.Types.NavigationTreeOrderBuilder
+@using Shields.UI.Stories.Shared
+
+<BlazingStoryApp Title="Shields UI"
+                 Assemblies="Assemblies"
+                 DefaultLayout="typeof(DefaultLayout)"
+                 NavigationTreeOrder="@N["Components", N["Actions"],
+                                         "Calorie Tracker", N["Screens"],
+                                         "Workout Log", N["Screens"]]">
+</BlazingStoryApp>
+
+@code {
+    private static readonly Assembly[] Assemblies =
+    [
+        typeof(DefaultLayout).Assembly,
+#if CALORIE_TRACKER
+        typeof(CalorieTracker.UI.ScreenStories.CalorieTrackerStories).Assembly,
+#endif
+#if WORKOUT_LOG
+        typeof(WorkoutLog.UI.ScreenStories.WorkoutLogStories).Assembly,
+#endif
+    ];
+}

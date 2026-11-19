@@ -29,7 +29,7 @@
             @foreach (var theme in Themes)
             {
                 <div class="themed narrow" data-theme="@theme">
-                    <Snackbar Message="Deadlift set 10 deleted from this workout" ActionLabel="Undo" OnAction="@(() => { })" Duration="Timeout.InfiniteTimeSpan" TestId="@($"two-lines-{theme}")" />
+                    <Snackbar Message="Deadlift set 10 deleted" ActionLabel="Undo" OnAction="@(() => { })" Duration="Timeout.InfiniteTimeSpan" TestId="@($"two-lines-{theme}")" />
                 </div>
             }
         </Template>

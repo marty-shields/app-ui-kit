@@ -28,6 +28,8 @@
     private CancellationTokenSource? timer;
     private bool timedOut;
     private bool focused;
+    private bool focusPending;
+    private string? timedMessage;
 
     /// <summary>
     /// What just happened, e.g. Barbell Back Squat set 2 deleted. When set, this snackbar shows it, for <see cref="Duration"/>,
@@ -89,16 +91,27 @@
 
     private bool HasAction => !string.IsNullOrWhiteSpace(ActionLabel) && OnAction.HasDelegate;
 
-    protected override void OnInitialized()
+    protected override void OnParametersSet()
     {
         if (Direct)
         {
-            StartTimer();
+            SnackbarService.ValidateDuration(Duration, nameof(Duration));
         }
-    }
 
-    protected override void OnParametersSet()
-    {
+        if (!string.Equals(Message, timedMessage, StringComparison.Ordinal))
+        {
+            // A new message gets a full duration and the focus again; none leaves nothing to time out.
+            timedMessage = Message;
+            StopTimer();
+            timedOut = false;
+            focused = false;
+            focusPending = TakeFocus && Direct;
+            if (Direct)
+            {
+                StartTimer();
+            }
+        }
+
         var wanted = Direct ? null : Source;
         if (ReferenceEquals(subscribed, wanted))
         {
@@ -119,14 +132,19 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!firstRender || !TakeFocus || !Direct || !HasAction)
+        if (!focusPending || !Direct || !HasAction)
         {
             return;
         }
 
+        focusPending = false;
         try
         {
             await action.FocusAsync();
+        }
+        catch (JSDisconnectedException)
+        {
+            // The page is gone, and the button with it.
         }
         catch (Exception exception)
         {
@@ -157,7 +175,23 @@
 
     private void OnChanged() => _ = InvokeAsync(StateHasChanged);
 
-    private Task OnActionAsync() => Direct ? OnAction.InvokeAsync() : Source.InvokeActionAsync(posted!);
+    private Task OnActionAsync()
+    {
+        if (!Direct)
+        {
+            return Source.InvokeActionAsync(posted!);
+        }
+
+        if (timedOut)
+        {
+            return Task.CompletedTask;
+        }
+
+        // The action settles the message: it must not time out on top of it.
+        StopTimer();
+        timedOut = true;
+        return OnAction.InvokeAsync();
+    }
 
     private async Task OnFocusAsync()
     {
@@ -189,6 +223,11 @@
         {
             module ??= JS.InvokeAsync<IJSObjectReference>("import", "./_content/Shields.UI/Components/Feedback/Snackbar.razor.js").AsTask();
             return await (await module).InvokeAsync<bool>("isFocusVisible", action);
+        }
+        catch (JSDisconnectedException)
+        {
+            // The page is gone; the snackbar goes with it.
+            return false;
         }
         catch (Exception exception)
         {
@@ -232,6 +271,7 @@
 
         await InvokeAsync(async () =>
         {
+            // The delay can finish before the timer is stopped and this runs; a stop in between must win.
             if (stopped.IsCancellationRequested)
             {
                 return;

@@ -347,6 +347,208 @@ public class SnackbarTests : ComponentTestBase
     }
 
     [Test]
+    public async Task MessageChanges_RestartsTheTimerForAFullDuration()
+    {
+        var timedOut = 0;
+        var cut = RenderMessage(onTimeout: () => timedOut++);
+        clock.Advance(Snackbar.DefaultDuration - TimeSpan.FromSeconds(1));
+
+        cut.Render(p => p.Add(x => x.Message, "Set 3 deleted"));
+        clock.Advance(Snackbar.DefaultDuration - TimeSpan.FromSeconds(1));
+        await WaitForRendererAsync();
+        var early = timedOut;
+        clock.Advance(TimeSpan.FromSeconds(1));
+        await WaitForRendererAsync();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(early, Is.Zero);
+            Assert.That(timedOut, Is.EqualTo(1));
+        });
+    }
+
+    [Test]
+    public async Task MessageChangesAfterTimingOut_TimesOutAgain()
+    {
+        var timedOut = 0;
+        var cut = RenderMessage(onTimeout: () => timedOut++);
+        clock.Advance(Snackbar.DefaultDuration);
+        await WaitForRendererAsync();
+
+        cut.Render(p => p.Add(x => x.Message, "Set 3 deleted"));
+        clock.Advance(Snackbar.DefaultDuration);
+        await WaitForRendererAsync();
+
+        Assert.That(timedOut, Is.EqualTo(2));
+    }
+
+    [Test]
+    public async Task MessageAppearsOnALiveInstance_StartsTheTimer()
+    {
+        var timedOut = 0;
+        var cut = Context.Render<Snackbar>(p => p.Add(x => x.OnTimeout, () => timedOut++));
+
+        cut.Render(p => p.Add(x => x.Message, "Set 2 deleted"));
+        clock.Advance(Snackbar.DefaultDuration);
+        await WaitForRendererAsync();
+
+        Assert.That(timedOut, Is.EqualTo(1));
+    }
+
+    [Test]
+    public async Task MessageGoesNull_StopsTheTimer()
+    {
+        var timedOut = 0;
+        var cut = RenderMessage(onTimeout: () => timedOut++);
+
+        cut.Render(p => p.Add(x => x.Message, null));
+        clock.Advance(Snackbar.DefaultDuration);
+        await WaitForRendererAsync();
+
+        Assert.That(timedOut, Is.Zero);
+    }
+
+    [Test]
+    public void MessageChanges_TakesFocusAgain()
+    {
+        var cut = RenderMessage(takeFocus: true);
+
+        cut.Render(p => p.Add(x => x.Message, "Set 3 deleted"));
+
+        Assert.That(Context.JSInterop.Invocations["Blazor._internal.domWrapper.focus"], Has.Count.EqualTo(2));
+    }
+
+    [Test]
+    public async Task Action_StopsTheTimerSoItNeverTimesOutAfterwards()
+    {
+        var timedOut = 0;
+        var cut = RenderMessage(onTimeout: () => timedOut++);
+
+        cut.Find(Action).Click();
+        clock.Advance(Snackbar.DefaultDuration);
+        await WaitForRendererAsync();
+
+        Assert.That(timedOut, Is.Zero);
+    }
+
+    [Test]
+    public async Task ActionAfterTimingOut_IsIgnored()
+    {
+        var done = 0;
+        var cut = RenderMessage(onAction: () => done++);
+        clock.Advance(Snackbar.DefaultDuration);
+        await WaitForRendererAsync();
+
+        cut.Find(Action).Click();
+
+        Assert.That(done, Is.Zero);
+    }
+
+    [TestCase(-1)]
+    [TestCase(-2)]
+    public void NegativeDuration_Throws(int seconds) =>
+        Assert.Throws<ArgumentOutOfRangeException>(() => Context.Render<Snackbar>(p => p
+            .Add(x => x.Message, "Set 2 deleted")
+            .Add(x => x.Duration, TimeSpan.FromSeconds(seconds))));
+
+    [Test]
+    public void DurationAboveWhatATimerAccepts_Throws() =>
+        Assert.Throws<ArgumentOutOfRangeException>(() => Context.Render<Snackbar>(p => p
+            .Add(x => x.Message, "Set 2 deleted")
+            .Add(x => x.Duration, TimeSpan.FromDays(50))));
+
+    [Test]
+    public async Task StoppedAfterTheDelayEndsButBeforeTheTimeoutRuns_DoesNotTimeOut()
+    {
+        var timedOut = 0;
+        var cut = RenderMessage(onTimeout: () => timedOut++);
+
+        // The clock moves off the renderer's thread while it is held, so the timeout waits in the renderer's queue until the dispose has run.
+        await Context.Renderer.Dispatcher.InvokeAsync(() =>
+        {
+            Task.Run(() => clock.Advance(Snackbar.DefaultDuration)).Wait();
+            return cut.Instance.DisposeAsync().AsTask();
+        });
+        await WaitForRendererAsync();
+
+        Assert.That(timedOut, Is.Zero);
+    }
+
+    [Test]
+    public async Task FocusCheckAfterDisconnect_LogsNothingAndStillTimesOut()
+    {
+        var logger = new RecordingLogger<Snackbar>();
+        Context.Services.AddSingleton<ILogger<Snackbar>>(logger);
+        Context.JSInterop.SetupModule(SnackbarModule).Setup<bool>("isFocusVisible", _ => true).SetException(new JSDisconnectedException("Gone"));
+        var timedOut = 0;
+        var cut = RenderMessage(onTimeout: () => timedOut++);
+
+        await cut.Find(Action).FocusAsync(new FocusEventArgs());
+        clock.Advance(Snackbar.DefaultDuration);
+        await WaitForRendererAsync();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(logger.Records, Is.Empty);
+            Assert.That(timedOut, Is.EqualTo(1));
+        });
+    }
+
+    [Test]
+    public void TakeFocusAfterDisconnect_LogsNothingAndKeepsTheSnackbar()
+    {
+        var logger = new RecordingLogger<Snackbar>();
+        Context.Services.AddSingleton<ILogger<Snackbar>>(logger);
+        Context.JSInterop.SetupVoid("Blazor._internal.domWrapper.focus", _ => true).SetException(new JSDisconnectedException("Gone"));
+
+        var cut = RenderMessage(takeFocus: true);
+
+        cut.WaitForAssertion(() => Assert.That(Context.JSInterop.Invocations["Blazor._internal.domWrapper.focus"], Has.Count.EqualTo(1)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(logger.Records, Is.Empty);
+            Assert.That(cut.FindAll(Action), Has.Count.EqualTo(1));
+        });
+    }
+
+    [Test]
+    public async Task Disposed_DisposesTheImportedModule()
+    {
+        var js = new FakeModuleRuntime();
+        Context.Services.AddSingleton<IJSRuntime>(js);
+        var cut = RenderMessage();
+        await cut.Find(Action).FocusAsync(new FocusEventArgs());
+
+        await cut.Instance.DisposeAsync();
+
+        Assert.That(js.Module.Disposals, Is.EqualTo(1));
+    }
+
+    [Test]
+    public async Task DisposedAfterDisconnect_SwallowsIt()
+    {
+        var js = new FakeModuleRuntime { DisposeThrows = true };
+        Context.Services.AddSingleton<IJSRuntime>(js);
+        var cut = RenderMessage();
+        await cut.Find(Action).FocusAsync(new FocusEventArgs());
+
+        await cut.Instance.DisposeAsync();
+        Assert.That(js.Module.Disposals, Is.EqualTo(1));
+    }
+
+    [Test]
+    public async Task DisposedWithoutAnImport_DisposesNothing()
+    {
+        var js = new FakeModuleRuntime();
+        Context.Services.AddSingleton<IJSRuntime>(js);
+        var cut = RenderMessage();
+
+        await cut.Instance.DisposeAsync();
+
+        Assert.That(js.Module.Disposals, Is.Zero);
+    }
+
+    [Test]
     public void NoMessageAndNothingPosted_RendersNothing()
     {
         var cut = Context.Render<Snackbar>();
@@ -492,6 +694,35 @@ public class SnackbarTests : ComponentTestBase
     /// <summary>The action answers whether it has keyboard focus (<c>:focus-visible</c>) with <paramref name="visible"/>.</summary>
     private void KeyboardFocus(bool visible) =>
         Context.JSInterop.SetupModule(SnackbarModule).Setup<bool>("isFocusVisible", _ => true).SetResult(visible);
+
+    private sealed class FakeModuleRuntime : IJSRuntime
+    {
+        public FakeModule Module { get; } = new();
+
+        public bool DisposeThrows { set => Module.Throws = value; }
+
+        public ValueTask<TValue> InvokeAsync<TValue>(string identifier, object?[]? args) => ValueTask.FromResult((TValue)(object)Module);
+
+        public ValueTask<TValue> InvokeAsync<TValue>(string identifier, CancellationToken cancellationToken, object?[]? args) =>
+            ValueTask.FromResult((TValue)(object)Module);
+    }
+
+    private sealed class FakeModule : IJSObjectReference
+    {
+        public int Disposals { get; private set; }
+
+        public bool Throws { get; set; }
+
+        public ValueTask<TValue> InvokeAsync<TValue>(string identifier, object?[]? args) => ValueTask.FromResult((TValue)(object)false);
+
+        public ValueTask<TValue> InvokeAsync<TValue>(string identifier, CancellationToken cancellationToken, object?[]? args) => ValueTask.FromResult((TValue)(object)false);
+
+        public ValueTask DisposeAsync()
+        {
+            Disposals++;
+            return Throws ? ValueTask.FromException(new JSDisconnectedException("Gone")) : ValueTask.CompletedTask;
+        }
+    }
 
     private sealed class FailingImports : IJSRuntime
     {

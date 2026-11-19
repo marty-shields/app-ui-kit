@@ -34,6 +34,21 @@ public class ShieldsUiServiceCollectionExtensionsTests
     }
 
     [Test]
+    public void AddShieldsUi_KeepsTheHostsOwnSnackbarService()
+    {
+        using var own = new SnackbarService(TimeProvider.System);
+        var services = new ServiceCollection().AddSingleton(own).AddShieldsUi();
+
+        using var provider = services.BuildServiceProvider();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(provider.GetRequiredService<SnackbarService>(), Is.SameAs(own));
+            Assert.That(services.Count(d => d.ServiceType == typeof(SnackbarService)), Is.EqualTo(1));
+        });
+    }
+
+    [Test]
     public void AddShieldsUi_KeepsTheHostsClock()
     {
         var clock = new ManualClock();

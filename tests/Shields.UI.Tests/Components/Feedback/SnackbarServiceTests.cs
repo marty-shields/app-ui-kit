@@ -70,6 +70,39 @@ public class SnackbarServiceTests
     }
 
     [Test]
+    public void ZeroDuration_IsAllowedAndDismissesAtTheNextTick()
+    {
+        service.Show("Entry added", duration: TimeSpan.Zero);
+        var before = service.Current;
+
+        clock.Advance(TimeSpan.Zero);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(before, Is.Not.Null);
+            Assert.That(service.Current, Is.Null);
+        });
+    }
+
+    [TestCase(-1)]
+    [TestCase(-2)]
+    public void Show_NegativeDuration_ThrowsAndShowsNothing(int seconds)
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => service.Show("Entry added", duration: TimeSpan.FromSeconds(seconds)));
+        Assert.That(service.Current, Is.Null);
+    }
+
+    [Test]
+    public void Show_DurationAboveWhatATimerAccepts_ThrowsAndLeavesTheShowingMessage()
+    {
+        service.Show("First");
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => service.Show("Second", duration: TimeSpan.FromDays(50)));
+
+        Assert.That(service.Current?.Text, Is.EqualTo("First"));
+    }
+
+    [Test]
     public void InfiniteDuration_KeepsTheMessageUntilDismissed()
     {
         service.Show("Entry added", duration: Timeout.InfiniteTimeSpan);

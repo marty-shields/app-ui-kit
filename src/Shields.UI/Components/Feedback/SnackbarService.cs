@@ -4,6 +4,7 @@ namespace Shields.UI.Components.Feedback;
 /// The one snackbar message the app shows, kept apart from any screen so a message posted before a screen change is there on the
 /// next screen. A new message replaces the one showing. It goes away when its action runs, after its duration, or on <see cref="Dismiss"/>.
 /// </summary>
+/// <remarks>One instance serves the whole app process, which suits MAUI Blazor Hybrid and WebAssembly. It doesn't suit Blazor Server, where every circuit would share it.</remarks>
 public sealed class SnackbarService : IDisposable
 {
     /// <summary>How long a message shows when <see cref="Show"/> gets no duration.</summary>
@@ -15,6 +16,18 @@ public sealed class SnackbarService : IDisposable
     private ITimer? timer;
 
     public SnackbarService(TimeProvider time) => this.time = time;
+
+    // The most Task.Delay and a timer accept (49 days), so a longer duration fails here, visibly, not later in a timer.
+    private static readonly TimeSpan MaxDuration = TimeSpan.FromMilliseconds(uint.MaxValue - 1);
+
+    /// <summary>Throws unless <paramref name="duration"/> is null, <see cref="Timeout.InfiniteTimeSpan"/>, or between zero and what a timer accepts.</summary>
+    internal static void ValidateDuration(TimeSpan? duration, string paramName = "duration")
+    {
+        if (duration is { } d && d != Timeout.InfiniteTimeSpan && (d < TimeSpan.Zero || d > MaxDuration))
+        {
+            throw new ArgumentOutOfRangeException(paramName, duration, "A duration can't be negative or longer than 49 days.");
+        }
+    }
 
     /// <summary>The message showing, or null.</summary>
     public SnackbarMessage? Current
@@ -38,11 +51,7 @@ public sealed class SnackbarService : IDisposable
     /// <param name="duration"><see cref="DefaultDuration"/> when null; <see cref="Timeout.InfiniteTimeSpan"/> keeps it until dismissed.</param>
     public void Show(string text, string? actionLabel = null, Func<Task>? onAction = null, TimeSpan? duration = null)
     {
-        if (duration is { } d && d != Timeout.InfiniteTimeSpan && d < TimeSpan.Zero)
-        {
-            throw new ArgumentOutOfRangeException(nameof(duration), duration, "A duration can't be negative.");
-        }
-
+        ValidateDuration(duration);
         var hasAction = !string.IsNullOrWhiteSpace(actionLabel) && onAction is not null;
         var message = new SnackbarMessage(text, hasAction ? actionLabel : null, hasAction ? onAction : null);
         lock (gate)

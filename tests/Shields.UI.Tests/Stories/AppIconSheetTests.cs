@@ -4,10 +4,10 @@ namespace Shields.UI.Tests.Stories;
 
 public class AppIconSheetTests : ComponentTestBase
 {
-    private IRenderedComponent<AppIconSheet> RenderSheet() => Context.Render<AppIconSheet>(p => p
+    private IRenderedComponent<AppIconSheet> RenderSheet(string monochrome = "mono.svg") => Context.Render<AppIconSheet>(p => p
         .Add(x => x.Background, "bg.svg")
         .Add(x => x.Foreground, "fg.svg")
-        .Add(x => x.Monochrome, "mono.svg")
+        .Add(x => x.Monochrome, monochrome)
         .Add(x => x.SplashLight, "splash-light.svg")
         .Add(x => x.SplashDark, "splash-dark.svg"));
 
@@ -27,5 +27,14 @@ public class AppIconSheetTests : ComponentTestBase
             Assert.That(cut.Find(".splash.light .splash-image").GetAttribute("src"), Is.EqualTo("splash-light.svg"));
             Assert.That(cut.Find(".splash.dark .splash-image").GetAttribute("src"), Is.EqualTo("splash-dark.svg"));
         });
+    }
+
+    [Test]
+    public void Monochrome_IsQuotedAndEscapedInTheMaskImage()
+    {
+        var cut = RenderSheet("data:image/svg+xml;utf8,<svg a=\"1\" b='x\\y'/>");
+
+        var style = cut.Find(".silhouette").GetAttribute("style")!;
+        Assert.That(style, Does.Contain("mask-image: url(\"data:image/svg+xml;utf8,<svg a=\\\"1\\\" b='x\\\\y'/>\")"));
     }
 }

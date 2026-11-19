@@ -1,8 +1,14 @@
 // Reads token values for the token sheet.
 
 // "rgb(48, 82, 82)", "rgba(0, 0, 0, 0.45)" or color-mix()'s "color(srgb 0.2 0.3 0.3 / 0.12)" to "#305252", "#00000073" or "#334d4d1f".
+// Any other colour space (oklch(), color(display-p3 ...)) is returned as written.
 function hex(colour) {
-    const scale = colour.startsWith("color(") ? 255 : 1;
+    const isSrgb = colour.startsWith("color(srgb ");
+    if (!isSrgb && !/^rgba?\(/.test(colour)) {
+        return colour;
+    }
+
+    const scale = isSrgb ? 255 : 1;
     const [r, g, b, a] = colour.match(/[\d.]+/g).map(Number);
     const rgb = [r, g, b].map(n => Math.round(n * scale));
     const parts = a === undefined ? rgb : [...rgb, Math.round(a * 255)];

@@ -1,9 +1,9 @@
-using System.Text.RegularExpressions;
 using Shields.UI.Stories.Shared;
+using Shields.UI.Tests.DesignSystem;
 
 namespace Shields.UI.Tests.Stories;
 
-public partial class TokenSheetTests : ComponentTestBase
+public class TokenSheetTests : ComponentTestBase
 {
     private const string Module = "./_content/Shields.UI.Stories/Shared/TokenSheet.razor.js";
 
@@ -14,8 +14,7 @@ public partial class TokenSheetTests : ComponentTestBase
 
         var cut = Context.Render<TokenSheet>();
 
-        var shown = cut.FindAll("[data-token]").Select(e => e.GetAttribute("data-token"));
-        Assert.That(shown, Is.EquivalentTo(TokensInCss()));
+        Assert.That(TokenNames(cut), Is.EquivalentTo(DesignTokens.TokensCssNames));
     }
 
     [Test]
@@ -40,26 +39,22 @@ public partial class TokenSheetTests : ComponentTestBase
         Context.JSInterop.SetupModule(Module).Setup<Dictionary<string, string>>("read", _ => true)
             .SetResult(new() { ["--color-protein light"] = "#112233", ["--color-protein dark"] = "#445566", ["--ring-size"] = "10rem" });
 
+        var kitOnly = TokenNames(Context.Render<TokenSheet>());
         var cut = Context.Render<TokenSheet>(p => p
             .Add(x => x.ExtraColours, ["--color-protein"])
             .Add(x => x.ExtraSizes, ["--ring-size"]));
 
-        var shown = cut.FindAll("[data-token]").Select(e => e.GetAttribute("data-token")).ToList();
+        var kitColours = cut.FindAll("tbody [data-token]").Count - 1;
         var colourCells = cut.Find("[data-token=\"--color-protein\"]").QuerySelectorAll("td[data-theme] .value");
         Assert.Multiple(() =>
         {
-            Assert.That(shown, Is.EquivalentTo(TokensInCss().Concat(["--color-protein", "--ring-size"])));
+            Assert.That(TokenNames(cut), Is.EqualTo(kitOnly.Take(kitColours).Append("--color-protein")
+                .Concat(kitOnly.Skip(kitColours)).Append("--ring-size")));
             Assert.That(colourCells.Select(c => c.TextContent), Is.EqualTo(new[] { "#112233", "#445566" }));
             Assert.That(cut.Find("li[data-token=\"--ring-size\"] .value").TextContent, Is.EqualTo("10rem"));
         });
     }
 
-    private static IEnumerable<string> TokensInCss()
-    {
-        var css = RepoFiles.Read("src", "Shields.UI", "wwwroot", "css", "tokens.css");
-        return TokenName().Matches(css).Select(m => m.Groups[1].Value);
-    }
-
-    [GeneratedRegex(@"^\s*(--[a-z0-9-]+):", RegexOptions.Multiline)]
-    private static partial Regex TokenName();
+    private static List<string?> TokenNames(IRenderedComponent<TokenSheet> cut) =>
+        cut.FindAll("[data-token]").Select(e => e.GetAttribute("data-token")).ToList();
 }

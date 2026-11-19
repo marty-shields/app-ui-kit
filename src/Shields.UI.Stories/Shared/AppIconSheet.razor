@@ -28,7 +28,7 @@
                 {
                     <figure class="icon">
                         <span class="mask circle size-@size @wallpaper">
-                            <span class="layer silhouette" style="@($"mask-image: url({Monochrome})")"></span>
+                            <span class="layer silhouette" style="@MaskStyle()"></span>
                         </span>
                         <figcaption>@label, @(size)px</figcaption>
                     </figure>
@@ -54,6 +54,9 @@
 </div>
 
 @code {
+    // The URL is a quoted CSS string, so a data URI that is not base64 (spaces, quotes) still parses.
+    private string MaskStyle() => $"mask-image: url(\"{Monochrome.Replace("\\", "\\\\").Replace("\"", "\\\"")}\")";
+
     private static readonly string[] Shapes = ["circle", "squircle"];
 
     private static readonly int[] Sizes = [48, 192];

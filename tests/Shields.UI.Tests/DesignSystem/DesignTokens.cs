@@ -13,6 +13,9 @@ internal static partial class DesignTokens
     public static IReadOnlySet<string> Names { get; } =
         Declaration().Matches(TokensCss + BaseCss).Select(m => m.Groups[1].Value).ToHashSet();
 
+    /// <summary>Names of the custom properties declared in tokens.css, in file order.</summary>
+    public static IReadOnlyList<string> TokensCssNames { get; } = Declares(TokensCss).ToList();
+
     /// <summary>Light and dark value of a colour token: a <c>light-dark()</c> pair or one hex value for both.</summary>
     public static (Rgb Light, Rgb Dark) Colour(string name)
     {

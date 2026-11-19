@@ -37,7 +37,7 @@
             <li class="item" data-token="@name">
                 <code>@name</code>
                 <code class="value">@Value(name)</code>
-                <span class="sample" style="@SampleStyle(name)">Squat 3 × 5 @@ 100 kg</span>
+                <span class="sample" style="@SampleStyle(name)">The quick brown fox 123</span>
             </li>
         }
     </ul>
@@ -116,27 +116,30 @@
         "--add-button-size", "--add-button-lift", "--legend-swatch-size",
     ];
 
-    /// <summary>Colour tokens the app declares itself, shown in light and dark after the kit's.</summary>
+    /// <summary>Colour tokens the app declares itself on <c>:root</c>, shown in light and dark after the kit's.</summary>
     [Parameter]
     public IReadOnlyList<string> ExtraColours { get; set; } = [];
 
-    /// <summary>Other tokens the app declares itself (sizes, durations, shadows), shown after the kit's sizes.</summary>
+    /// <summary>Other tokens the app declares itself on <c>:root</c> (sizes, durations, shadows), shown after the kit's sizes.</summary>
     [Parameter]
     public IReadOnlyList<string> ExtraSizes { get; set; } = [];
 
     private ElementReference sheet;
     private IJSObjectReference? module;
     private Dictionary<string, string> values = [];
+    private string? readFor;
 
     #pragma warning disable BL0016 // A story whose script fails should fail loudly in the browser, not be caught.
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!firstRender)
+        var extras = $"{string.Join('|', ExtraColours)}||{string.Join('|', ExtraSizes)}";
+        if (extras == readFor)
         {
             return;
         }
 
-        module = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/Shields.UI.Stories/Shared/TokenSheet.razor.js");
+        readFor = extras;
+        module ??= await JS.InvokeAsync<IJSObjectReference>("import", "./_content/Shields.UI.Stories/Shared/TokenSheet.razor.js");
         values = await module.InvokeAsync<Dictionary<string, string>>("read", sheet);
         StateHasChanged();
     }

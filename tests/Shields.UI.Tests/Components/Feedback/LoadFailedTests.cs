@@ -83,6 +83,23 @@ public class LoadFailedTests : ComponentTestBase
         });
     }
 
+    [Test]
+    public void FocusAfterDisconnect_LogsNothingAndKeepsTheError()
+    {
+        var logger = new RecordingLogger();
+        Context.Services.AddSingleton<ILogger<LoadFailed>>(logger);
+        Context.JSInterop.SetupVoid("Blazor._internal.domWrapper.focus", _ => true).SetException(new JSDisconnectedException("Gone"));
+
+        var cut = Render();
+
+        cut.WaitForAssertion(() => Assert.That(Focuses(), Has.Count.EqualTo(1)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(logger.Records, Is.Empty);
+            Assert.That(cut.FindAll("[data-testid=dashboard-retry]"), Has.Count.EqualTo(1));
+        });
+    }
+
     private IRenderedComponent<LoadFailed> Render(Action? onRetry = null) =>
         Context.Render<LoadFailed>(p => p
             .Add(x => x.Message, "Couldn't load the Dashboard")

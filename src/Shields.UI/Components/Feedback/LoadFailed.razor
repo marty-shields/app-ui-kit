@@ -1,4 +1,5 @@
 @using Microsoft.Extensions.Logging
+@using Microsoft.JSInterop
 @inject ILogger<LoadFailed> Logger
 
 <div class="failed">
@@ -32,6 +33,10 @@
         try
         {
             await retry.FocusAsync();
+        }
+        catch (JSDisconnectedException)
+        {
+            // The page is gone, and the button with it.
         }
         catch (Exception exception)
         {

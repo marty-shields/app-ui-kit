@@ -10,7 +10,7 @@ namespace Shields.UI.Tests.Logging;
 public partial class EventIdTests
 {
     private static IEnumerable<TestCaseData> SourceFiles() =>
-        RepoFiles.Find("*.cs", "src", "Shields.UI")
+        RepoFiles.Find("*.cs", "src", "Shields.UI").Concat(RepoFiles.Find("*.razor", "src", "Shields.UI"))
             .Select(f => new TestCaseData(f).SetArgDisplayNames(Path.GetRelativePath(RepoFiles.Root, f)));
 
     [Test]
@@ -32,6 +32,6 @@ public partial class EventIdTests
     public void LoggerMessage_UsesANamedEventId(string file) =>
         Assert.That(BareNumber().IsMatch(File.ReadAllText(file)), Is.False);
 
-    [GeneratedRegex(@"\[LoggerMessage\(\s*(EventId\s*=\s*)?\d")]
+    [GeneratedRegex(@"\[LoggerMessage\((\s*\d|[^\]]*?\b(EventId\s*=|eventId\s*:)\s*\d)")]
     private static partial Regex BareNumber();
 }

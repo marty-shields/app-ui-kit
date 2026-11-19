@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body style="margin:0">
+<title>Two Apps, One Design System</title>
+<style>
+/* Layout: one reading column; evidence (screenshots, tables) sits in bordered panels; the plan is a run of tables, each answering one question. */
+:root {
+  --bg: #f4f8f8;
+  --surface: #ffffff;
+  --border: #b7d5d4;
+  --border-strong: #77878b;
+  --text: #2b3335;
+  --muted: #5e6e72;
+  --primary: #305252;
+  --on-primary: #ffffff;
+  --tint: #dcebea;
+  --warn: #8a4b00;
+  --warn-bg: #fbeed9;
+  --good: #256b2a;
+  --good-bg: #e2f1e3;
+  --bad: #8f1f18;
+  --bad-bg: #f8e2e0;
+  --font: system-ui, Roboto, "Segoe UI", sans-serif;
+  --mono: ui-monospace, "Cascadia Code", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141819; --surface: #212829; --border: #364243; --border-strong: #7f9093;
+    --text: #e4ecec; --muted: #a3b1b3; --primary: #b7d5d4; --on-primary: #173535; --tint: #2b4444;
+    --warn: #e0a860; --warn-bg: #3a2e1b; --good: #a5d6a7; --good-bg: #1f3221; --bad: #f2b8b5; --bad-bg: #3b2221;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141819; --surface: #212829; --border: #364243; --border-strong: #7f9093;
+  --text: #e4ecec; --muted: #a3b1b3; --primary: #b7d5d4; --on-primary: #173535; --tint: #2b4444;
+  --warn: #e0a860; --warn-bg: #3a2e1b; --good: #a5d6a7; --good-bg: #1f3221; --bad: #f2b8b5; --bad-bg: #3b2221;
+  color-scheme: dark;
+}
+body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 16px; line-height: 1.5; }
+.page { max-width: 60rem; margin: 0 auto; padding-block: 2rem 4rem; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 2.5rem; }
+h1 { font-size: 2rem; line-height: 1.15; margin: 0; text-wrap: balance; }
+h2 { font-size: 1.375rem; line-height: 1.25; margin: 0; text-wrap: balance; }
+h3 { font-size: 1.0625rem; margin: 0; }
+p { margin: 0; max-width: 68ch; }
+section { display: flex; flex-direction: column; gap: 1rem; min-width: 0; }
+.lede { font-size: 1.125rem; color: var(--muted); }
+.meta { color: var(--muted); font-size: 0.875rem; }
+.part { font-size: 0.8125rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 600; border-top: 1px solid var(--border-strong); padding-top: 0.75rem; }
+code { font-family: var(--mono); font-size: 0.875em; background: var(--tint); padding: 0.05em 0.3em; border-radius: 4px; overflow-wrap: anywhere; }
+a { color: var(--primary); }
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; min-width: 0; }
+.summary { display: flex; flex-direction: column; gap: 0.75rem; }
+.summary ul, ul.plain { margin: 0; padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.4rem; max-width: 70ch; }
+.pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+.repo { display: flex; flex-direction: column; gap: 0.5rem; }
+.repo.kit { border: 2px solid var(--primary); }
+.repo ul { margin: 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.9375rem; }
+.repo .kind { font-size: 0.8125rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+figure { margin: 0; display: flex; flex-direction: column; gap: 0.5rem; min-width: 0; }
+figcaption { font-size: 0.875rem; color: var(--muted); }
+figcaption strong { color: var(--text); }
+.crop { aspect-ratio: 428 / 128; overflow: hidden; border: 1px solid var(--border); border-radius: 8px; max-width: 100%; }
+.crop img { width: 100%; height: 100%; object-fit: cover; object-position: 0 96.5%; display: block; }
+.shot { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; max-width: 22rem; }
+.shot img { display: block; width: 100%; height: auto; }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.9375rem; }
+th, td { text-align: left; vertical-align: top; padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--border); }
+thead th { font-size: 0.8125rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border-strong); white-space: nowrap; }
+tbody tr:last-child td, tbody tr:last-child th { border-bottom: 0; }
+tbody th { font-weight: 600; min-width: 9rem; }
+td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.diff td { min-width: 13rem; }
+.tag { display: inline-block; font-size: 0.75rem; font-weight: 600; padding: 0.1rem 0.5rem; border-radius: 999px; white-space: nowrap; }
+.tag.see { background: var(--warn-bg); color: var(--warn); }
+.tag.code { background: var(--tint); color: var(--text); }
+.tag.good { background: var(--good-bg); color: var(--good); }
+.tag.mid { background: var(--warn-bg); color: var(--warn); }
+.tag.bad { background: var(--bad-bg); color: var(--bad); }
+.tree { font-family: var(--mono); font-size: 0.8125rem; line-height: 1.5; background: var(--tint); border-radius: 8px; padding: 0.75rem; margin: 0; overflow-x: auto; white-space: pre; }
+ol.steps { margin: 0; padding-left: 1.3rem; display: flex; flex-direction: column; gap: 0.5rem; max-width: 70ch; }
+@media (max-width: 760px) {
+  .pair, .trio { grid-template-columns: minmax(0, 1fr); }
+  h1 { font-size: 1.625rem; }
+}
+</style>
+
+<div class="page">
+  <header style="display:flex;flex-direction:column;gap:0.75rem">
+    <h1>Calorie Tracker and Workout Log: one shared UI kit and one stories site</h1>
+    <p class="lede">Where the two apps' UIs differ today, and what it takes to move the shared parts into a kit that both apps install, with a single stories site showing the kit and both apps' screens.</p>
+    <p class="meta">Compared on 19 November 2026: calorie-tracker-app at the head of PR #134 (<code>c55be5f</code>, still open) and workout-log-app at <code>main</code> after PR #244 merged (<code>58bd59f</code>). Two files count as identical when they match after replacing the app's name. Your decisions from 19 November are recorded in Part 3.</p>
+  </header>
+
+  <section class="panel summary">
+    <h2>Short version</h2>
+    <ul>
+      <li>The two UI libraries started as copies and have drifted. Of 64 files at the same path in both, 25 are still identical.</li>
+      <li>The plan is a third repo, the kit, holding the tokens, the general components, the stories shell and the design tests. It publishes NuGet packages that both apps install. Screens and app-only components stay in each app.</li>
+      <li>The kit repo also builds one stories site from all three repos: Foundations, Components, Calorie Tracker, Workout Log.</li>
+      <li>Nothing found blocks this. The general components do not use either app's Core, and the log event ids they share already match in both apps.</li>
+      <li>All the design and set-up decisions are made (Part 3). Three technical risks still need a small trial before the full build.</li>
+      <li>Calorie Tracker's PR #134 should merge before its move starts, because the move touches the same files.</li>
+    </ul>
+  </section>
+
+  <div class="part">Part 1 · What differs today</div>
+
+  <section>
+    <h2>The raised button</h2>
+    <p>Both buttons are 3.5rem wide with the same colour and shadow. The shape, the label, how far the button lifts and the token names differ.</p>
+    <div class="pair">
+      <figure>
+        <div class="crop"><img src="img/cal-today.png" alt="Calorie Tracker bottom bar: Today, a round Add button, Trends"></div>
+        <figcaption><strong>Calorie Tracker.</strong> A circle (<code>--radius-round</code>), labelled Add, lifted 1.25rem. The Add label sits a little higher than the Today and Trends labels.</figcaption>
+      </figure>
+      <figure>
+        <div class="crop"><img src="img/wk-week.png" alt="Workout Log bottom bar: This week, a rounded square New button, Trends"></div>
+        <figcaption><strong>Workout Log.</strong> A rounded square (<code>--radius-md</code>, 12px), labelled New, lifted 1.5rem. The label is level with the other two by design.</figcaption>
+      </figure>
+    </div>
+    <div class="panel scroll">
+      <table class="diff">
+        <thead><tr><th>Bottom bar</th><th>Calorie Tracker</th><th>Workout Log</th></tr></thead>
+        <tbody>
+          <tr><th>Component</th><td><code>BottomNav</code>, built from a <code>NavDestinations</code> list, CSS grid</td><td><code>MainTabBar</code>, three buttons written out, flexbox</td></tr>
+          <tr><th>Size and lift tokens</th><td><code>--add-button-size</code>, <code>--add-button-lift</code></td><td><code>--nav-new-size</code>, <code>--nav-new-raise</code></td></tr>
+          <tr><th>Icon name</th><td><code>IconName.Plus</code></td><td><code>IconName.Add</code> (same glyph)</td></tr>
+          <tr><th>Keyboard focus</th><td>Focus ring drawn round the circle</td><td>No rule of its own for the button</td></tr>
+          <tr><th>Test ids</th><td><code>bottom-nav</code>, <code>add-button</code></td><td><code>tab-bar</code>, <code>new-link</code></td></tr>
+          <tr><th><code>AppScreen</code> parameters</th><td><code>Destination</code>, <code>OnAdd</code>, <code>status-slot</code></td><td><code>Tab</code>, <code>OnNew</code>, <code>snackbar-slot</code></td></tr>
+          <tr><th>Room under the button</th><td>Screens add no extra bottom padding</td><td>Card lists add <code>--nav-new-raise</code> of bottom padding</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Trends, side by side</h2>
+    <div class="pair">
+      <figure>
+        <div class="shot"><img src="img/cal-trends.png" alt="Calorie Tracker Trends screen, week view"></div>
+        <figcaption><strong>Calorie Tracker.</strong> 20px card titles, large-figure tiles, pill-shaped legend swatches, a y-axis with grid lines.</figcaption>
+      </figure>
+      <figure>
+        <div class="shot"><img src="img/wk-trends.png" alt="Workout Log Trends screen, week view"></div>
+        <figcaption><strong>Workout Log.</strong> 16px card titles, label-first tiles with a change line, dot swatches, no axis.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section>
+    <h2>All the differences found</h2>
+    <p><span class="tag see">Visible</span> rows change what a person sees. <span class="tag code">Code</span> rows look the same today but are built differently.</p>
+    <div class="panel scroll">
+      <table class="diff">
+        <thead><tr><th>What</th><th>Calorie Tracker</th><th>Workout Log</th></tr></thead>
+        <tbody>
+          <tr><th>Accent colour <span class="tag see">Visible</span></th><td><code>#29494c</code> light, <code>#acd5d2</code> dark (darkened so the calorie ring keeps 3:1 contrast)</td><td><code>#488286</code> light, <code>#8cc4c1</code> dark</td></tr>
+          <tr><th>Error colour <span class="tag see">Visible</span></th><td><code>#841c16</code> light, <code>#f4c1be</code> dark</td><td><code>#a8231c</code> light, <code>#f2b8b5</code> dark</td></tr>
+          <tr><th>Card titles <span class="tag see">Visible</span></th><td>20px; an <code>h3</code> written in each screen inside <code>SummaryCard</code></td><td>16px; a <code>TrendCard</code> component with a title and an aside</td></tr>
+          <tr><th>Stat tiles <span class="tag see">Visible</span></th><td><code>StatTile</code>: 24px figure over a caption, 12px corners</td><td>Three versions: <code>StatTile</code> (36px accent value, 20px corners, import review only), <code>WeekTiles</code> and <code>TrendTiles</code> (label, 16px value, change)</td></tr>
+          <tr><th>Chart legend <span class="tag see">Visible</span></th><td>A <code>ChartLegend</code> component with 24×16px pill swatches</td><td>12px dots, written inside <code>TrendBars</code> and again inside <code>MonthCalendar</code></td></tr>
+          <tr><th>Bar chart <span class="tag see">Visible</span></th><td><code>TrendBarChart</code>: y-axis, grid lines, target band, value labels</td><td><code>TrendBars</code>: no axis, paired bars for this and last period</td></tr>
+          <tr><th>Month calendar <span class="tag see">Visible</span></th><td>Square cells filled with the day's status colour; today marked with a box-shadow ring</td><td>36px round dots, dashed when there is no workout; today marked with an outline ring</td></tr>
+          <tr><th>Snackbar <span class="tag see">Visible</span></th><td>12px corners, raised shadow, no entry animation</td><td>8px corners, no shadow, rises in over 150ms</td></tr>
+          <tr><th>Calendar tab icon <span class="tag see">Visible</span></th><td><code>Today</code>: a calendar with a day square</td><td><code>Calendar</code>: an empty calendar page</td></tr>
+          <tr><th>Period stepper <span class="tag code">Code</span></th><td>Two <code>IconButton</code>s and an <code>h2</code> written in <code>TrendsView</code></td><td>A <code>PeriodStepper</code> component that mirrors one chevron</td></tr>
+          <tr><th><code>IconButton</code> <span class="tag code">Code</span></th><td>Has Filled and Soft chip styles, <code>Disabled</code> and <code>Pressed</code></td><td>None of those</td></tr>
+          <tr><th><code>NumberField</code> <span class="tag code">Code</span></th><td>One 161-line component</td><td>A 71-line component over a separate <code>FieldInput</code></td></tr>
+          <tr><th>Tokens only one app has <span class="tag code">Code</span></th><td>Chip colours, ring, macro colours, sheet sizes, <code>--letter-spacing-label</code>, <code>--opacity-thin</code></td><td><code>--color-bar-past</code>, calendar, meter and legend sizes, <code>--dialog-max-width</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>How much is copied today</h2>
+    <div class="panel scroll">
+      <table>
+        <thead><tr><th>Area</th><th>Same path in both</th><th>Still identical</th><th>What they are</th></tr></thead>
+        <tbody>
+          <tr><th>UI library</th><td class="num">64</td><td class="num">25</td><td>Buttons, icons, segmented control, list rows, spinner, screen frame, theme, <code>base.css</code>, <code>tokens.css</code></td></tr>
+          <tr><th>Stories site</th><td class="num">58</td><td class="num">26</td><td>Phone frame, theme switch, token sheet, app icon sheet, component stories</td></tr>
+          <tr><th>UI tests</th><td class="num">53</td><td class="num">18</td><td>Tokens-only CSS, touch target, phone frame and component tests</td></tr>
+          <tr><th>CI (<code>.github</code>)</th><td class="num">85</td><td class="num">52</td><td>Workflows, emulator scripts, story layout and README screenshot checks</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="part">Part 2 · The plan</div>
+
+  <section>
+    <h2>Three repos, and what each one owns</h2>
+    <div class="trio">
+      <div class="panel repo">
+        <span class="kind">App repo</span>
+        <h3>calorie-tracker-app</h3>
+        <ul>
+          <li>Core, the MAUI app, E2E tests</li>
+          <li>Its screens and app-only components (calorie ring, Add sheet, meal headers)</li>
+          <li>Its stories, and its own stories site for PR checks and README screenshots</li>
+          <li>Installs the kit packages</li>
+        </ul>
+      </div>
+      <div class="panel repo kit">
+        <span class="kind">New repo</span>
+        <h3>The kit</h3>
+        <ul>
+          <li>Tokens, <code>base.css</code>, theme script</li>
+          <li>General components</li>
+          <li>Stories shell (phone frame, theme switch, token sheet) and the kit's own stories</li>
+          <li>Design-system tests</li>
+          <li>Publishes the packages</li>
+          <li>Builds the combined stories site</li>
+        </ul>
+      </div>
+      <div class="panel repo">
+        <span class="kind">App repo</span>
+        <h3>workout-log-app</h3>
+        <ul>
+          <li>Core, the MAUI app, E2E tests</li>
+          <li>Its screens and app-only components (set rows, exercise cards, week strip)</li>
+          <li>Its stories, and its own stories site for PR checks and README screenshots</li>
+          <li>Installs the kit packages</li>
+        </ul>
+      </div>
+    </div>
+    <pre class="tree">app-ui-kit
+  src/Shields.UI/                 package 1: tokens.css, base.css, theme.js, components, back button, lifecycle, theme service
+  src/Shields.UI.Stories/         package 2: phone frame, layouts, theme switch, token sheet, stories for the kit's components
+  src/Shields.UI.Testing/         package 3: the token list and the tokens-only, contrast and touch-target checks, for the apps' tests
+  src/Shields.UI.Stories.Host/    the kit's own stories site (local work and PR checks)
+  src/Shields.UI.Stories.All/     the combined site: kit + Calorie Tracker + Workout Log
+  tests/Shields.UI.Tests/</pre>
+  </section>
+
+  <section>
+    <h2>What moves into the kit</h2>
+    <div class="panel scroll">
+      <table>
+        <thead><tr><th>Group</th><th>Files</th><th>Work</th></tr></thead>
+        <tbody>
+          <tr><th>Identical today <span class="tag good">Move</span></th><td><code>AppButton</code>, <code>SegmentedControl</code>, <code>Spinner</code>, <code>EmptyState</code>, <code>AppErrorBoundary</code>, <code>base.css</code>, <code>BackHandler</code>, <code>IBackButton</code>, <code>SystemBarInsetWriter</code>, lifecycle interfaces, icon sizes and tones, the CSS of <code>ListRow</code>, <code>FilterChips</code>, <code>LoadFailed</code> and <code>Icon</code></td><td>Rename the namespace. No visual change.</td></tr>
+          <tr><th>A few lines apart <span class="tag good">Move</span></th><td><code>ListRow</code>, <code>LoadFailed</code>, <code>BackButton</code>, <code>AppLifecycle</code>, <code>ThemeService</code>, <code>theme.js</code>, <code>ErrorView</code>, <code>StartupView</code></td><td>The differences are the app's name and the theme storage key.</td></tr>
+          <tr><th>Drifted <span class="tag mid">Agree, then move</span></th><td><code>tokens.css</code>, <code>Icon</code> and <code>IconName</code>, <code>IconButton</code>, <code>Snackbar</code>, <code>NumberField</code>, <code>FilterChips</code>, <code>AppScreen</code>, <code>StartupGate</code>, the bottom bar, <code>StatTile</code>, the card, the period stepper, the chart legend</td><td>One version of each, from your decisions in Part 3.</td></tr>
+          <tr><th>General, in one app only <span class="tag mid">Move when wanted</span></th><td>From Workout Log: <code>RadioGroup</code>, <code>ConfirmDialog</code>, <code>FieldInput</code>. From Calorie Tracker: <code>TextField</code>, <code>SelectField</code>, <code>DateStrip</code>.</td><td>Move as is. The other app gains them.</td></tr>
+          <tr><th>Stories shell <span class="tag good">Move</span></th><td><code>PhoneFrame</code>, <code>PhoneLayout</code>, <code>ThemeLayout</code>, <code>ThemeSwitch</code>, <code>HoldPull</code>, <code>TokenSheet</code>, <code>AppIconSheet</code>, <code>blazor-ui.css</code>, the host's <code>index.html</code> and <code>iframe.html</code></td><td>All identical today.</td></tr>
+          <tr><th>Stays in each app <span class="tag code">Stay</span></th><td>Every screen page and view, models, routes, charts (<code>TrendBarChart</code>, <code>TrendBars</code>, <code>MonthCalendar</code>, <code>CalorieRing</code>), <code>AddSheet</code>, <code>MealHeader</code>, the workout and week components</td><td>They install the kit and build on it.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Changes needed inside the general components</h2>
+    <p>Five of them carry something app-specific today and need a small redesign on the way in.</p>
+    <div class="panel scroll">
+      <table>
+        <thead><tr><th>Component</th><th>What ties it to an app today</th><th>In the kit</th></tr></thead>
+        <tbody>
+          <tr><th>Bottom bar and <code>AppScreen</code></th><td>They use each app's own list of tabs (<code>NavDestinations</code>, <code>MainTab</code>).</td><td>The bar takes a list of items, the current one, and the raised button's label and icon. Each app passes its own.</td></tr>
+          <tr><th><code>Icon</code></th><td>A fixed list of icon names that differs between the apps (Scan and Star in one, Record and Note in the other).</td><td>The kit holds every icon either app uses. A new icon is a kit change.</td></tr>
+          <tr><th><code>theme.js</code></th><td>The storage key and script name contain the app's name. The upgrade tests check that a saved theme survives.</td><td>The key is read from an attribute on the script tag, so each app keeps its current key. Both apps' content security policy allows this.</td></tr>
+          <tr><th>Log event ids</th><td>Each app has its own <code>UiEvent</code> list. Ids never change once logged.</td><td>The kit gets its own list. The shared ids already match in both apps (2001–2002, 2101, 2201–2203, 3301, 3403–3405), so they keep their numbers.</td></tr>
+          <tr><th><code>tokens.css</code></th><td>One file holding shared and app-only tokens.</td><td>The kit ships the shared tokens. Each app keeps a small file for its own (ring and macro colours; meter and calendar sizes).</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>The packages</h2>
+    <div class="panel scroll">
+      <table>
+        <thead><tr><th>Question</th><th>Finding</th></tr></thead>
+        <tbody>
+          <tr><th>Where to publish</th><td><strong>nuget.org.</strong> Both apps already restore only from nuget.org, so they need no configuration change. GitHub Packages was ruled out: it <a href="https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-nuget-registry">needs an access token even to install a public package</a>, which would mean a token on your machine, in each app's CI and in Dependabot.</td></tr>
+          <tr><th>Publishing secret</th><td>None. nuget.org's <a href="https://learn.microsoft.com/nuget/nuget-org/trusted-publishing">Trusted Publishing</a> lets the kit's release workflow publish with a short-lived key it gets from GitHub. It needs a nuget.org account and a one-time policy for the kit repo.</td></tr>
+          <tr><th>What it means to be on nuget.org</th><td>The packages are public, like the two repos. A published version can be hidden but not deleted, and the package name is taken for good.</td></tr>
+          <tr><th>How the CSS and script arrive</th><td>The standard way for a Razor class library: files are served under <code>_content/Shields.UI/</code>. Each app's <code>index.html</code> and stories <code>iframe.html</code> change three paths.</td></tr>
+          <tr><th>How updates reach the apps</th><td>Dependabot already opens grouped NuGet update PRs each week and both repos auto-merge minor and patch updates once checks pass. A kit release arrives the same way. A breaking (major) kit release waits for you, as majors do today.</td></tr>
+          <tr><th>Delay</th><td>Up to a day, once both apps' Dependabot NuGet schedule changes from weekly to daily as decided.</td></tr>
+          <tr><th>Visual safety net</th><td>The update PR runs each app's story layout check and README screenshot check, so a kit change that alters a screen fails the PR until the screenshots are retaken.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>The combined stories site</h2>
+    <p>One BlazingStory site, built in the kit repo, with four top-level sections: Foundations, Components, Calorie Tracker, Workout Log. Each app keeps its own small site as well, because its PR checks and README screenshots run against it.</p>
+    <div class="panel scroll">
+      <table>
+        <thead><tr><th>What has to change</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><th>Split each app's stories project in two</th><td>Today the stories are compiled into the site itself, so no other site can load them. They move into a library (<code>CalorieTracker.UI.Stories</code>) with a thin host beside it (<code>CalorieTracker.UI.Stories.Host</code>). The combined site references the two libraries. Both apps' sites already pass BlazingStory a list of assemblies, which is the hook this uses.</td></tr>
+          <tr><th>Prefix each app's story titles</th><td><code>Screens/Dashboard</code> becomes <code>Calorie Tracker/Screens/Dashboard</code>, so the two apps' Screens and Trends stories do not collide. The story layout script, the README screenshot script and the story coverage tests use these paths and change with them.</td></tr>
+          <tr><th>Move sample service set-up into the stories library</th><td>Workout Log registers seven sample services in its site's <code>Program.cs</code>. As one method in the library, both its own site and the combined site can call it.</td></tr>
+          <tr><th>A build switch in each app</th><td>One site cannot load two versions of the kit. The combined build therefore compiles both apps against the kit's current source, not the package each has installed.</td></tr>
+          <tr><th>Turn off locked restore for that build</th><td>Both apps fail a CI restore that would change <code>packages.lock.json</code>. Swapping the package for source changes it, so the combined build passes <code>-p:RestoreLockedMode=false</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <pre class="tree">&lt;!-- in each app's UI and stories projects --&gt;
+&lt;ItemGroup Condition="'$(UseKitSource)' != 'true'"&gt;
+  &lt;PackageReference Include="Shields.UI" /&gt;
+&lt;/ItemGroup&gt;
+&lt;ItemGroup Condition="'$(UseKitSource)' == 'true'"&gt;
+  &lt;ProjectReference Include="$(KitPath)/src/Shields.UI/Shields.UI.csproj" /&gt;
+&lt;/ItemGroup&gt;</pre>
+    <ul class="plain">
+      <li><strong>It doubles as an early warning.</strong> Every kit PR can build both apps' UI against the change, so a break shows before a release.</li>
+      <li><strong>It doubles as the local loop.</strong> With the three repos checked out side by side, the same switch lets you change a kit component and see it in an app without publishing.</li>
+      <li><strong>When it rebuilds.</strong> On every push to the kit's <code>main</code>, daily, and on demand. Rebuilding the moment an app changes needs a token in each app repo to notify the kit repo; daily avoids that.</li>
+      <li><strong>What it shows.</strong> Each app's <code>main</code> built against the kit's <code>main</code>. For a short time after a kit change, this is newer than what an app has installed. The site footer should name the three commits.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Where each check lives afterwards</h2>
+    <div class="panel scroll">
+      <table>
+        <thead><tr><th>Check</th><th>Kit</th><th>Each app</th></tr></thead>
+        <tbody>
+          <tr><th>Tokens only, no literal colours or sizes</th><td>For the kit's CSS</td><td>For the app's CSS, using the kit's token list from the testing package</td></tr>
+          <tr><th>Contrast and touch targets</th><td>For shared tokens and components</td><td>Only for app-only tokens and components</td></tr>
+          <tr><th>Component tests (bUnit)</th><td>For moved components</td><td>For app components and screens</td></tr>
+          <tr><th>Story for every component and view</th><td>For kit components</td><td>For app components and views</td></tr>
+          <tr><th>Story layout (clipping, overflow)</th><td>Kit stories; optionally the combined site</td><td>Unchanged, on the app's own site</td></tr>
+          <tr><th>README screenshots</th><td>None</td><td>Unchanged</td></tr>
+          <tr><th>E2E on the emulator</th><td>None</td><td>Unchanged, apart from renamed test ids on the bottom bar</td></tr>
+          <tr><th>New: no local copy of a kit component</th><td></td><td>A test that fails when the app declares a component or token the kit already has</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The last row is what enforces consistency from then on. Both <code>AGENTS.md</code> files also gain a rule: a general component or token is added to the kit, not to the app.</p>
+  </section>
+
+  <section>
+    <h2>Three things to prove with a small trial first</h2>
+    <p>These are the parts I could not confirm from reading the code. A one-day trial with <code>AppButton</code>, the tokens and one screen from each app would settle all three.</p>
+    <div class="panel scroll">
+      <table>
+        <thead><tr><th>Risk</th><th>Why it might bite</th><th>If it does</th></tr></thead>
+        <tbody>
+          <tr><th>BlazingStory loading stories from three libraries</th><td>Both sites pass one assembly today. Loading several, with four-level titles, is supported by the parameter but untested here. BlazingStory is a preview package (<code>1.0.0-preview.97</code>).</td><td>Publish three sites under one address with a shared landing page.</td></tr>
+          <tr><th>Both apps' UI in one WebAssembly site</th><td>Each UI library pulls in its Core and SQLite. Each stories project already strips the native SQLite file; the combined site must do it for both.</td><td>Same fallback.</td></tr>
+          <tr><th>Package versions across repos</th><td>Each repo pins its own versions and treats warnings as errors. If an app pins an older ASP.NET Core package than the kit, the source build fails with a downgrade error.</td><td>Keep the kit on the lowest versions it needs; Dependabot keeps the apps current.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Order of work</h2>
+    <div class="panel scroll">
+      <table>
+        <thead><tr><th>Step</th><th>Where</th><th>What</th><th>Done when</th></tr></thead>
+        <tbody>
+          <tr><th>0</th><td>You</td><td>Merge PR #134. Create a nuget.org account and the Trusted Publishing policy for <code>app-ui-kit</code>.</td><td>The decisions are already made (Part 3).</td></tr>
+          <tr><th>1</th><td>Kit</td><td>The trial above, kept as the start of the repo.</td><td>One site shows a kit component and one screen from each app.</td></tr>
+          <tr><th>2</th><td>Kit</td><td>Repo set-up: build, tests, lint, story layout check, release to nuget.org, stories site on GitHub Pages.</td><td>Version 1.0.0 is on nuget.org with the identical files.</td></tr>
+          <tr><th>3</th><td>Kit</td><td>The drifted components, one PR each, built to your decisions. The bottom bar is first.</td><td>Every row of "What moves into the kit" has a story and tests.</td></tr>
+          <tr><th>4</th><td>Workout Log</td><td>Install the kit; delete the local copies a group at a time; split the tokens file; rename test ids. First because its redesign is already merged.</td><td>No general component is left in the app; all checks green; README screenshots retaken.</td></tr>
+          <tr><th>5</th><td>Calorie Tracker</td><td>The same.</td><td>The same.</td></tr>
+          <tr><th>6</th><td>Both apps</td><td>Split the stories project, prefix the titles, add the build switch.</td><td>Each app's own site and checks still pass.</td></tr>
+          <tr><th>7</th><td>Kit</td><td>The combined site and its workflow. Stop publishing the two app sites and point their README links at the combined one.</td><td>One address shows all four sections.</td></tr>
+          <tr><th>8</th><td>All three</td><td>The no-local-copy test and the <code>AGENTS.md</code> rules.</td><td>Adding a duplicate component to an app fails its PR.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Steps 4 and 5 each fit your epic workflow as one epic per app. Steps 2 and 3 are an epic in the kit repo. The kit repo starts with its own copy of some CI scripts (lint, story layout, versioning); sharing those across the three repos is a separate, later job.</p>
+  </section>
+
+  <div class="part">Part 3 · Decisions made on 19 November 2026</div>
+
+  <section>
+    <h2>Design: which version wins</h2>
+    <div class="panel scroll">
+      <table>
+        <thead><tr><th>Question</th><th>Decision</th><th>Which app changes</th></tr></thead>
+        <tbody>
+          <tr><th>Raised button shape</th><td>Rounded square, 12px corners</td><td>Calorie Tracker</td></tr>
+          <tr><th>Raised button lift</th><td>1.5rem, so its label is level with the tab labels</td><td>Calorie Tracker</td></tr>
+          <tr><th>Accent and error colours</th><td>Calorie Tracker's darker pair (<code>#29494c</code>, <code>#841c16</code>)</td><td>Workout Log</td></tr>
+          <tr><th>Card titles</th><td>16px, on a shared card based on <code>TrendCard</code></td><td>Calorie Tracker</td></tr>
+          <tr><th>Stat tile</th><td>Label first: a small bold label, the value, then an optional change or caption line</td><td>Calorie Tracker; Workout Log's import review tiles</td></tr>
+          <tr><th>Chart legend</th><td>12px dots. Calorie Tracker's Over marker moves beside its dot, so colour is still not the only cue.</td><td>Calorie Tracker</td></tr>
+          <tr><th>Snackbar</th><td>12px corners and a raised shadow, rising in over 150ms</td><td>Both, slightly</td></tr>
+          <tr><th>Names</th><td><code>BottomNav</code>, <code>IconName.Plus</code>, test ids <code>bottom-nav</code> and <code>add-button</code>. The visible labels stay Add and New.</td><td>Workout Log, including its E2E tests</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Set-up</h2>
+    <div class="panel scroll">
+      <table>
+        <thead><tr><th>Question</th><th>Decision</th></tr></thead>
+        <tbody>
+          <tr><th>Where to publish</th><td>Publicly on nuget.org</td></tr>
+          <tr><th>Names</th><td>Repo <code>app-ui-kit</code>; packages <code>Shields.UI</code>, <code>Shields.UI.Stories</code> and <code>Shields.UI.Testing</code>. Whether those names are free on nuget.org has not been checked yet.</td></tr>
+          <tr><th>Releases</th><td>A new version on every merge to the kit's <code>main</code>, using the PR's semver label</td></tr>
+          <tr><th>Update speed</th><td>Dependabot checks NuGet daily in both apps</td></tr>
+          <tr><th>App stories sites</th><td>Retired once the combined site is live. Each app's site still runs inside its own CI checks.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+</body>
+</html>

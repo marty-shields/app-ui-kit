@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Components;
 using Shields.UI.Components.Inputs;
 
 namespace Shields.UI.Tests.Components.Inputs;
@@ -106,18 +107,81 @@ public class SegmentedControlTests : ComponentTestBase
     [Test]
     public void TappingASegment_TheParentTakes_DoesNotRedrawTheRadios()
     {
-        var value = 1;
+        var cut = RenderTracking(1);
+        var renders = cut.RenderCount;
+        cut.Find("[data-testid=three]").Change(true);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.RenderCount - renders, Is.LessThanOrEqualTo(2));
+            Assert.That(cut.FindAll("input").Select(i => i.HasAttribute("checked")), Is.EqualTo(new[] { false, false, true }));
+        });
+    }
+
+    [Test]
+    public async Task TappingASegment_TheParentTakesAfterAnAsyncHandler_DoesNotRedrawTheRadios()
+    {
+        var release = new TaskCompletionSource();
+        IRenderedComponent<SegmentedControl<int>>? cut = null;
+        cut = Context.Render<SegmentedControl<int>>(p => p
+            .Add(x => x.Label, "Choose")
+            .Add(x => x.Options, Options)
+            .Add(x => x.Value, 1)
+            .Add(x => x.ValueChanged, async (int v) =>
+            {
+                await release.Task;
+                cut!.Render(q => q.Add(x => x.Value, v));
+            }));
+        var before = cut.RenderCount;
+        var tap = cut.Find("[data-testid=three]").ChangeAsync(new ChangeEventArgs { Value = true });
+        cut.Render();
+        var whileWaiting = cut.RenderCount - before;
+        release.SetResult();
+        await tap;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(whileWaiting, Is.EqualTo(2), "renders while the parent had not answered");
+            Assert.That(cut.FindAll("input").Select(i => i.HasAttribute("checked")), Is.EqualTo(new[] { false, false, true }));
+        });
+    }
+
+    [Test]
+    public void TappingASegment_WhenValueChangedThrows_StillChecksTheParentsValue()
+    {
         var cut = Context.Render<SegmentedControl<int>>(p => p
             .Add(x => x.Label, "Choose")
             .Add(x => x.Options, Options)
+            .Add(x => x.Value, 1)
+            .Add(x => x.ValueChanged, (int _) => throw new InvalidOperationException("parent failed")));
+
+        Assert.That(() => cut.Find("[data-testid=three]").Change(true), Throws.InvalidOperationException);
+        cut.Render();
+
+        Assert.That(cut.FindAll("input").Select(i => i.HasAttribute("checked")), Is.EqualTo(new[] { true, false, false }));
+    }
+
+    [Test]
+    public void NullValue_ChecksTheOptionWhoseValueIsNull()
+    {
+        var cut = Context.Render<SegmentedControl<int?>>(p => p
+            .Add(x => x.Label, "Choose")
+            .Add(x => x.Options, [new RadioOption<int?>(1, "One", "one"), new RadioOption<int?>(null, "All", "all")])
+            .Add(x => x.Value, null)
+            .Add(x => x.ValueChanged, (int? _) => { }));
+
+        Assert.That(cut.FindAll("input").Select(i => i.HasAttribute("checked")), Is.EqualTo(new[] { false, true }));
+    }
+
+    private IRenderedComponent<SegmentedControl<int>> RenderTracking(int value)
+    {
+        IRenderedComponent<SegmentedControl<int>>? cut = null;
+        cut = Context.Render<SegmentedControl<int>>(p => p
+            .Add(x => x.Label, "Choose")
+            .Add(x => x.Options, Options)
             .Add(x => x.Value, value)
-            .Add(x => x.ValueChanged, (int v) => value = v));
-        cut.Render(p => p.Add(x => x.Value, 3));
-        var renders = cut.RenderCount;
-
-        cut.Find("[data-testid=three]").Change(true);
-
-        Assert.That(cut.RenderCount - renders, Is.LessThanOrEqualTo(1));
+            .Add(x => x.ValueChanged, (int v) => cut!.Render(q => q.Add(x => x.Value, v))));
+        return cut;
     }
 
     private IRenderedComponent<SegmentedControl<int>> Render(int value) =>

@@ -4,3 +4,7 @@
     background-color: var(--color-bg);
     color: var(--color-text);
 }
+
+.narrow {
+    max-width: var(--dialog-max-width);
+}

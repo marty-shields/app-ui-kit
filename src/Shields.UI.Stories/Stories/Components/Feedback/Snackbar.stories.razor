@@ -28,8 +28,8 @@
         <Template>
             @foreach (var theme in Themes)
             {
-                <div class="themed" data-theme="@theme">
-                    <Snackbar Message="Single-Arm Dumbbell Romanian Deadlift set 10 deleted from this workout" ActionLabel="Undo" OnAction="@(() => { })" Duration="Timeout.InfiniteTimeSpan" TestId="@($"two-lines-{theme}")" />
+                <div class="themed narrow" data-theme="@theme">
+                    <Snackbar Message="Deadlift set 10 deleted from this workout" ActionLabel="Undo" OnAction="@(() => { })" Duration="Timeout.InfiniteTimeSpan" TestId="@($"two-lines-{theme}")" />
                 </div>
             }
         </Template>

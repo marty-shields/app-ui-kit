@@ -85,6 +85,22 @@ public class CardTests : ComponentTestBase
         });
     }
 
+    [Test]
+    public void Title_Wraps_WhileTheAsideStaysOnOneLine()
+    {
+        var cut = Context.Render<Card>(p => p.Add(x => x.Title, "Records").Add(x => x.Aside, "1 this week"));
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Layout", "Card.razor.css");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find("h2").HasAttribute("data-wrap-ok"), Is.True);
+            Assert.That(Rule(css, ".title"), Does.Contain("overflow-wrap: anywhere;"));
+            Assert.That(Rule(css, ".title"), Does.Contain("min-width: 0;"));
+            Assert.That(Rule(css, ".aside"), Does.Contain("flex-shrink: 0;"));
+            Assert.That(Rule(css, ".aside"), Does.Contain("white-space: nowrap;"));
+        });
+    }
+
     private static string Rule(string css, string selector) =>
         Regex.Match(css, Regex.Escape(selector) + @"\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
 }

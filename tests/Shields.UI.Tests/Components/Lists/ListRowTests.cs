@@ -119,7 +119,25 @@ public class ListRowTests : ComponentTestBase
     }
 
     [Test]
-    public void Css_CutsTextAndDetailWithAnEllipsis_AndKeepsAsideAndChevronWhole()
+    public void TextAndDetail_AreMarkedWrapOk_InBothVariants()
+    {
+        foreach (var clickable in new[] { true, false })
+        {
+            var cut = Context.Render<ListRow>(p =>
+            {
+                p.Add(x => x.Text, "Barbell Back Squat").Add(x => x.Detail, "Last Tue");
+                if (clickable)
+                {
+                    p.Add(x => x.OnClick, () => { });
+                }
+            });
+
+            Assert.That(cut.FindAll(".text[data-wrap-ok], .detail[data-wrap-ok]"), Has.Count.EqualTo(2), $"clickable: {clickable}");
+        }
+    }
+
+    [Test]
+    public void Css_WrapsTextAndDetail_AndKeepsAsideAndChevronWhole()
     {
         var css = RepoFiles.Read("src", "Shields.UI", "Components", "Lists", "ListRow.razor.css");
 
@@ -127,9 +145,9 @@ public class ListRowTests : ComponentTestBase
         {
             foreach (var selector in new[] { ".text", ".detail" })
             {
-                Assert.That(Rule(css, selector), Does.Contain("overflow: hidden;"), selector);
-                Assert.That(Rule(css, selector), Does.Contain("text-overflow: ellipsis;"), selector);
-                Assert.That(Rule(css, selector), Does.Contain("white-space: nowrap;"), selector);
+                Assert.That(Rule(css, selector), Does.Contain("overflow-wrap: anywhere;"), selector);
+                Assert.That(Rule(css, selector), Does.Not.Contain("text-overflow"), selector);
+                Assert.That(Rule(css, selector), Does.Not.Contain("white-space: nowrap;"), selector);
             }
 
             Assert.That(Rule(css, ".aside"), Does.Contain("flex-shrink: 0;"));

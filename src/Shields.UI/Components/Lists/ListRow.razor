@@ -21,7 +21,7 @@ else
 }
 
 @code {
-    /// <summary>Main line of the row, cut with an ellipsis when too long for one line.</summary>
+    /// <summary>Main line of the row. Wraps when too long for one line.</summary>
     [Parameter, EditorRequired]
     public string Text { get; set; } = "";
 
@@ -43,10 +43,10 @@ else
 
     private RenderFragment Texts =>
         @<span class="texts">
-            <span class="text">@Text</span>
+            <span class="text" data-wrap-ok>@Text</span>
             @if (Detail is not null)
             {
-                <span class="detail">@Detail</span>
+                <span class="detail" data-wrap-ok>@Detail</span>
             }
         </span>;
 }

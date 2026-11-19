@@ -1,0 +1,33 @@
+@attribute [Stories("Components/Lists/EmptyState")]
+
+<Stories TComponent="EmptyState" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Default">
+        <Template>
+            <EmptyState Message="Nothing here yet" />
+        </Template>
+    </Story>
+
+    <Story Name="With hint">
+        <Template>
+            <EmptyState Message="Nothing here yet" Hint="Add something to see it here" />
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <EmptyState Message="Nothing here yet" Hint="Add something to see it here" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <EmptyState Message="Nothing here yet" Hint="Add something to see it here" />
+            </div>
+        </Template>
+    </Story>
+
+</Stories>

@@ -1,0 +1,51 @@
+@attribute [Stories("Components/Lists/ListRow")]
+
+<Stories TComponent="ListRow" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Tappable">
+        <Template>
+            <ListRow Text="Workouts" OnClick="() => { }" />
+        </Template>
+    </Story>
+
+    <Story Name="Tappable with detail">
+        <Template>
+            <ListRow Text="Barbell Back Squat" Detail="Last Tue 20 Oct · 70kg × 3" OnClick="() => { }" />
+        </Template>
+    </Story>
+
+    <Story Name="Tappable with aside">
+        <Template>
+            <ListRow Text="Porridge oats" Detail="Quaker" Aside="372 kcal / 100 g" OnClick="() => { }" />
+        </Template>
+    </Story>
+
+    <Story Name="Static">
+        <Template>
+            <ListRow Text="Tue 20 Oct 2026 · 18:05" />
+        </Template>
+    </Story>
+
+    <Story Name="Static with detail and aside">
+        <Template>
+            <ListRow Text="Porridge oats" Detail="Quaker" Aside="372 kcal / 100 g" />
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <ListRow Text="Barbell Back Squat" Detail="Last Tue 20 Oct · 70kg × 3" Aside="Strength" OnClick="() => { }" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <ListRow Text="Barbell Back Squat" Detail="Last Tue 20 Oct · 70kg × 3" Aside="Strength" OnClick="() => { }" />
+            </div>
+        </Template>
+    </Story>
+
+</Stories>

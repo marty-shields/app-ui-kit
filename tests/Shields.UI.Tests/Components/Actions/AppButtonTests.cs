@@ -2,16 +2,8 @@ using Shields.UI.Components.Actions;
 
 namespace Shields.UI.Tests.Components.Actions;
 
-public class AppButtonTests
+public class AppButtonTests : ComponentTestBase
 {
-    private BunitContext Context { get; set; } = null!;
-
-    [SetUp]
-    public void CreateContext() => Context = new BunitContext();
-
-    [TearDown]
-    public void DisposeContext() => Context.Dispose();
-
     [Test]
     public void Click_RaisesOnClick()
     {

@@ -2,7 +2,21 @@
 
   <PropertyGroup>
     <IsPackable>true</IsPackable>
+    <PackageId>Shields.UI.Stories</PackageId>
+    <Description>The stories shell for Shields.UI: phone frame, theme switch, token sheet and app icon sheet.</Description>
+    <Authors>Martin Shields</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/marty-shields/app-ui-kit</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/marty-shields/app-ui-kit</RepositoryUrl>
+    <!-- BlazingStory has only preview releases, so a stable version of this package depends on a prerelease. -->
+    <NoWarn>$(NoWarn);NU5104</NoWarn>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="/" />
+    <None Include="../../NOTICE" Pack="true" PackagePath="/" />
+  </ItemGroup>
 
   <ItemGroup>
     <SupportedPlatform Include="browser" />

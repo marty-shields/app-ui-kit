@@ -130,18 +130,20 @@ index 0000000..143bca3
 +</Project>
 diff --git a/src/WorkoutLog.UI.ScreenStories/WorkoutLogStories.cs b/src/WorkoutLog.UI.ScreenStories/WorkoutLogStories.cs
 new file mode 100644
-index 0000000..cf8f877
+index 0000000..27336dd
 --- /dev/null
 +++ b/src/WorkoutLog.UI.ScreenStories/WorkoutLogStories.cs
-@@ -0,0 +1,9 @@
+@@ -0,0 +1,11 @@
 +using Microsoft.Extensions.DependencyInjection;
++using WorkoutLog.UI.Navigation;
 +
 +namespace WorkoutLog.UI.ScreenStories;
 +
 +public static class WorkoutLogStories
 +{
-+    /// <summary>Registers what Workout Log's screen stories need. The trial story renders without Core's services; the full split moves the sample services here.</summary>
-+    public static IServiceCollection AddWorkoutLogStories(this IServiceCollection services) => services.AddUi();
++    /// <summary>Registers what Workout Log's screen stories need: the back button the screens' back handler uses. AddUi() is left out on purpose: it also registers services that need Core's, which the host does not have.</summary>
++    public static IServiceCollection AddWorkoutLogStories(this IServiceCollection services) =>
++        services.AddSingleton<IBackButton, BackButton>();
 +}
 diff --git a/src/WorkoutLog.UI.ScreenStories/_Imports.razor b/src/WorkoutLog.UI.ScreenStories/_Imports.razor
 new file mode 100644
@@ -189,17 +191,3 @@ index 0000000..86dc5bc
 +    --meter-value-width-narrow: 2rem;
 +    --legend-swatch-size: 0.75rem;
 +}
-diff --git a/src/WorkoutLog.UI/WorkoutLog.UI.csproj b/src/WorkoutLog.UI/WorkoutLog.UI.csproj
-index 8b1d803..750fdc4 100644
---- a/src/WorkoutLog.UI/WorkoutLog.UI.csproj
-+++ b/src/WorkoutLog.UI/WorkoutLog.UI.csproj
-@@ -21,4 +21,9 @@
-     <ProjectReference Include="..\WorkoutLog.Core\WorkoutLog.Core.csproj" />
-   </ItemGroup>
- 
-+  <!-- Trial: compile against the kit's source. Without it the UI builds as before (the Shields.UI package is not published yet). -->
-+  <ItemGroup Condition="'$(UseKitSource)' == 'true'">
-+    <ProjectReference Include="$(KitPath)/src/Shields.UI/Shields.UI.csproj" />
-+  </ItemGroup>
-+
- </Project>

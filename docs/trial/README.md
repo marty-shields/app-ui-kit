@@ -37,7 +37,7 @@ These properties are real global properties on purpose. Given only the two path 
 ## What the patches contain
 
 - `UseKitSource` switch in each app's UI project: a `ProjectReference` to `$(KitPath)/src/Shields.UI/Shields.UI.csproj`. The `PackageReference` branch is left out because the package is not published yet.
-- A new `*.UI.ScreenStories` Razor library per app (BlazingStory, the UI project and the kit's `Shields.UI.Stories`): one screen story with a four-level title (`Calorie Tracker/Screens/Dashboard`, `Workout Log/Screens/This week`), its sample data, a phone layout that also loads the app's own tokens, and an `Add...Stories` method for the host's services.
+- A new `*.UI.ScreenStories` Razor library per app (BlazingStory, the UI project and the kit's `Shields.UI.Stories`): one screen story with a four-level title (`Calorie Tracker/Screens/Dashboard`, `Workout Log/Screens/This week`), its sample data, a phone layout that also loads the app's own tokens, and an `Add...Stories` method for the host's services (Calorie Tracker's calls `AddUi()`; Workout Log's registers only the back button, see below).
 - `app-tokens.css` per app: the app's `tokens.css` without the tokens the kit now ships. The kit's `tokens.css` wins for shared tokens, so Workout Log shows the decided accent and error colours.
 
 Lock files are not in the patches; the restore regenerates them.
@@ -45,4 +45,4 @@ Lock files are not in the patches; the restore regenerates them.
 ## Not done in the trial
 
 - The apps' own stories projects are untouched (not split into a library plus host), their story titles are not prefixed, and the apps' views still use their own `AppButton`.
-- Workout Log's seven sample services are not moved into the library; the trial screen needs none of them.
+- Workout Log's seven sample services are not moved into the library; the trial screen is a pure view and needs none of them. Its `AddWorkoutLogStories()` therefore registers only `IBackButton` (the screen's back handler needs it) and does not call `AddUi()`: that registers services that need Core's (`IWorkoutService`, `IExerciseCatalog` and others), and the host's container validation fails at start-up without them. The full split registers the sample services next to `AddUi()`.

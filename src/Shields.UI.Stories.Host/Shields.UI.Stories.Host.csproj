@@ -14,47 +14,10 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.Gateway" PrivateAssets="all" />
   </ItemGroup>
 
-  <!--
-    The apps' story libraries are opt-in, so the kit builds alone by default. Point these at copies of the apps that carry the screen-story
-    libraries (docs/trial/README.md), e.g. -p:CalorieTrackerPath=<copy> -p:WorkoutLogPath=<copy>. Each one adds its assembly to the site.
-  -->
-  <PropertyGroup Condition="'$(CalorieTrackerPath)' != ''">
-    <DefineConstants>$(DefineConstants);CALORIE_TRACKER</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(WorkoutLogPath)' != ''">
-    <DefineConstants>$(DefineConstants);WORKOUT_LOG</DefineConstants>
-  </PropertyGroup>
-  <!-- The apps pull in more packages than the committed packages.lock.json lists, so a build with them keeps its own lock file out of the tree. -->
-  <PropertyGroup Condition="'$(CalorieTrackerPath)$(WorkoutLogPath)' != ''">
-    <NuGetLockFilePath>$(MSBuildProjectDirectory)/obj/with-apps.packages.lock.json</NuGetLockFilePath>
-    <RestoreLockedMode>false</RestoreLockedMode>
-  </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Shields.UI.Stories\Shields.UI.Stories.csproj" />
   </ItemGroup>
 
-  <!--
-    The apps are built against this kit's source: pass -p:UseKitSource=true -p:KitPath=<this repo> -p:RestoreLockedMode=false as well
-    (docs/trial/README.md). They are real global properties, so the host, the apps and the kit projects share one build each (a project
-    reference's AdditionalProperties would build the apps and the kit a second time, in parallel, and the two builds collide).
-  -->
-  <ItemGroup Condition="'$(CalorieTrackerPath)' != ''">
-    <ProjectReference Include="$(CalorieTrackerPath)/src/CalorieTracker.UI.ScreenStories/CalorieTracker.UI.ScreenStories.csproj" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(WorkoutLogPath)' != ''">
-    <ProjectReference Include="$(WorkoutLogPath)/src/WorkoutLog.UI.ScreenStories/WorkoutLog.UI.ScreenStories.csproj" />
-  </ItemGroup>
-
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk.BlazorWebAssembly" />
-
-  <!--
-    Drops the native SQLite reference that each app's Core brings in: nothing links native files here, and the wasm workload's build check
-    fails on one. The package adds it when the SDK targets are imported, so this group comes after that import and hooks no SDK target.
-    The unlinked e_sqlite3.a still ships as a static file.
-  -->
-  <ItemGroup>
-    <NativeFileReference Remove="@(NativeFileReference->WithMetadataValue('Filename', 'e_sqlite3'))" />
-  </ItemGroup>
 
 </Project>

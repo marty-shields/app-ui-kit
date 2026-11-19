@@ -1,0 +1,11 @@
+namespace Shields.UI.Logging;
+
+/// <summary>
+/// Event ids of the kit's log messages. Each keeps the number the apps logged it under, so ids sit in the apps' 2000–4999 range
+/// at their old block. Values never change once logged; ids are never reused.
+/// </summary>
+internal enum KitEvent
+{
+    /// <summary><see cref="Components.Feedback.LoadFailed"/>: focusing Try again failed.</summary>
+    LoadFailedFocusFailed = 3301,
+}

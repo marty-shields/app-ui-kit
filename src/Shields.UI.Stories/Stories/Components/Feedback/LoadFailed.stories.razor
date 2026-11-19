@@ -1,0 +1,27 @@
+@attribute [Stories("Components/Feedback/LoadFailed")]
+
+<Stories TComponent="LoadFailed" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Default">
+        <Template>
+            <LoadFailed Message="Couldn't load the Dashboard" TestId="dashboard" />
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <LoadFailed Message="Couldn't load the Dashboard" TestId="light" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <LoadFailed Message="Couldn't load the Dashboard" TestId="dark" />
+            </div>
+        </Template>
+    </Story>
+
+</Stories>

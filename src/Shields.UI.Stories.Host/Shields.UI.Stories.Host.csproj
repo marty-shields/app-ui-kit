@@ -1,0 +1,53 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+    <!-- The Gateway that `dotnet run` starts serves index.html for / and any other path that isn't a file, as in the .NET 11 Blazor WebAssembly template. -->
+    <StaticWebAssetSpaFallbackEnabled>true</StaticWebAssetSpaFallbackEnabled>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BlazingStory" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Gateway" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Shields.UI.Stories\Shields.UI.Stories.csproj" />
+  </ItemGroup>
+
+  <!--
+    The apps' story libraries are opt-in, so the kit builds alone by default. Point these at copies of the apps that carry the screen-story
+    libraries (docs/trial/README.md), e.g. -p:CalorieTrackerPath=<copy> -p:WorkoutLogPath=<copy>. Each one adds its assembly to the site.
+  -->
+  <PropertyGroup Condition="'$(CalorieTrackerPath)' != ''">
+    <DefineConstants>$(DefineConstants);CALORIE_TRACKER</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(WorkoutLogPath)' != ''">
+    <DefineConstants>$(DefineConstants);WORKOUT_LOG</DefineConstants>
+  </PropertyGroup>
+  <!-- The apps pull in more packages than the committed packages.lock.json lists, so a build with them keeps its own lock file out of the tree. -->
+  <PropertyGroup Condition="'$(CalorieTrackerPath)$(WorkoutLogPath)' != ''">
+    <NuGetLockFilePath>$(MSBuildProjectDirectory)/obj/with-apps.packages.lock.json</NuGetLockFilePath>
+    <RestoreLockedMode>false</RestoreLockedMode>
+  </PropertyGroup>
+
+  <!-- Each app is built against this kit's source, and its restore may change its own lock file (RestoreLockedMode=false). -->
+  <PropertyGroup>
+    <KitSourceProperties>UseKitSource=true;KitPath=$(MSBuildThisFileDirectory)../..;RestoreLockedMode=false</KitSourceProperties>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(CalorieTrackerPath)' != ''">
+    <ProjectReference Include="$(CalorieTrackerPath)/src/CalorieTracker.UI.ScreenStories/CalorieTracker.UI.ScreenStories.csproj" AdditionalProperties="$(KitSourceProperties)" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(WorkoutLogPath)' != ''">
+    <ProjectReference Include="$(WorkoutLogPath)/src/WorkoutLog.UI.ScreenStories/WorkoutLog.UI.ScreenStories.csproj" AdditionalProperties="$(KitSourceProperties)" />
+  </ItemGroup>
+
+  <!-- Removes the native SQLite file that each app's Core brings in. -->
+  <Target Name="RemoveSqliteNativeReference" BeforeTargets="_CheckBrowserWorkloadNeededButNotAvailable">
+    <ItemGroup>
+      <NativeFileReference Remove="@(NativeFileReference)" Condition="'%(Filename)' == 'e_sqlite3'" />
+    </ItemGroup>
+  </Target>
+
+</Project>

@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Shields.UI\Shields.UI.csproj" />
-    <ProjectReference Include="..\..\src\Shields.UI.Stories\Shields.UI.Stories.csproj" />
   </ItemGroup>
 
   <ItemGroup>

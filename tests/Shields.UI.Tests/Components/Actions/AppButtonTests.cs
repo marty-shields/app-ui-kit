@@ -93,4 +93,25 @@ public class AppButtonTests
 
         Assert.That(cut.Find("button").ClassList, Does.Contain(cssClass));
     }
+
+    [Test]
+    public void FullWidth_SetsFullClass()
+    {
+        var full = Context.Render<AppButton>(p => p.Add(x => x.FullWidth, true));
+        var normal = Context.Render<AppButton>();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(full.Find("button").ClassList, Does.Contain("full"));
+            Assert.That(normal.Find("button").ClassList, Does.Not.Contain("full"));
+        });
+    }
+
+    [Test]
+    public void TestId_SetsDataTestId()
+    {
+        var cut = Context.Render<AppButton>(p => p.Add(x => x.TestId, "save"));
+
+        Assert.That(cut.Find("button").GetAttribute("data-testid"), Is.EqualTo("save"));
+    }
 }

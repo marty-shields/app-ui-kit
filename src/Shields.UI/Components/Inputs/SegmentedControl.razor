@@ -1,0 +1,21 @@
+@typeparam TValue
+@inherits RadioGroupBase<TValue>
+<fieldset class="segments" data-testid="@TestId" @key="Generation">
+    <legend class="visually-hidden">@Label</legend>
+    @for (var i = 0; i < Options.Count; i++)
+    {
+        var index = i;
+        var option = Options[i];
+        <label class="segment">
+            <input type="radio"
+                   class="radio"
+                   name="@GroupName"
+                   checked="@IsSelected(option)"
+                   aria-label="@option.AriaLabel"
+                   data-testid="@option.TestId"
+                   @ref="Radios[index]"
+                   @onchange="() => Pick(option.Value)" />
+            <span class="text">@option.Label</span>
+        </label>
+    }
+</fieldset>

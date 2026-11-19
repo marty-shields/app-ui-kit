@@ -55,7 +55,7 @@ def anchors(text):
             count = seen.get(base, 0)
             seen[base] = count + 1
             found.add(base if count == 0 else f'{base}-{count}')
-        found.update(HTML_ANCHOR.findall(line))
+        found.update(id.lower() for id in HTML_ANCHOR.findall(line))
     return found
 
 

@@ -6,7 +6,7 @@ The shared UI kit (.NET 11 Blazor) for the Calorie Tracker and Workout Log apps:
 - Build: `dotnet build Shields.UI.slnx` (warnings fail the build)
 - Code style: `dotnet format Shields.UI.slnx --verify-no-changes` (CI runs it; drop `--verify-no-changes` to apply the fixes)
 - Test: `dotnet test tests/Shields.UI.Tests`
-- CI script tests (need `bash`, `git`, `python3`, `shellcheck`): `.github/scripts/tests/run.sh`
+- CI script tests (need `bash`, `git`, `python3`): `.github/scripts/tests/run.sh`
 - CI lint (needs `shellcheck`): `.github/scripts/lint-ci.sh` runs shellcheck over the scripts and actionlint over the workflows; CI runs it in `Build and test`.
 - Filler comments: `python3 -I .github/scripts/check-filler-comments.py` fails a `<summary>` or `<param>` that only restates the name; CI runs it in `Build and test`.
 - Docs: `python3 -I .github/scripts/check-docs.py` fails on a relative link or `#anchor` in a tracked `*.md` that doesn't resolve; CI runs it in `Build and test`.

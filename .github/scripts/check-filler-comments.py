@@ -25,6 +25,8 @@ TYPE_DECL = re.compile(r'\b(?:class|struct|interface|enum|record(?:\s+(?:class|s
 DOC_LINE = re.compile(r'^\s*///\s?(.*)$')
 ELEMENT = re.compile(r'<(summary|param)\b([^>]*)>(.*?)</\1>', re.S)
 NAME_ATTR = re.compile(r'name\s*=\s*"(\w+)"')
+ATTRIBUTES = re.compile(r'^\s*(?:\[[^\]]*\]\s*)+')
+ATTRIBUTES_ONLY = re.compile(r'^\s*(?:\[[^\]]*\]\s*)+$')
 SUFFIXES = ('ing', 'ed', 'es', 's', 'e')
 
 
@@ -45,13 +47,13 @@ def stem(word):
 def declaration_head(lines, start):
     """The declaration text from lines[start] up to its body, attributes skipped, and the line index it starts on."""
     index = start
-    while index < len(lines) and lines[index].lstrip().startswith('['):
+    while index < len(lines) and ATTRIBUTES_ONLY.match(lines[index]):
         index += 1
     if index >= len(lines):
         return None, index
     text = ''
     for line in lines[index:index + 12]:
-        text += ' ' + line.strip()
+        text += ' ' + (ATTRIBUTES.sub('', line, count=1) if line is lines[index] else line).strip()
         if text.count('(') == text.count(')') and re.search(r'[{;,]|=>', line):
             break
     return re.split(r'\{|=>|;|,(?![^(]*\))', text)[0].strip(), index
@@ -102,7 +104,7 @@ def check_file(path):
         if 'filler-ok' in text:
             continue
         head, decl_line = declaration_head(lines, end)
-        if not head or any('[Parameter' in line for line in lines[end:decl_line]):
+        if not head or any('[Parameter' in line for line in lines[end:decl_line + 1]):
             continue
         member_indent = indent_of(lines[decl_line])
         known = declaration_words(head)

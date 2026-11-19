@@ -11,6 +11,7 @@ trap 'rm -rf "$work"' EXIT
 repo() {
   rm -rf "${work:?}/$1" && mkdir -p "$work/$1/docs" && cd "$work/$1" || exit 1
   git init -q
+  printf 'data\n' > docs/data.txt
   printf '%s\n' "$2" > README.md
   printf '# Guide\n\n## Setup & run\n\n## Setup & run\n\n### `Code` heading\n\n```\n[not a link](missing.md)\n```\n' > docs/guide.md
   git add -A
@@ -25,13 +26,16 @@ repo ok '# Title
 See [guide](docs/guide.md#setup--run), [again](docs/guide.md#setup--run-1), [code](docs/guide.md#code-heading),
 [below](#title), [site](https://example.com/missing), [mail](mailto:a@b.c) and [dir](docs/).
 <a id="custom"></a> [custom](#custom) and [story](./?path=/story/x).
-<img src="docs/guide.md" /> `[inline](missing.md)`'
+<img src="docs/guide.md" /> `[inline](missing.md)`
+<a id="Custom"></a> [mixed case](#Custom), [root](/docs/guide.md), [text](docs/data.txt#frag).'
 run "links and anchors that resolve" 'exit=0' ok
 
 repo missing '[gone](docs/nope.md)
-<img src="docs/nope.png" />'
+<img src="docs/nope.png" />
+[root](/docs/nope.md)'
 run "a missing file in a link or an image" 'README.md:1: link to a missing path: docs/nope.md
 README.md:2: link to a missing path: docs/nope.png
+README.md:3: link to a missing path: /docs/nope.md
 exit=1' missing
 
 repo anchor '[a](docs/guide.md#nope) and [b](#nope)'

@@ -71,11 +71,37 @@ run "an inherited doc is left alone" 'exit=0' 'public sealed class Row
     public string Name { get; }
 }'
 
-run "a filler-ok marker skips the block" 'exit=0' 'public sealed class Row
+run "a filler-ok marker skips the block" 'exit=0' 'public sealed class ExerciseState
 {
     /// <summary>Exercise name.</summary>
     /// <!-- filler-ok: shown on the stories Docs page -->
     public string Name { get; }
+}'
+
+run "the same block without the marker is filler" 'Sample.cs:3: <summary> only restates the name: "Exercise name."
+exit=1' 'public sealed class ExerciseState
+{
+    /// <summary>Exercise name.</summary>
+    public string Name { get; }
+}'
+
+run "a comment of seven name words is not filler" 'exit=0' 'public sealed class Row
+{
+    /// <summary>Exercise name exercise name exercise name exercise.</summary>
+    public string ExerciseName { get; }
+}'
+
+run "an attribute on the member line is stepped over" 'Sample.cs:3: <summary> only restates the name: "The name."
+exit=1' 'public sealed class Row
+{
+    /// <summary>The name.</summary>
+    [Obsolete] public string Name { get; }
+}'
+
+run "a component parameter with its attribute on the member line is left alone" 'exit=0' 'public partial class Icon
+{
+    /// <summary>Size of the icon.</summary>
+    [Parameter] public IconSize Size { get; set; }
 }'
 
 run "a component parameter is left alone" 'exit=0' 'public partial class Icon
@@ -102,6 +128,15 @@ exit=1' 'public enum Equipment
     /// <summary>Strength and cardio.</summary>
     Duration,
 }'
+
+mkdir -p "$work/tree/obj"
+printf '%s\n' 'public sealed class ExerciseState
+{
+    /// <summary>Exercise name.</summary>
+    public string Name { get; }
+}' > "$work/tree/obj/Generated.cs"
+out=$(python3 -I "$script" "$work/tree" 2>&1; echo "exit=$?")
+check "a folder argument skips obj" 'exit=0' "$out"
 
 tree=$(cd "$here/../../.." && pwd)
 out=$(cd "$tree" && python3 -I "$script" 2>&1; echo "exit=$?")

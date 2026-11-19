@@ -4,28 +4,35 @@
 
     <Story Name="All icons">
         <Template>
-            @foreach (var name in Enum.GetValues<IconName>())
-            {
-                @name
-                <Icon Name="name" />
-            }
+            <div class="grid">
+                @foreach (var name in Enum.GetValues<IconName>())
+                {
+                    <figure class="cell">
+                        <Icon Name="name" />
+                        <figcaption>@name</figcaption>
+                    </figure>
+                }
+            </div>
         </Template>
     </Story>
 
     <Story Name="Sizes and tones">
         <Template>
-            @foreach (var name in Enum.GetValues<IconName>())
-            {
-                @name
-                foreach (var size in Enum.GetValues<IconSize>())
+            <div class="rows">
+                @foreach (var name in Enum.GetValues<IconName>())
                 {
-                    foreach (var tone in Enum.GetValues<IconTone>())
-                    {
-                        <Icon Name="name" Tone="tone" Size="size" />
-                    }
+                    <div class="row">
+                        <span class="label">@name</span>
+                        @foreach (var size in Enum.GetValues<IconSize>())
+                        {
+                            foreach (var tone in Enum.GetValues<IconTone>())
+                            {
+                                <Icon Name="name" Tone="tone" Size="size" />
+                            }
+                        }
+                    </div>
                 }
-                <br />
-            }
+            </div>
         </Template>
     </Story>
 

@@ -14,7 +14,7 @@ Screens and app-only components stay in each app's repo. The apps install the ki
 
 ## Status
 
-A trial is in place: `Shields.UI` (with `AppButton`, the tokens and base styles), `Shields.UI.Stories` and a stories site, `Shields.UI.Stories.Host`. The trial code is the start of the repo. It already sets the solution-wide build rules (`Directory.Build.props` and `.editorconfig`, copied from Workout Log); CI and [AGENTS.md](https://github.com/marty-shields/app-ui-kit/blob/main/AGENTS.md) are in place; the finished rules come with the later epics. The plan and the decisions behind it are in [docs/design/shared-ui-kit.html](https://github.com/marty-shields/app-ui-kit/blob/main/docs/design/shared-ui-kit.html) (download it and open it in a browser). The work is tracked in this repo's epic issues.
+A trial is in place: `Shields.UI` (with `AppButton`, `Icon`, the tokens and base styles), `Shields.UI.Stories` and a stories site, `Shields.UI.Stories.Host`. The trial code is the start of the repo. It already sets the solution-wide build rules (`Directory.Build.props` and `.editorconfig`, copied from Workout Log); CI and [AGENTS.md](https://github.com/marty-shields/app-ui-kit/blob/main/AGENTS.md) are in place; the finished rules come with the later epics. The plan and the decisions behind it are in [docs/design/shared-ui-kit.html](https://github.com/marty-shields/app-ui-kit/blob/main/docs/design/shared-ui-kit.html) (download it and open it in a browser). The work is tracked in this repo's epic issues.
 
 ## Build and run
 

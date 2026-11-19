@@ -83,7 +83,7 @@ public partial class StoryCoverageTests
         Assert.That(tokens.Shown, Is.EqualTo(new[] { "TokenSheet" }));
     }
 
-    /// <summary>The stories files in a folder under Stories: title, TComponent and the component each story's template starts with.</summary>
+    /// <summary>The stories files in a folder under Stories: title, TComponent and the first component each story's template shows.</summary>
     private static IEnumerable<(string Title, string Component, IReadOnlyList<string> Shown)> StoriesFiles(string folder) =>
         RepoFiles.Find("*.stories.razor", "src", "Shields.UI.Stories", "Stories", folder)
             .Select(File.ReadAllText)
@@ -98,6 +98,6 @@ public partial class StoryCoverageTests
     [GeneratedRegex(@"<Stories\b[^>]*\bTComponent=""([A-Za-z_]\w*)")]
     private static partial Regex TComponent();
 
-    [GeneratedRegex(@"<Template>\s*(?:@\{[^\n]*\}\s*)?<([A-Za-z_]\w*)")]
+    [GeneratedRegex(@"<Template>(?:(?!</Template>)[\s\S])*?(?<!\w)<([A-Z]\w*)")]
     private static partial Regex Shown();
 }

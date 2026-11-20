@@ -1,0 +1,61 @@
+@attribute [Stories("Components/Layout/StartupView")]
+
+<Stories TComponent="StartupView" Layout="typeof(PhoneLayout)">
+
+    <Story Name="Starting">
+        <Template>
+            <div class="themed">
+                <StartupView Title="My App" FailedMessage="Couldn't open the database" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Failed">
+        <Template>
+            <div class="themed">
+                <StartupView Title="My App" FailedMessage="Couldn't open the database" Failed />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Failed with Try again">
+        <Template>
+            <div class="themed">
+                <StartupView Title="My App" FailedMessage="Couldn't open the database" Failed OnRetry="() => { }" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Starting, light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <StartupView Title="My App" FailedMessage="Couldn't open the database" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Starting, dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <StartupView Title="My App" FailedMessage="Couldn't open the database" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Failed, light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <StartupView Title="My App" FailedMessage="Couldn't open the database" Failed OnRetry="() => { }" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Failed, dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <StartupView Title="My App" FailedMessage="Couldn't open the database" Failed OnRetry="() => { }" />
+            </div>
+        </Template>
+    </Story>
+
+</Stories>

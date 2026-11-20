@@ -1,0 +1,23 @@
+.screen {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: calc(var(--space-4) + var(--inset-top)) var(--space-4) calc(var(--space-4) + var(--inset-bottom));
+}
+
+.title {
+    margin: 0;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+}
+
+.centre {
+    display: grid;
+    flex: 1;
+    place-items: center;
+    text-align: center;
+}
+
+.message {
+    margin: 0;
+}

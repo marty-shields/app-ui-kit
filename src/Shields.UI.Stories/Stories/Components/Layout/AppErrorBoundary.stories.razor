@@ -1,0 +1,25 @@
+@attribute [Stories("Components/Layout/AppErrorBoundary")]
+
+<Stories TComponent="AppErrorBoundary" Layout="typeof(PhoneLayout)">
+
+    <Story Name="Error">
+        <Template>
+            <div class="themed">
+                <AppErrorBoundary Title="My App">
+                    <ThrowOnRender />
+                </AppErrorBoundary>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="No error">
+        <Template>
+            <div class="themed">
+                <AppErrorBoundary Title="My App">
+                    <p>App content.</p>
+                </AppErrorBoundary>
+            </div>
+        </Template>
+    </Story>
+
+</Stories>

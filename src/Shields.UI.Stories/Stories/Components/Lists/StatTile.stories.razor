@@ -1,0 +1,80 @@
+@attribute [Stories("Components/Lists/StatTile")]
+
+<Stories TComponent="StatTile" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Label and value">
+        <Template>
+            <StatTile Label="Workouts" Value="3" TestId="tile" />
+        </Template>
+    </Story>
+
+    <Story Name="Change up">
+        <Template>
+            <StatTile Label="Time" Value="3h 20m" Change="@(new StatChange(ChangeDirection.Up, "35m"))" TestId="tile" />
+        </Template>
+    </Story>
+
+    <Story Name="Change down">
+        <Template>
+            <StatTile Label="Sets" Value="42" Change="@(new StatChange(ChangeDirection.Down, "6"))" TestId="tile" />
+        </Template>
+    </Story>
+
+    <Story Name="No change">
+        <Template>
+            <StatTile Label="Workouts" Value="3" Change="@(new StatChange(ChangeDirection.None, ""))" TestId="tile" />
+        </Template>
+    </Story>
+
+    <Story Name="Caption">
+        <Template>
+            <StatTile Label="Average" Value="1,980" Caption="avg kcal a day" TestId="tile" />
+        </Template>
+    </Story>
+
+    <Story Name="Change and caption">
+        <Template>
+            <StatTile Label="Volume" Value="12.4 t" Change="@(new StatChange(ChangeDirection.Up, "8%"))" Caption="strength" TestId="tile" />
+        </Template>
+    </Story>
+
+    <Story Name="Not enough data">
+        <Template>
+            <StatTile Label="Average" Value="1,980" Caption="avg kcal a day" NotEnoughData="true" TestId="tile" />
+        </Template>
+    </Story>
+
+    <Story Name="Two by two">
+        <Template>
+            <div class="grid">
+                <StatTile Label="Workouts" Value="3" Change="@(new StatChange(ChangeDirection.Up, "1"))" />
+                <StatTile Label="Time" Value="3h 20m" Change="@(new StatChange(ChangeDirection.Down, "35m"))" />
+                <StatTile Label="Sets" Value="42" Change="@(new StatChange(ChangeDirection.None, ""))" />
+                <StatTile Label="Average" Value="1,980" Caption="avg kcal a day" NotEnoughData="true" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Long caption and figure">
+        <Template>
+            <StatTile Label="Average calories eaten across the whole training block" Value="1,234,567,890,123 kcal" Change="@(new StatChange(ChangeDirection.Up, "123,456 kcal"))" Caption="averaged over every logged day since the plan started, rest days included" TestId="tile" />
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <StatTile Label="Time" Value="3h 20m" Change="@(new StatChange(ChangeDirection.Up, "35m"))" Caption="this week" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <StatTile Label="Time" Value="3h 20m" Change="@(new StatChange(ChangeDirection.Down, "35m"))" Caption="this week" />
+            </div>
+        </Template>
+    </Story>
+
+</Stories>

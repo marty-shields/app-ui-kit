@@ -10,7 +10,7 @@ public partial class ChartLegendContrastTests
     private static readonly string Css = RepoFiles.Read("src", "Shields.UI", "Components", "Charts", "ChartLegend.razor.css");
 
     private static IEnumerable<TestCaseData> Cases() =>
-        new[] { ("marker", "color", Text), ("swatch.accent", "background-color", Graphic), ("swatch.chip", "background-color", Graphic), ("swatch.error", "background-color", Graphic) }
+        new[] { ("marker", "color", Text), ("swatch.accent", "background-color", Graphic), ("swatch.chip", "background-color", Graphic), ("swatch.error", "background-color", Graphic), ("swatch.outline", "border", Graphic), ("swatch.line", "border-top", Graphic) }
             .SelectMany(c => new[] { "--color-bg", "--color-surface" }.SelectMany(background => new[] { "light", "dark" }
                 .Select(theme => new TestCaseData(c.Item1, c.Item2, background, c.Item3, theme).SetArgDisplayNames($".{c.Item1} {c.Item2} on {background} ({theme})"))));
 
@@ -27,7 +27,7 @@ public partial class ChartLegendContrastTests
     private static string Declaration(string selector, string property) =>
         Declared().Matches(Css)
             .Where(m => m.Groups[1].Value.Trim() == "." + selector)
-            .Select(m => Regex.Match(m.Groups[2].Value, @"(?<![-\w])" + property + @":\s*var\((--[\w-]+)\)"))
+            .Select(m => Regex.Match(m.Groups[2].Value, @"(?<![-\w])" + property + @":[^;]*var\((--[\w-]+)\)"))
             .Single(m => m.Success).Groups[1].Value;
 
     [GeneratedRegex(@"([^{}]+)\{([^{}]*)\}")]

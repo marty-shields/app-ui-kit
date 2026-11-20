@@ -1,6 +1,6 @@
 <div class="tile" data-testid="@TestId">
     <span class="label" data-wrap-ok data-testid="@Id("label")">@Label</span>
-    <span class="value" data-testid="@Id("value")">@(NotEnoughData ? "–" : Value)</span>
+    <span class="value" data-wrap-ok data-testid="@Id("value")">@(NotEnoughData ? "–" : Value)</span>
     @if (Change is not null && !NotEnoughData)
     {
         <span class="change @ChangeClass" data-wrap-ok data-testid="@Id("change")">
@@ -32,9 +32,9 @@
     [Parameter, EditorRequired]
     public string Label { get; set; } = "";
 
-    /// <summary>The number or short text shown large, e.g. 3 or 1,980. Keep it short: it does not wrap.</summary>
-    [Parameter]
-    public string? Value { get; set; }
+    /// <summary>The number or short text shown large, e.g. 3 or 1,980. Wraps when it does not fit.</summary>
+    [Parameter, EditorRequired]
+    public string Value { get; set; } = "";
 
     /// <summary>How the value moved on the period before. Null shows no change line. Hidden when <see cref="NotEnoughData"/> is set.</summary>
     [Parameter]

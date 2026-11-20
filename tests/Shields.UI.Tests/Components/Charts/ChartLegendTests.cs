@@ -42,6 +42,14 @@ public class ChartLegendTests : ComponentTestBase
     }
 
     [Test]
+    public void Render_WithNoItems_RendersNothing()
+    {
+        var cut = Context.Render<ChartLegend>(p => p.Add(x => x.TestId, "legend"));
+
+        Assert.That(cut.Markup.Trim(), Is.Empty);
+    }
+
+    [Test]
     public void Render_WithoutTestId_RendersNoTestIds()
     {
         var cut = Context.Render<ChartLegend>(p => p.Add(x => x.Items, [new(LegendSwatch.Accent, "On target")]));

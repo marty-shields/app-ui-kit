@@ -115,6 +115,30 @@ public class StatTileTests : ComponentTestBase
         Assert.That(cut.FindAll("[data-testid]"), Is.Empty);
     }
 
+    [Test]
+    public void Render_LongValue_CanWrapInsteadOfOverflowing()
+    {
+        var cut = Context.Render<StatTile>(p => p.Add(x => x.Label, "Total").Add(x => x.Value, "1,234,567,890 kcal").Add(x => x.TestId, "tile"));
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Lists", "StatTile.razor.css");
+        var rule = System.Text.RegularExpressions.Regex.Match(css, @"\.value\s*\{([^}]*)\}").Groups[1].Value;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find("[data-testid=tile-value]").HasAttribute("data-wrap-ok"), Is.True);
+            Assert.That(rule, Does.Contain("overflow-wrap: anywhere;"));
+            Assert.That(rule, Does.Not.Contain("nowrap"));
+        });
+    }
+
+    [TestCase(ChangeDirection.Up, "")]
+    [TestCase(ChangeDirection.Down, "  ")]
+    public void StatChange_UpOrDownWithoutAnAmount_Throws(ChangeDirection direction, string amount) =>
+        Assert.Throws<ArgumentException>(() => new StatChange(direction, amount));
+
+    [Test]
+    public void StatChange_NoneWithoutAnAmount_IsAllowed() =>
+        Assert.That(new StatChange(ChangeDirection.None, "").Direction, Is.EqualTo(ChangeDirection.None));
+
     private IRenderedComponent<StatTile> RenderWithChange(StatChange change) =>
         Context.Render<StatTile>(p => p
             .Add(x => x.Label, "Time")

@@ -14,6 +14,12 @@
         </Template>
     </Story>
 
+    <Story Name="Long labels">
+        <Template>
+            <ChartLegend Items="Long" TestId="legend" />
+        </Template>
+    </Story>
+
     <Story Name="Light">
         <Template>
             <div class="themed" data-theme="light">
@@ -39,6 +45,13 @@
         new(LegendSwatch.Accent, "On target"),
         new(LegendSwatch.Outline, "Not logged"),
         new(LegendSwatch.Line, "Target"),
+    ];
+
+    private static readonly IReadOnlyList<LegendItem> Long =
+    [
+        new(LegendSwatch.Chip, "Under the daily calorie target by more than one hundred kcal"),
+        new(LegendSwatch.Accent, "Within the daily calorie target range"),
+        new(LegendSwatch.Error, "Over the daily calorie target by any amount at all", "▲"),
     ];
 
     private static readonly IReadOnlyList<LegendItem> WithMarker =

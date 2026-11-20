@@ -20,7 +20,7 @@
     font-weight: var(--font-weight-bold);
     font-variant-numeric: tabular-nums;
     line-height: var(--line-height-tight);
-    white-space: nowrap;
+    overflow-wrap: anywhere;
 }
 
 .change {

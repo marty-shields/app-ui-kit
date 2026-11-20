@@ -1,17 +1,20 @@
-<ul class="legend" aria-label="Legend" data-testid="@TestId">
-    @for (var i = 0; i < Items.Count; i++)
-    {
-        var item = Items[i];
-        <li class="item" data-testid="@(TestId is null ? null : $"{TestId}-{i}")">
-            <span class="swatch @Slug(item.Swatch)" aria-hidden="true"></span>
-            @if (item.Marker is not null)
-            {
-                <span class="marker" aria-hidden="true">@item.Marker</span>
-            }
-            <span class="text" data-wrap-ok>@item.Label</span>
-        </li>
-    }
-</ul>
+@if (Items.Count > 0)
+{
+    <ul class="legend" aria-label="Legend" data-testid="@TestId">
+        @for (var i = 0; i < Items.Count; i++)
+        {
+            var item = Items[i];
+            <li class="item" data-testid="@(TestId is null ? null : $"{TestId}-{i}")">
+                <span class="swatch @Slug(item.Swatch)" aria-hidden="true"></span>
+                @if (item.Marker is not null)
+                {
+                    <span class="marker" aria-hidden="true">@item.Marker</span>
+                }
+                <span class="text" data-wrap-ok>@item.Label</span>
+            </li>
+        }
+    </ul>
+}
 
 @code {
     /// <summary>The entries, in the order shown.</summary>

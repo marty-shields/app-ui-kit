@@ -1,0 +1,44 @@
+@using Shields.UI.Components.Actions
+@attribute [Stories("Components/Layout/BottomNav")]
+
+<Stories TComponent="BottomNav" Layout="typeof(ThemeLayout)">
+
+    <Story Name="First tab current">
+        <Template>
+            <BottomNav Items="Tabs" Current="Tabs[0]" AddLabel="Add" AddIcon="IconName.Plus" AddHasPopup="dialog" />
+        </Template>
+    </Story>
+
+    <Story Name="Second tab current">
+        <Template>
+            <BottomNav Items="Tabs" Current="Tabs[1]" AddLabel="Add" AddIcon="IconName.Plus" AddHasPopup="dialog" />
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <BottomNav Items="Tabs" Current="Tabs[0]" AddLabel="Add" AddIcon="IconName.Plus" />
+                <BottomNav Items="Tabs" Current="Tabs[1]" AddLabel="Add" AddIcon="IconName.Plus" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <BottomNav Items="Tabs" Current="Tabs[0]" AddLabel="Add" AddIcon="IconName.Plus" />
+                <BottomNav Items="Tabs" Current="Tabs[1]" AddLabel="Add" AddIcon="IconName.Plus" />
+            </div>
+        </Template>
+    </Story>
+
+</Stories>
+
+@code {
+    private static readonly IReadOnlyList<BottomNavItem> Tabs =
+    [
+        new("Today", IconName.Today, "today-link"),
+        new("Trends", IconName.BarChart, "trends-link"),
+    ];
+}

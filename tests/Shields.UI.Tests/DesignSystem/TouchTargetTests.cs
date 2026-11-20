@@ -52,6 +52,21 @@ public partial class TouchTargetTests
         });
     }
 
+    [Test]
+    public void BottomNav_TabsAndRaisedButtonAreTouchTargets_AndTheRaisedButtonIsWideEnough()
+    {
+        var css = Rules(RepoFiles.Read("src", "Shields.UI", "Components", "Layout", "BottomNav.razor.css")).ToList();
+        string[] Declarations(string selector) => css.Where(r => r.Selectors.Contains(selector)).SelectMany(r => r.Declarations).ToArray();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(Declarations(".item"), Has.Member($"min-height: {TouchTarget}"));
+            Assert.That(Declarations(".add"), Has.Member($"min-height: {TouchTarget}"));
+            Assert.That(Declarations(".fab"), Has.Member("width: var(--add-button-size)").And.Member("height: var(--add-button-size)"));
+            Assert.That(RepoFiles.Read("src", "Shields.UI", "wwwroot", "css", "tokens.css"), Does.Contain("--add-button-size: 3.5rem;"));
+        });
+    }
+
     private static string? FirstClass(string attributes) =>
         Class().Match(attributes) is { Success: true } m
             ? m.Groups[1].Value.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault(c => !c.StartsWith('@'))

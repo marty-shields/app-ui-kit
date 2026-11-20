@@ -1,0 +1,71 @@
+<div class="stepper" data-testid="@TestId">
+    <IconButton @ref="previous" Icon="IconName.ChevronLeft" AriaLabel="@($"Previous {Unit}")" Disabled="@(!CanGoPrevious)" TestId="@Id("previous")" OnClick="PreviousPressed" />
+    <span class="label" aria-live="polite" data-wrap-ok data-testid="@Id("label")">@Label</span>
+    <IconButton @ref="next" Icon="IconName.Chevron" AriaLabel="@($"Next {Unit}")" Disabled="@(!CanGoNext)" TestId="@Id("next")" OnClick="NextPressed" />
+</div>
+
+@code {
+    /// <summary>Names the arrows: Previous week, Next month.</summary>
+    [Parameter, EditorRequired]
+    public PeriodKind Kind { get; set; }
+
+    /// <summary>The period's name, e.g. 16 – 22 Nov, November 2026 or 2026. Read out when it changes. Wraps when too long for one line.</summary>
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = "";
+
+    /// <summary>False disables the previous arrow, e.g. at the first period with data.</summary>
+    [Parameter]
+    public bool CanGoPrevious { get; set; }
+
+    /// <summary>False disables the next arrow, e.g. at the period that holds today.</summary>
+    [Parameter]
+    public bool CanGoNext { get; set; }
+
+    /// <summary>Raised by the previous arrow.</summary>
+    [Parameter]
+    public EventCallback OnPrevious { get; set; }
+
+    /// <summary>Raised by the next arrow.</summary>
+    [Parameter]
+    public EventCallback OnNext { get; set; }
+
+    /// <summary>Value of the data-testid attribute, and the prefix of its parts': <c>{TestId}-previous</c>, <c>{TestId}-label</c>, <c>{TestId}-next</c>. None are rendered when unset.</summary>
+    [Parameter]
+    public string? TestId { get; set; }
+
+    private string Unit => Kind.ToString().ToLowerInvariant();
+
+    private IconButton? previous;
+    private IconButton? next;
+    private bool? lastPressedNext;
+
+    private async Task PreviousPressed()
+    {
+        lastPressedNext = false;
+        await OnPrevious.InvokeAsync();
+    }
+
+    private async Task NextPressed()
+    {
+        lastPressedNext = true;
+        await OnNext.InvokeAsync();
+    }
+
+    /// <summary>A pressed arrow the parent has just disabled would drop focus to the page; hand it to the other arrow. The press is remembered across renders because the parent's new state may arrive in a later one.</summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (lastPressedNext is not { } pressedNext)
+        {
+            return;
+        }
+
+        var (pressed, other, canOther) = pressedNext ? (CanGoNext, previous, CanGoPrevious) : (CanGoPrevious, next, CanGoNext);
+        if (!pressed && canOther && other is not null)
+        {
+            lastPressedNext = null;
+            await other.FocusAsync();
+        }
+    }
+
+    private string? Id(string part) => TestId is null ? null : $"{TestId}-{part}";
+}

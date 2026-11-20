@@ -1,0 +1,26 @@
+@attribute [CustomPage("Components/Lists/Overview")]
+
+<h1>Lists</h1>
+
+<h2><code>ListRow</code></h2>
+<p>A full-width row of text, at least <code>--touch-target</code> tall, with a bottom border. An optional muted <code>Detail</code> line goes under the text and optional muted <code>Aside</code> text at the right. With <code>OnClick</code> it is a button ending in a muted chevron <code>Icon</code>; without, it is plain text. Long text wraps.</p>
+<ul>
+    <li><code>data-testid</code>: <code>TestId</code>.</li>
+</ul>
+
+<h2><code>EmptyState</code></h2>
+<p>A message in a dashed box, for a list or section with nothing in it. An optional <code>Hint</code> under it, smaller, says how to fill it. <code>ChildContent</code> adds an action below.</p>
+<ul>
+    <li><code>data-testid</code>: <code>TestId</code>; the message <code>{TestId}-message</code>, the hint <code>{TestId}-hint</code>.</li>
+</ul>
+
+<h2><code>StatTile</code></h2>
+<p>A label over a value, on a bordered tile. Tiles sit in a grid the page lays out. Long text wraps.</p>
+<ul>
+    <li><code>Change</code>: a <code>StatChange</code> showing how the value moved on the period before. Up is an up <code>Icon</code> and the amount in <code>--color-success</code>, Down a down <code>Icon</code> in <code>--color-error</code>, None a muted dash. Screen readers hear "up 35m", "down 1" or "no change".</li>
+    <li><code>Caption</code>: a muted line under the value, e.g. "avg kcal a day".</li>
+    <li><code>NotEnoughData</code>: the value shows a dash, the change goes and "Not enough data yet" is added, so the tile keeps its place in the layout.</li>
+    <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>{TestId}-label</code>, <code>{TestId}-value</code>, <code>{TestId}-change</code>, <code>{TestId}-caption</code>, <code>{TestId}-note</code>.</li>
+</ul>
+
+<p>Stories: <a href="./?path=/docs/components-lists-listrow--docs">ListRow</a>, <a href="./?path=/docs/components-lists-emptystate--docs">EmptyState</a>, <a href="./?path=/docs/components-lists-stattile--docs">StatTile</a></p>

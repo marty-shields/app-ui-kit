@@ -10,6 +10,6 @@
 </ul>
 
 <h2><code>BackHandler</code></h2>
-<p>Renders nothing. While <code>OnBack</code> is set, the Android back button runs it instead of leaving the app; the newest handler on screen wins, and removing the component or clearing <code>OnBack</code> unregisters it. A failure in <code>OnBack</code> goes to the nearest error boundary, as one from a button click would. It needs the <code>IBackButton</code> service from <code>AddShieldsUi()</code>; the host calls <code>IBackButton.HandleAsync()</code> when the system back is pressed.</p>
+<p>Renders nothing. While <code>OnBack</code> is set, the Android back button runs it instead of leaving the app; the newest handler on screen wins, and removing the component or clearing <code>OnBack</code> unregisters it. A failure in <code>OnBack</code> goes to the nearest error boundary, as one from a button click would. It needs the <code>IBackButton</code> service from <code>AddShieldsUi()</code>; the host calls <code>IBackButton.HandleAsync()</code>, on the instance from the WebView's scope, when the system back is pressed.</p>
 
 <p>Stories: <a href="./?path=/docs/components-navigation-periodstepper--docs">PeriodStepper</a>, <a href="./?path=/docs/components-navigation-backhandler--docs">BackHandler</a></p>

@@ -36,6 +36,9 @@
     private string typed = "";
     private ElementReference input;
 
+    // Seam for tests: the browser hands out the new reference late, which bUnit does not do.
+    internal virtual ElementReference CurrentInput => input;
+
     private async Task OnInput(ChangeEventArgs e)
     {
         typed = e.Value?.ToString() ?? "";
@@ -56,12 +59,13 @@
         if (restoreFocus)
         {
             // The reference only points at the new input once the browser has drawn it.
-            if (input.Id != staleInputId)
+            var current = CurrentInput;
+            if (current.Id != staleInputId)
             {
                 restoreFocus = false;
                 try
                 {
-                    await input.FocusAsync();
+                    await current.FocusAsync();
                 }
                 catch (JSDisconnectedException)
                 {
@@ -90,7 +94,7 @@
         inputSettled = false;
         if (Value == previousValue && typed != (Value ?? ""))
         {
-            staleInputId = input.Id;
+            staleInputId = CurrentInput.Id;
             generation++;
             restoreFocus = true;
             staleChecks = 0;

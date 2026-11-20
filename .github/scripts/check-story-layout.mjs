@@ -12,7 +12,7 @@ if (!baseUrl || !chromePath) {
   process.exit(64);
 }
 
-// 424px is the narrowest preview width: a 360dp phone plus the 96px the story preview adds around the story.
+// 424px is the narrowest preview width: a 328px story area (a 360dp phone less 16px padding either side) plus the 96px the story preview adds around it.
 const WIDTH = 424;
 // Exploration knob (Android font size scales rem); not run in CI.
 const FONT_SCALE = Number(process.env.STORY_FONT_SCALE ?? 1);
@@ -59,6 +59,8 @@ function inspect() {
     const style = getComputedStyle(storyRoot);
     const area = storyRoot.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
     if (Math.abs(area - 328) > 1) findings.push(`story area is ${Math.round(area)}px wide, expected 328px`);
+  } else if (!frame) {
+    findings.push('no story root found (neither the phone frame nor [data-testid=preview]), so the width was not checked');
   }
   for (const card of app.querySelectorAll('.card')) {
     if (!card.parentElement) continue;

@@ -105,9 +105,10 @@
     background-color: var(--color-bg);
 }
 
-/* A footer holding only the floating status message has no bar of its own to rule off. */
+/* A footer holding only the floating status message has no bar of its own to rule off, and keeps clear of the gesture bar itself. */
 .bottom:not(:has(> :not(.status-slot))) {
     border-top: 0;
+    padding-bottom: var(--inset-bottom);
 }
 
 .bottom-bar {

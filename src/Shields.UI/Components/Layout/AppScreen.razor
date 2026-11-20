@@ -66,6 +66,7 @@
     private IJSObjectReference? module;
     private DotNetObjectReference<AppScreen>? self;
     private bool refreshing;
+    private bool disposed;
 
     /// <summary>Screen title.</summary>
     [Parameter, EditorRequired]
@@ -161,10 +162,17 @@
         try
         {
             self = DotNetObjectReference.Create(this);
-            module = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/Shields.UI/Components/Layout/AppScreen.razor.js");
+            var imported = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/Shields.UI/Components/Layout/AppScreen.razor.js");
+            if (disposed)
+            {
+                await imported.DisposeAsync();
+                return;
+            }
+
+            module = imported;
             await module.InvokeVoidAsync("attach", content, indicator, self);
         }
-        catch (Exception exception)
+        catch (Exception exception) when (!disposed)
         {
             Log.PullRefreshFailed(Logger, exception);
         }
@@ -183,6 +191,11 @@
         {
             await OnRefresh.InvokeAsync();
         }
+        catch (Exception exception)
+        {
+            // Thrown back over interop it would only reach the console: pass it to the nearest error boundary, as a click handler's would.
+            await DispatchExceptionAsync(exception);
+        }
         finally
         {
             refreshing = false;
@@ -191,6 +204,7 @@
 
     public async ValueTask DisposeAsync()
     {
+        disposed = true;
         if (module is not null)
         {
             try
@@ -207,7 +221,7 @@
     }
 
     private EventCallback Back =>
-        OnBack.HasDelegate || NavItems is not { Count: > 0 } items || Current is null || Current == items[0]
+        OnBack.HasDelegate || !OnNavigate.HasDelegate || NavItems is not { Count: > 0 } items || Current is null || Current == items[0]
             ? OnBack
             : EventCallback.Factory.Create(this, () => OnNavigate.InvokeAsync(items[0]));
 }

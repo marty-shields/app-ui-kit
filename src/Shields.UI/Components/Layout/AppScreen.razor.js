@@ -62,11 +62,17 @@ export function attach(content, indicator, screen) {
         }
     };
 
+    const cancel = () => {
+        if (phase === "pulling") {
+            show("idle");
+        }
+    };
+
     content.addEventListener("touchstart", start, { passive: true });
     content.addEventListener("touchmove", move, { passive: false });
     content.addEventListener("touchend", end);
-    content.addEventListener("touchcancel", end);
-    gestures.set(content, { start, move, end });
+    content.addEventListener("touchcancel", cancel);
+    gestures.set(content, { start, move, end, cancel });
 }
 
 export function detach(content) {
@@ -78,6 +84,6 @@ export function detach(content) {
     content.removeEventListener("touchstart", gesture.start);
     content.removeEventListener("touchmove", gesture.move);
     content.removeEventListener("touchend", gesture.end);
-    content.removeEventListener("touchcancel", gesture.end);
+    content.removeEventListener("touchcancel", gesture.cancel);
     gestures.delete(content);
 }

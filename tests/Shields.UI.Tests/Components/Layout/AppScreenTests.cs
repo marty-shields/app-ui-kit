@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
@@ -288,6 +289,14 @@ public class AppScreenTests : ComponentTestBase
     }
 
     [Test]
+    public void AnotherItem_WithNoOnNavigate_DoesNotTakeAndroidBack()
+    {
+        RenderTopLevel(Trends);
+
+        Assert.That(BackButton.HasHandler, Is.False);
+    }
+
+    [Test]
     public void NoCurrentItem_DoesNotTakeAndroidBack()
     {
         Render("Details", p => p.Add(x => x.NavItems, Tabs).Add(x => x.AddLabel, "Add").Add(x => x.AddIcon, IconName.Plus));
@@ -413,6 +422,50 @@ public class AppScreenTests : ComponentTestBase
     }
 
     [Test]
+    public async Task OnRefreshThrows_PassesTheFailureToTheNearestErrorBoundary()
+    {
+        PullModule();
+        AppScreen? screen = null;
+        RenderFragment content = b =>
+        {
+            b.OpenComponent<AppScreen>(0);
+            b.AddComponentParameter(1, nameof(AppScreen.Title), "Screen title");
+            b.AddComponentParameter(2, nameof(AppScreen.OnRefresh), EventCallback.Factory.Create(this, () => Task.FromException(new InvalidOperationException())));
+            b.AddComponentReferenceCapture(3, instance => screen = (AppScreen)instance);
+            b.CloseComponent();
+        };
+        var cut = Context.Render<ErrorBoundary>(p => p
+            .AddChildContent(content)
+            .Add(x => x.ErrorContent, _ => b => b.AddMarkupContent(0, "<p data-testid=\"error-message\">failed</p>")));
+
+        await cut.InvokeAsync(screen!.RefreshAsync);
+
+        Assert.That(cut.FindAll("[data-testid=error-message]"), Has.Count.EqualTo(1));
+    }
+
+    [Test]
+    public async Task DisposedWhileImporting_DisposesTheModuleAndLogsNothing()
+    {
+        var logger = new RecordingLogger<AppScreen>();
+        Context.Services.AddSingleton<ILogger<AppScreen>>(logger);
+        var module = new FakeModule();
+        var runtime = new DelayedImportRuntime();
+        Context.Services.AddSingleton<IJSRuntime>(runtime);
+        var cut = Render("Screen title", p => p.Add(x => x.OnRefresh, () => Task.CompletedTask));
+
+        await Context.DisposeComponentsAsync();
+        runtime.Import.SetResult(module);
+        await Task.Yield();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(module.Disposed, Is.True);
+            Assert.That(module.Calls, Is.Empty);
+            Assert.That(logger.Records, Is.Empty);
+        });
+    }
+
+    [Test]
     public void PullGestureFailsToAttach_LogsItAndShowsTheScreen()
     {
         var logger = new RecordingLogger<AppScreen>();
@@ -448,4 +501,39 @@ public class AppScreenTests : ComponentTestBase
         module.Mode = JSRuntimeMode.Loose;
         return module;
     }
+
+#pragma warning disable BL0016 // Fakes implement the interop interfaces; nothing here calls into JS
+    private sealed class FakeModule : IJSObjectReference
+    {
+        public List<string> Calls { get; } = [];
+
+        public bool Disposed { get; private set; }
+
+        public ValueTask<TValue> InvokeAsync<TValue>(string identifier, object?[]? args)
+        {
+            Calls.Add(identifier);
+            return ValueTask.FromResult<TValue>(default!);
+        }
+
+        public ValueTask<TValue> InvokeAsync<TValue>(string identifier, CancellationToken cancellationToken, object?[]? args) =>
+            InvokeAsync<TValue>(identifier, args);
+
+        public ValueTask DisposeAsync()
+        {
+            Disposed = true;
+            return ValueTask.CompletedTask;
+        }
+    }
+
+    private sealed class DelayedImportRuntime : IJSRuntime
+    {
+        public TaskCompletionSource<IJSObjectReference> Import { get; } = new();
+
+        public ValueTask<TValue> InvokeAsync<TValue>(string identifier, object?[]? args) =>
+            new((Task<TValue>)(object)Import.Task);
+
+        public ValueTask<TValue> InvokeAsync<TValue>(string identifier, CancellationToken cancellationToken, object?[]? args) =>
+            InvokeAsync<TValue>(identifier, args);
+    }
+#pragma warning restore BL0016
 }

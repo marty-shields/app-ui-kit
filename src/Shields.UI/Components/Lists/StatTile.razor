@@ -1,0 +1,63 @@
+<div class="tile" data-testid="@TestId">
+    <span class="label" data-wrap-ok data-testid="@Id("label")">@Label</span>
+    <span class="value" data-testid="@Id("value")">@(NotEnoughData ? "–" : Value)</span>
+    @if (Change is not null && !NotEnoughData)
+    {
+        <span class="change @ChangeClass" data-wrap-ok data-testid="@Id("change")">
+            @if (Change.Direction == ChangeDirection.None)
+            {
+                <span aria-hidden="true">—</span>
+                <span class="visually-hidden">no change</span>
+            }
+            else
+            {
+                <Icon Name="Change.Direction == ChangeDirection.Up ? IconName.Up : IconName.Down" Tone="Change.Direction == ChangeDirection.Up ? IconTone.Success : IconTone.Error" Size="IconSize.Small" />
+                <span class="visually-hidden">@(Change.Direction == ChangeDirection.Up ? "up " : "down ")</span>
+                @Change.Amount
+            }
+        </span>
+    }
+    @if (Caption is not null)
+    {
+        <span class="caption" data-wrap-ok data-testid="@Id("caption")">@Caption</span>
+    }
+    @if (NotEnoughData)
+    {
+        <span class="caption" data-wrap-ok data-testid="@Id("note")">Not enough data yet</span>
+    }
+</div>
+
+@code {
+    /// <summary>What the value measures, shown first and in bold, e.g. Workouts.</summary>
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = "";
+
+    /// <summary>The number or short text shown large, e.g. 3 or 1,980. Keep it short: it does not wrap.</summary>
+    [Parameter]
+    public string? Value { get; set; }
+
+    /// <summary>How the value moved on the period before. Null shows no change line. Hidden when <see cref="NotEnoughData"/> is set.</summary>
+    [Parameter]
+    public StatChange? Change { get; set; }
+
+    /// <summary>Muted line under the value (and under the change), e.g. avg kcal a day. Null shows none.</summary>
+    [Parameter]
+    public string? Caption { get; set; }
+
+    /// <summary>Replaces the value with a dash, drops the change and adds "Not enough data yet", so the tile keeps its place in the layout.</summary>
+    [Parameter]
+    public bool NotEnoughData { get; set; }
+
+    /// <summary>Value of the data-testid attribute, and the prefix of <c>-label</c>, <c>-value</c>, <c>-change</c>, <c>-caption</c> and <c>-note</c>. None are rendered when unset.</summary>
+    [Parameter]
+    public string? TestId { get; set; }
+
+    private string? ChangeClass => Change?.Direction switch
+    {
+        ChangeDirection.Up => "up",
+        ChangeDirection.Down => "down",
+        _ => "same",
+    };
+
+    private string? Id(string part) => TestId is null ? null : $"{TestId}-{part}";
+}

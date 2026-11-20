@@ -1,0 +1,34 @@
+<ul class="legend" aria-label="Legend" data-testid="@TestId">
+    @for (var i = 0; i < Items.Count; i++)
+    {
+        var item = Items[i];
+        <li class="item" data-testid="@(TestId is null ? null : $"{TestId}-{i}")">
+            <span class="swatch @Slug(item.Swatch)" aria-hidden="true"></span>
+            @if (item.Marker is not null)
+            {
+                <span class="marker" aria-hidden="true">@item.Marker</span>
+            }
+            <span class="text" data-wrap-ok>@item.Label</span>
+        </li>
+    }
+</ul>
+
+@code {
+    /// <summary>The entries, in the order shown.</summary>
+    [Parameter]
+    public IReadOnlyList<LegendItem> Items { get; set; } = [];
+
+    /// <summary>Value of the data-testid attribute, and the prefix of each entry's <c>-0</c>, <c>-1</c>, … by position. None are rendered when unset.</summary>
+    [Parameter]
+    public string? TestId { get; set; }
+
+    private static string Slug(LegendSwatch swatch) => swatch switch
+    {
+        LegendSwatch.Accent => "accent",
+        LegendSwatch.Chip => "chip",
+        LegendSwatch.Error => "error",
+        LegendSwatch.Outline => "outline",
+        LegendSwatch.Line => "line",
+        _ => throw new ArgumentOutOfRangeException(nameof(swatch), swatch, null),
+    };
+}

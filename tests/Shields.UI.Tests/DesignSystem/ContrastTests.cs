@@ -60,5 +60,5 @@ public class ContrastTests
         Assert.That(Rgb.Contrast(Rgb.Parse("#ffffff"), bar), Is.GreaterThanOrEqualTo(LargeTextOrControl), $"#ffffff on {bar}");
     }
 
-    private static Rgb Pick((Rgb Light, Rgb Dark) colour, string theme) => theme == "light" ? colour.Light : colour.Dark;
+    internal static Rgb Pick((Rgb Light, Rgb Dark) colour, string theme) => theme == "light" ? colour.Light : colour.Dark;
 }

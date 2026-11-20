@@ -1,0 +1,50 @@
+@attribute [Stories("Components/Charts/ChartLegend")]
+
+<Stories TComponent="ChartLegend" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Plain dots">
+        <Template>
+            <ChartLegend Items="Plain" TestId="legend" />
+        </Template>
+    </Story>
+
+    <Story Name="Dot with a marker">
+        <Template>
+            <ChartLegend Items="WithMarker" TestId="legend" />
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <ChartLegend Items="WithMarker" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <ChartLegend Items="WithMarker" />
+            </div>
+        </Template>
+    </Story>
+
+</Stories>
+
+@code {
+    private static readonly IReadOnlyList<LegendItem> Plain =
+    [
+        new(LegendSwatch.Chip, "Under"),
+        new(LegendSwatch.Accent, "On target"),
+        new(LegendSwatch.Outline, "Not logged"),
+        new(LegendSwatch.Line, "Target"),
+    ];
+
+    private static readonly IReadOnlyList<LegendItem> WithMarker =
+    [
+        new(LegendSwatch.Chip, "Under"),
+        new(LegendSwatch.Accent, "On target"),
+        new(LegendSwatch.Error, "Over", "▲"),
+    ];
+}

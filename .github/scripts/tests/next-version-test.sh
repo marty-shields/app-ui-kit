@@ -31,6 +31,9 @@ run() {
   local name="$1" expected="$2" out
   out=$(cd "$work/repo" && PATH="$work/bin:$PATH" PRS="$work/prs" GITHUB_REPOSITORY=o/r GITHUB_OUTPUT="$work/out" bash "$script" v "$(git -C "$work/repo" rev-parse HEAD)" 2> "$work/err"; echo "exit=$?")
   check "$name" "$expected" "$(cat "$work/out" 2>/dev/null; echo "$out" | grep '^exit=')"
+  if [[ -n "${ERROR:-}" ]]; then
+    check "$name: error message" "1" "$(grep -cF -- "::error title=Version::$ERROR" <<<"$out")"
+  fi
   rm -f "$work/out"
 }
 
@@ -79,23 +82,23 @@ exit=0"
 
 fresh; git -C "$work/repo" tag v1.2.3
 sha=$(commit a)
-run "a commit that is no PR's merge fails" "exit=1"
+ERROR="Commit $sha isn't the merge of exactly one PR into main." run "a commit that is no PR's merge fails" "exit=1"
 
 fresh; git -C "$work/repo" tag v1.2.3
 sha=$(commit a); pr "$sha" 10 "enhancement"
-run "a PR with no semver label fails" "exit=1"
+ERROR="PR #10 needs exactly one semver label; it has: enhancement." run "a PR with no semver label fails" "exit=1"
 
 fresh; git -C "$work/repo" tag v1.2.3
 sha=$(commit a); pr "$sha" 10 "semver:patch" "semver:minor"
-run "a PR with two semver labels fails" "exit=1"
+ERROR="PR #10 needs exactly one semver label; it has: semver:patch semver:minor." run "a PR with two semver labels fails" "exit=1"
 
 fresh; git -C "$work/repo" tag v1.2.3
 sha=$(commit a); echo '[{"number":10,"merged_at":null,"base":{"ref":"main"},"labels":[{"name":"semver:patch"}]}]' > "$work/prs/$sha.json"
-run "an unmerged PR does not count" "exit=1"
+ERROR="Commit $sha isn't the merge of exactly one PR into main." run "an unmerged PR does not count" "exit=1"
 
 fresh; git -C "$work/repo" tag v1.2.3
 sha=$(commit a); pr "$sha" 10 "semver:patch"; jq '.[0].base.ref = "dev"' "$work/prs/$sha.json" > "$work/x" && mv "$work/x" "$work/prs/$sha.json"
-run "a PR into another branch does not count" "exit=1"
+ERROR="Commit $sha isn't the merge of exactly one PR into main." run "a PR into another branch does not count" "exit=1"
 
 # A force-push can leave the last release tag off main. The PRs merged before that release's commit are already in it.
 # rewritten_release <date>: tags v1.2.3 on a commit dated <date> that is not an ancestor of main.
@@ -142,9 +145,23 @@ version=2.0.0
 exit=0"
 
 fresh; git -C "$work/repo" tag v1.2.3
-PENDING_LABELS="enhancement" run "beta whose PR has no semver label fails" "exit=1"
+PENDING_LABELS="enhancement" ERROR="The PR needs exactly one semver label; it has: enhancement." run "beta whose PR has no semver label fails" "exit=1"
 
 fresh; git -C "$work/repo" tag v1.2.3
-PENDING_LABELS="semver:patch semver:minor" run "beta whose PR has two semver labels fails" "exit=1"
+PENDING_LABELS="semver:patch semver:minor" ERROR="The PR needs exactly one semver label; it has: semver:patch semver:minor." run "beta whose PR has two semver labels fails" "exit=1"
+
+fresh; git -C "$work/repo" tag v1.2.3
+sha=$(commit a); pr "$sha" 10 "semver:minorx"
+ERROR="PR #10 needs exactly one semver label; it has: semver:minorx." run "a merged PR's label that only starts like a semver label is not counted" "exit=1"
+
+fresh; git -C "$work/repo" tag v1.2.3
+PENDING_LABELS="semver:minorx" ERROR="The PR needs exactly one semver label; it has: semver:minorx." run "a beta label that only starts like a semver label is not counted" "exit=1"
+
+# A tag with a leading zero is no release tag, so v1.08.0 can't break the arithmetic.
+fresh; git -C "$work/repo" tag v1.2.3; git -C "$work/repo" tag v1.08.0
+sha=$(commit a); pr "$sha" 10 "semver:patch"
+run "a tag with a leading zero in a part is ignored" "release=true
+version=1.2.4
+exit=0"
 
 finish

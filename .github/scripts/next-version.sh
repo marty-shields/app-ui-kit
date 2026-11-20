@@ -21,7 +21,8 @@ level_of() {
 }
 
 # Release tags only: <prefix>X.Y.Z.
-semver="^${prefix}[0-9]+\.[0-9]+\.[0-9]+$"
+part="(0|[1-9][0-9]*)"
+semver="^${prefix}${part}\.${part}\.${part}$"
 last=$(git tag --list "${prefix}*" --sort=-v:refname | { grep -E "$semver" || true; } | head -n 1)
 
 if [[ -z "$last" ]]; then
@@ -30,7 +31,9 @@ if [[ -z "$last" ]]; then
 else
   bump=0
   released_at=$(git log -1 --format=%ct "$last")
-  for sha in $(git rev-list "$(git merge-base "$last" "$target")..$target"); do
+  base=$(git merge-base "$last" "$target")
+  shas=$(git rev-list "$base..$target")
+  for sha in $shas; do
     prs=$(gh api "repos/$GITHUB_REPOSITORY/commits/$sha/pulls" --jq '[.[] | select(.merged_at != null and .base.ref == "main")]')
     if [[ $(jq length <<<"$prs") -ne 1 ]]; then
       echo "::error title=Version::Commit $sha isn't the merge of exactly one PR into main."

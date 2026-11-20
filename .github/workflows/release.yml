@@ -1,7 +1,8 @@
 # Publishes the kit on every push to main except one that changes only docs or CI (docs/release.md): works out the next
 # version from the semver labels of the PRs merged since the last v* tag, packs Shields.UI, Shields.UI.Stories and
-# Shields.UI.Testing at that version, pushes them to nuget.org with Trusted Publishing (no API key is stored) and creates
-# the v<version> tag with a GitHub release.
+# Shields.UI.Testing at that version, creates the v<version> tag with a GitHub release, then pushes the packages to
+# nuget.org with Trusted Publishing (no API key is stored). The tag comes first so that a failed push never leaves the
+# version free for the next run to compute again.
 name: Release
 
 on:
@@ -11,6 +12,7 @@ on:
       - "docs/**"
       - "**.md"
       - ".github/**"
+      - "tests/**"
 
 permissions:
   contents: read
@@ -41,14 +43,13 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: .github/scripts/next-version.sh v "$GITHUB_SHA"
 
-  publish:
+  pack:
     needs: version
     if: needs.version.outputs.release == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
-      contents: write
-      id-token: write
+      contents: read
     env:
       VERSION: ${{ needs.version.outputs.version }}
     steps:
@@ -60,6 +61,33 @@ jobs:
         with:
           global-json-file: global.json
 
+      - name: Pack
+        run: |
+          for project in Shields.UI Shields.UI.Stories Shields.UI.Testing; do
+            dotnet pack "src/$project" -c Release -p:Version="$VERSION" -o "$RUNNER_TEMP/packages"
+          done
+          test "$(find "$RUNNER_TEMP/packages" -name "*.$VERSION.nupkg" | wc -l)" -eq 3
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: packages
+          path: ${{ runner.temp }}/packages/*.nupkg
+          if-no-files-found: error
+          retention-days: 1
+
+  # Runs no project code (no checkout, no build): it only tags, downloads the packages and pushes them. The release
+  # environment limits it to main, and the nuget.org policy only accepts a token issued for that environment.
+  publish:
+    needs: [version, pack]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: release
+    permissions:
+      contents: write
+      id-token: write
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
+    steps:
       - name: NuGet user set
         env:
           NUGET_USER: ${{ vars.NUGET_USER }}
@@ -69,13 +97,21 @@ jobs:
             exit 1
           fi
 
-      # The packages are built before the token exchange, so no key exists while project code runs.
-      - name: Pack
+      # Creates the v* tag on this commit with the release before anything is pushed. A re-run of the failed jobs finds it and goes on.
+      - name: Tag and release
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          for project in Shields.UI Shields.UI.Stories Shields.UI.Testing; do
-            dotnet pack "src/$project" -c Release -p:Version="$VERSION" -o "$RUNNER_TEMP/packages"
-          done
-          test "$(find "$RUNNER_TEMP/packages" -name "*.$VERSION.nupkg" | wc -l)" -eq 3
+          if gh release view "v$VERSION" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release v$VERSION exists already."
+          else
+            gh release create "v$VERSION" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "v$VERSION" --generate-notes
+          fi
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: packages
+          path: ${{ runner.temp }}/packages
 
       - name: NuGet login
         id: login
@@ -88,9 +124,3 @@ jobs:
         env:
           NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
         run: dotnet nuget push "$RUNNER_TEMP/packages/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY" --skip-duplicate
-
-      # Creates the v* tag on this commit with the release.
-      - name: Publish the release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh release create "v$VERSION" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "v$VERSION" --generate-notes

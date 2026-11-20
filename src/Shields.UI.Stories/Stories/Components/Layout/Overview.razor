@@ -11,3 +11,14 @@
 </ul>
 
 <p>Stories: <a href="./?path=/docs/components-layout-card--docs">Card</a></p>
+
+<h2><code>BottomNav</code></h2>
+<p>The bar at the foot of a screen: the tabs in <code>Items</code> with a raised button between them. The tab equal to <code>Current</code> has a pill behind its icon, bold text and <code>aria-current="page"</code>; tapping it raises nothing. With an odd number of tabs the extra one goes left of the raised button.</p>
+<ul>
+    <li><code>AddLabel</code> and <code>AddIcon</code>: the raised button, a primary rounded square (<code>--radius-md</code>) of <code>--add-button-size</code>, lifted by <code>--add-button-lift</code> so its label is level with the tab labels. It is an action and is never current.</li>
+    <li><code>AddHasPopup</code>: optional <code>aria-haspopup</code> value, e.g. <code>dialog</code>.</li>
+    <li><code>OnNavigate</code> is raised with the tapped tab; <code>OnAdd</code> by the raised button.</li>
+    <li><code>data-testid</code>: <code>bottom-nav</code>, <code>add-button</code> and each item's <code>TestId</code>.</li>
+</ul>
+
+<p>Stories: <a href="./?path=/docs/components-layout-bottomnav--docs">BottomNav</a></p>

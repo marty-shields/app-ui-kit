@@ -1,0 +1,7 @@
+.themed {
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+}
+

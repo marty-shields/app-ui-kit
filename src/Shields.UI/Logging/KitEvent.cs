@@ -38,4 +38,7 @@ internal enum KitEvent
 
     /// <summary><see cref="Components.Inputs.NumberField"/>: focusing the input on show failed. Calorie Tracker's id; Workout Log uses 3701 for something else, in its own app.</summary>
     NumberFieldFocusFailed = 3701,
+
+    /// <summary><see cref="Components.Layout.AppScreen"/>: setting up pull to refresh failed.</summary>
+    PullRefreshFailed = 4001,
 }

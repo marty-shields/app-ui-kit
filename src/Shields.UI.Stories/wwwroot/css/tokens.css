@@ -1,0 +1,37 @@
+/* Values only the stories need: the stand-in phone, wallpapers and sheet layouts. Kept out of the kit's tokens.css,
+   which holds only what apps share. Loaded after the kit's tokens.css in the story canvas (iframe.html). */
+:root {
+    --stories-phone-width: 412px;
+    --stories-phone-height: 915px;
+    --stories-phone-radius: 40px;
+    --stories-bezel-width: 8px;
+    --stories-bezel-colour: #111;
+    --stories-phone-bar-tint: rgb(0 0 0 / 0.06);
+    --stories-phone-bar-font-size: 0.75rem;
+    --stories-handle-width: 108px;
+    --stories-handle-height: 4px;
+    --stories-handle-radius: 2px;
+
+    --stories-section-gap: 40px;
+    --stories-caption-font-size: 0.75rem;
+    --stories-icon-size-small: 48px;
+    --stories-icon-size-large: 192px;
+    --stories-layer-offset: -25%;
+    --stories-layer-size: 150%;
+    --stories-squircle-radius: 32%;
+    --stories-wallpaper-light: #b7d5d4;
+    --stories-silhouette-on-light: #305252;
+    --stories-wallpaper-dark: #373e40;
+    --stories-silhouette-on-dark: #b7d5d4;
+    --stories-splash-width: 206px;
+    --stories-splash-height: 458px;
+    --stories-splash-border-width: 4px;
+    --stories-splash-image-size: 144px;
+    --stories-splash-light: #f4f8f8;
+    --stories-splash-dark: #173535;
+
+    --stories-sheet-max-width: 48rem;
+    --stories-token-name-width: 14rem;
+    --stories-token-value-width: 10rem;
+    --stories-icon-label-width: 6rem;
+}

@@ -7,6 +7,16 @@ public class TokensOnlyCssTests
             .Where(f => Path.GetFileName(f) != "tokens.css")
             .Select(f => new TestCaseData(f).SetArgDisplayNames(Path.GetFileName(f)));
 
+    // blazor-ui.css is the Blazor template's loading and error UI, which the framework drives (--blazor-load-percentage), so it stays as shipped.
+    private static IEnumerable<string> StoriesCss() =>
+        RepoFiles.Find("*.css", "src", "Shields.UI.Stories")
+            .Where(f => Path.GetFileName(f) is not ("tokens.css" or "blazor-ui.css"));
+
+    private static IEnumerable<TestCaseData> StoriesStyleFiles() =>
+        StoriesCss().Select(f => new TestCaseData(f).SetArgDisplayNames(Path.GetFileName(f)));
+
+    private static string StoriesTokens() => RepoFiles.Read("src", "Shields.UI.Stories", "wwwroot", "css", "tokens.css");
+
     private static IEnumerable<TestCaseData> MarkupFiles() =>
         RepoFiles.Find("*.razor", "src", "Shields.UI")
             .Select(f => new TestCaseData(f).SetArgDisplayNames(Path.GetFileName(f)));
@@ -53,5 +63,43 @@ public class TokensOnlyCssTests
             Assert.That(TokensOnlyCheck.LiteralsInFolder(kit), Is.Empty);
             Assert.That(TokensOnlyCheck.InlineStyleLiteralsInFolder(kit), Is.Empty);
         });
+    }
+
+    [TestCaseSource(nameof(StoriesStyleFiles))]
+    public void StoriesCss_HasNoLiteralColoursOrSizes(string file)
+    {
+        var literals = TokensOnlyCheck.Literals(File.ReadAllText(file), Path.GetFileName(file));
+
+        Assert.That(literals, Is.Empty);
+    }
+
+    [TestCaseSource(nameof(StoriesStyleFiles))]
+    public void StoriesCss_UsesOnlyDeclaredTokens(string file)
+    {
+        var unknown = TokensOnlyCheck.UnknownTokens(File.ReadAllText(file), DesignTokens.Declares(StoriesTokens()));
+
+        Assert.That(unknown, Is.Empty);
+    }
+
+    [Test]
+    public void StoriesCss_ScansTheStoriesLibrary()
+    {
+        var names = StoriesCss().Select(Path.GetFileName).ToList();
+
+        Assert.That(names, Does.Contain("PhoneFrame.razor.css").And.Contain("AppIconSheet.razor.css").And.Contain("TokenSheet.razor.css"));
+    }
+
+    [Test]
+    public void StoriesCss_ALiteralColour_IsCaught()
+    {
+        var css = File.ReadAllText(StoriesCss().First()) + "\n.x { color: #ff0000; }";
+
+        Assert.That(TokensOnlyCheck.Literals(css, "mutated.razor.css"), Has.Some.Contain("color: #ff0000;"));
+    }
+
+    [Test]
+    public void StoriesTokens_AreNamedForTheStories_NotTheKit()
+    {
+        Assert.That(DesignTokens.Declares(StoriesTokens()), Has.All.StartsWith("--stories-"));
     }
 }

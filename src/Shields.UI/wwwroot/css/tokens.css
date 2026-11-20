@@ -22,8 +22,8 @@
     --color-chip: light-dark(#6a9594, #587a7a);
     --color-on-chip: light-dark(#141819, #ffffff);
     /* A lighter, muted circle than the chip, with a plus that stays readable on it. */
-    --color-chip-soft: light-dark(#92b6b5, #466161);
-    --color-on-chip-soft: light-dark(#243d3d, #e4ecec);
+    --color-chip-soft: light-dark(#669897, #4c6a6a);
+    --color-on-chip-soft: light-dark(#1a2b2b, #e4ecec);
     --color-accent: light-dark(#29494c, #acd5d2);
     --color-focus: light-dark(#488286, #8cc4c1);
     --color-danger: light-dark(#a8231c, #f2b8b5);

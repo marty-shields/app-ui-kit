@@ -1,5 +1,5 @@
 .sheet {
-    max-width: 48rem;
+    max-width: var(--stories-sheet-max-width);
     padding: var(--space-4);
 }
 
@@ -53,7 +53,7 @@
 
 .item {
     display: grid;
-    grid-template-columns: 14rem 10rem 1fr;
+    grid-template-columns: var(--stories-token-name-width) var(--stories-token-value-width) 1fr;
     align-items: center;
     gap: var(--space-2);
     min-height: var(--touch-target);

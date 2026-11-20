@@ -1,18 +1,18 @@
 .frame {
-    margin: 16px auto;
+    margin: var(--space-4) auto;
     width: fit-content;
 }
 
 .phone {
-    --inset-top: 32px;
-    --inset-bottom: 32px;
+    --inset-top: var(--space-8);
+    --inset-bottom: var(--space-8);
     position: relative;
     box-sizing: content-box;
-    width: 412px;
-    height: 915px;
+    width: var(--stories-phone-width);
+    height: var(--stories-phone-height);
     overflow: hidden;
-    border: 8px solid #111;
-    border-radius: 40px;
+    border: var(--stories-bezel-width) solid var(--stories-bezel-colour);
+    border-radius: var(--stories-phone-radius);
     background-color: var(--color-bg);
     color: var(--color-text);
     transform: translateZ(0);
@@ -34,14 +34,14 @@
     display: flex;
     align-items: center;
     pointer-events: none;
-    background-color: rgb(0 0 0 / 0.06);
-    font-size: 0.75rem;
+    background-color: var(--stories-phone-bar-tint);
+    font-size: var(--stories-phone-bar-font-size);
 }
 
 .status-bar {
     top: 0;
     height: var(--inset-top);
-    padding: 0 24px;
+    padding: 0 var(--space-6);
     background-color: var(--color-bar);
     color: var(--color-on-bar);
 }
@@ -53,9 +53,9 @@
 }
 
 .handle {
-    width: 108px;
-    height: 4px;
-    border-radius: 2px;
+    width: var(--stories-handle-width);
+    height: var(--stories-handle-height);
+    border-radius: var(--stories-handle-radius);
     background-color: currentColor;
 }
 

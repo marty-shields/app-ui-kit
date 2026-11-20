@@ -1,0 +1,12 @@
+@attribute [CustomPage("Components/Navigation/Overview")]
+
+<h1>Navigation</h1>
+
+<h2><code>PeriodStepper</code></h2>
+<p>A previous arrow, the period's label and a next arrow in one row: <em>16 – 22 Nov</em>, <em>November 2026</em> or <em>2026</em>. The arrows are round buttons at <code>--touch-target</code>, a left chevron for previous and a right chevron for next, named by <code>Kind</code> (<code>Week</code>, <code>Month</code> or <code>Year</code>): "Previous week", "Next month". An arrow is disabled, at <code>--opacity-disabled</code>, when its flag is false: <code>CanGoPrevious</code> at the first period with data, <code>CanGoNext</code> at the period that holds today. The label is a polite live region, so a screen reader hears the new period; a long label wraps.</p>
+<ul>
+    <li><code>OnPrevious</code> and <code>OnNext</code> are raised by the arrows.</li>
+    <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>{TestId}-previous</code>, <code>{TestId}-label</code>, <code>{TestId}-next</code>.</li>
+</ul>
+
+<p>Stories: <a href="./?path=/docs/components-navigation-periodstepper--docs">PeriodStepper</a></p>

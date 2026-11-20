@@ -22,7 +22,7 @@
                 <Icon Name="IconName.Minus" />
             </button>
         }
-        <div class="box @(IsInvalid ? "invalid" : null)">
+        <div class="box @(IsInvalid ? "invalid" : null)" @onclick="FocusFromBox">
             <input @ref="input"
                    id="@inputId"
                    type="text"
@@ -62,6 +62,8 @@
     private readonly string messageId = $"number-field-message-{Guid.NewGuid():N}";
     private ElementReference input;
     private string text = "";
+    private decimal? lastValue;
+    private bool echoPending;
     private bool HasMessage => !string.IsNullOrEmpty(InvalidMessage);
     private bool IsInvalid => Invalid || HasMessage;
     private bool AtMinimum => Minimum is { } min && Value is { } v && v <= min;
@@ -71,7 +73,11 @@
     protected override void OnParametersSet()
     {
         // Keep what the user is typing (such as "1.") unless the parent set a different number.
-        if (Parse(text) != Value)
+        // A different Value from the parent also replaces text that is not a number, which Parse alone can't tell apart.
+        // Right after a keystroke the new Value is the parent taking what was typed, not a change of its own.
+        var parentChanged = Value != lastValue && !echoPending;
+        lastValue = Value;
+        if (parentChanged || Parse(text) != Value)
         {
             text = Value is { } v ? v.ToString(CultureInfo.InvariantCulture) : "";
         }
@@ -79,6 +85,7 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        echoPending = false;
         if (firstRender && AutoFocus && !Disabled)
         {
             try
@@ -102,21 +109,29 @@
 
     private async Task OnInput(ChangeEventArgs e)
     {
-        text = e.Value?.ToString() ?? "";
-        await TextChanged.InvokeAsync(text);
-        await ValueChanged.InvokeAsync(Parse(text));
+        var typed = e.Value?.ToString() ?? "";
+        text = typed;
+        echoPending = true;
+        await TextChanged.InvokeAsync(typed);
+        await ValueChanged.InvokeAsync(Parse(typed));
     }
+
+    // Clicking the padding or the unit focuses the input, as the box did when it was a label. Keyboard and screen readers use the input itself.
+    private Task FocusFromBox() => Disabled ? Task.CompletedTask : input.FocusAsync().AsTask();
 
     private Task OnKeyDown(KeyboardEventArgs e) => e.Key == "Enter" ? OnEnter.InvokeAsync() : Task.CompletedTask;
 
-    private Task Decrease() => StepBy(-Step);
+    private Task Decrease() => StepBy(-Math.Abs(Step));
 
-    private Task Increase() => StepBy(Step);
+    private Task Increase() => StepBy(Math.Abs(Step));
 
     // The parent's value is shown through OnParametersSet, so a parent that doesn't take it keeps the field as it was.
     private Task StepBy(decimal delta)
     {
-        var next = (Value ?? Minimum ?? 0) + delta;
+        var from = Value ?? Minimum ?? 0;
+        var next = delta > 0 && from > decimal.MaxValue - delta ? decimal.MaxValue
+            : delta < 0 && from < decimal.MinValue - delta ? decimal.MinValue
+            : from + delta;
         return ValueChanged.InvokeAsync(Minimum is { } min && next < min ? min : next);
     }
 
@@ -155,7 +170,7 @@
     [Parameter]
     public string? Unit { get; set; }
 
-    /// <summary>Uses the decimal keyboard. When false the numeric one, for whole numbers.</summary>
+    /// <summary>Uses the decimal keyboard. When false the numeric one, for whole numbers. Only the keyboard changes: the parent must validate that the number is whole.</summary>
     [Parameter]
     public bool AllowDecimal { get; set; } = true;
 
@@ -163,7 +178,7 @@
     [Parameter]
     public bool Stepper { get; set; }
 
-    /// <summary>How far − and + move the number.</summary>
+    /// <summary>How far − and + move the number. Its absolute value is used, so a negative step does not reverse the buttons; 0 leaves the number where it is.</summary>
     [Parameter]
     public decimal Step { get; set; } = 1;
 

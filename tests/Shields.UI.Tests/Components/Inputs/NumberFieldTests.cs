@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
@@ -105,15 +106,9 @@ public class NumberFieldTests : ComponentTestBase
     [Test]
     public void Typing_KeepsTheTypedTextWhileTheParentTakesTheNumber()
     {
-        decimal? value = null;
-        var cut = Context.Render<NumberField>(p => p
-            .Add(x => x.Label, "Amount")
-            .Add(x => x.TestId, "num")
-            .Add(x => x.Value, value)
-            .Add(x => x.ValueChanged, (decimal? v) => value = v));
+        var cut = RenderBound(null);
 
         cut.Find("[data-testid=num]").Input("1.");
-        cut.Render(p => p.Add(x => x.Value, value));
 
         Assert.That(cut.Find("[data-testid=num]").GetAttribute("value"), Is.EqualTo("1."));
     }
@@ -126,6 +121,107 @@ public class NumberFieldTests : ComponentTestBase
         cut.Render(p => p.Add(x => x.Value, 7m));
 
         Assert.That(cut.Find("[data-testid=num]").GetAttribute("value"), Is.EqualTo("7"));
+    }
+
+    [Test]
+    public void Typing_WithAnAsyncParent_PassesTheTypedTextEvenIfTheParentSetsAValueMeanwhile()
+    {
+        var gate = new TaskCompletionSource();
+        var changed = new List<decimal?>();
+        var cut = Render(p => p
+            .Add(x => x.TextChanged, async (string _) => await gate.Task)
+            .Add(x => x.ValueChanged, (decimal? v) => changed.Add(v)));
+
+        _ = cut.Find("[data-testid=num]").InputAsync(new ChangeEventArgs { Value = "12" });
+        cut.Render(p => p.Add(x => x.Value, 9m));
+        gate.SetResult();
+
+        cut.WaitForAssertion(() => Assert.That(changed, Is.EqualTo(new decimal?[] { 12m })));
+    }
+
+    [Test]
+    public void Value_SetToNullByTheParent_ClearsTextThatIsNotANumber()
+    {
+        var cut = Render(p => p.Add(x => x.Value, 5m));
+
+        cut.Find("[data-testid=num]").Input("abc");
+        cut.Render(p => p.Add(x => x.Value, null));
+
+        Assert.That(cut.Find("[data-testid=num]").GetAttribute("value"), Is.EqualTo(""));
+    }
+
+    [Test]
+    public void Typing_NotANumber_IsKeptWhenTheParentTakesTheNull()
+    {
+        var cut = RenderBound(5m);
+
+        cut.Find("[data-testid=num]").Input("abc");
+
+        Assert.That(cut.Find("[data-testid=num]").GetAttribute("value"), Is.EqualTo("abc"));
+    }
+
+    [TestCase(-10, 160, 140)]
+    [TestCase(0, 150, 150)]
+    public void Stepper_UsesTheAbsoluteValueOfStep(int step, int expectedPlus, int expectedMinus)
+    {
+        var changed = new List<decimal?>();
+        var cut = Render(p => p
+            .Add(x => x.Stepper, true)
+            .Add(x => x.Step, (decimal)step)
+            .Add(x => x.Value, 150m)
+            .Add(x => x.ValueChanged, (decimal? v) => changed.Add(v)));
+
+        cut.Find("[data-testid=num-plus]").Click();
+        cut.Find("[data-testid=num-minus]").Click();
+
+        Assert.That(changed, Is.EqualTo(new decimal?[] { expectedPlus, expectedMinus }));
+    }
+
+    [Test]
+    public void Stepper_NearTheLimitsOfDecimal_ClampsInsteadOfThrowing()
+    {
+        var changed = new List<decimal?>();
+        var high = Render(p => p
+            .Add(x => x.Stepper, true)
+            .Add(x => x.Value, decimal.MaxValue - 0.5m)
+            .Add(x => x.ValueChanged, (decimal? v) => changed.Add(v)));
+        var low = Render(p => p
+            .Add(x => x.Stepper, true)
+            .Add(x => x.Value, decimal.MinValue + 0.5m)
+            .Add(x => x.ValueChanged, (decimal? v) => changed.Add(v)));
+
+        high.Find("[data-testid=num-plus]").Click();
+        low.Find("[data-testid=num-minus]").Click();
+
+        Assert.That(changed, Is.EqualTo(new decimal?[] { decimal.MaxValue, decimal.MinValue }));
+    }
+
+    [Test]
+    public void ClickingTheBox_FocusesTheInput()
+    {
+        var cut = Render();
+
+        cut.Find(".unit").Click();
+
+        Assert.That(Context.JSInterop.Invocations["Blazor._internal.domWrapper.focus"], Has.Count.EqualTo(1));
+    }
+
+    [Test]
+    public void ClickingTheBox_WhenDisabled_DoesNotFocus()
+    {
+        var cut = Render(p => p.Add(x => x.Disabled, true));
+
+        cut.Find(".box").Click();
+
+        Assert.That(Context.JSInterop.Invocations, Is.Empty);
+    }
+
+    [Test]
+    public void Box_AddsNoSecondAccessibleName()
+    {
+        var cut = Render();
+
+        Assert.That(cut.FindAll("label"), Has.Count.EqualTo(1));
     }
 
     [TestCase("Enter", 1)]
@@ -294,16 +390,9 @@ public class NumberFieldTests : ComponentTestBase
     [Test]
     public void Stepper_WhenTheParentTakesTheValue_ShowsIt()
     {
-        decimal? value = 5m;
-        var cut = Context.Render<NumberField>(p => p
-            .Add(x => x.Label, "Amount")
-            .Add(x => x.TestId, "num")
-            .Add(x => x.Stepper, true)
-            .Add(x => x.Value, value)
-            .Add(x => x.ValueChanged, (decimal? v) => value = v));
+        var cut = RenderBound(5m);
 
         cut.Find("[data-testid=num-plus]").Click();
-        cut.Render(p => p.Add(x => x.Value, value));
 
         Assert.That(cut.Find("[data-testid=num]").GetAttribute("value"), Is.EqualTo("6"));
     }
@@ -386,7 +475,9 @@ public class NumberFieldTests : ComponentTestBase
 
         Assert.Multiple(() =>
         {
-            Assert.That(number.Split(".box.invalid {")[1].Split('}')[0], Does.Contain("var(--color-error)"));
+            var invalid = number.Split(".box.invalid {")[1].Split('}')[0];
+            Assert.That(invalid, Does.Contain("border-color: var(--color-error)").And.Contain("box-shadow: inset").And.Contain("var(--color-error)"));
+            Assert.That(invalid, Does.Not.Contain("border-width:"));
             Assert.That(field.Split(".message {")[1].Split('}')[0], Does.Contain("color: var(--color-error)"));
         });
     }
@@ -451,6 +542,30 @@ public class NumberFieldTests : ComponentTestBase
 
         Assert.That(Context.JSInterop.Invocations, Is.Empty);
     }
+
+    // A parent that binds the value, so the field gets it back in the same render as the keystroke.
+    private sealed class BoundHost : ComponentBase
+    {
+        [Parameter] public decimal? Value { get; set; }
+
+        [Parameter] public decimal? Initial { get; set; }
+
+        protected override void OnInitialized() => Value = Initial;
+
+        protected override void BuildRenderTree(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder)
+        {
+            builder.OpenComponent<NumberField>(0);
+            builder.AddAttribute(1, nameof(NumberField.Label), "Amount");
+            builder.AddAttribute(2, nameof(NumberField.TestId), "num");
+            builder.AddAttribute(3, nameof(NumberField.Stepper), true);
+            builder.AddAttribute(4, nameof(NumberField.Value), Value);
+            builder.AddAttribute(5, nameof(NumberField.ValueChanged), EventCallback.Factory.Create<decimal?>(this, v => Value = v));
+            builder.CloseComponent();
+        }
+    }
+
+    private IRenderedComponent<BoundHost> RenderBound(decimal? initial) =>
+        Context.Render<BoundHost>(p => p.Add(x => x.Initial, initial));
 
     private IRenderedComponent<NumberField> Render(Action<ComponentParameterCollectionBuilder<NumberField>>? configure = null) =>
         Context.Render<NumberField>(p =>

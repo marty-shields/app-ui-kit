@@ -46,7 +46,7 @@
 
     <Story Name="Error without a message">
         <Template>
-            <NumberField Label="Reps" ShowLabel="true" Invalid="true" AllowDecimal="false" @bind-Value="reps" TestId="example-number" />
+            <NumberField Label="Reps" ShowLabel="true" Invalid="true" AllowDecimal="false" @bind-Value="repsInvalid" TestId="example-number" />
         </Template>
     </Story>
 
@@ -62,6 +62,7 @@
     private decimal? empty;
     private decimal? daily = 2000;
     private decimal? reps = 8;
+    private decimal? repsInvalid = 8;
     private decimal? focused = 2000;
     private decimal? amount = 150;
     private decimal? atMin = 10;

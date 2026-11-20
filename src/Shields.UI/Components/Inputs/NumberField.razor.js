@@ -8,7 +8,9 @@ export function focusWhenReady(input, attempts) {
                 return;
             }
             input.focus();
-            if (document.activeElement === input || left <= 0) {
+            const active = document.activeElement;
+            const elsewhere = active !== null && active !== document.body && active !== input;
+            if (active === input || elsewhere || left <= 0) {
                 resolve();
                 return;
             }

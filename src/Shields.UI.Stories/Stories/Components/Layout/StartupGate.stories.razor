@@ -1,0 +1,37 @@
+@attribute [Stories("Components/Layout/StartupGate")]
+
+<Stories TComponent="StartupGate" Layout="typeof(PhoneLayout)">
+
+    <Story Name="Loading">
+        <Template>
+            <StartupGate Title="My App" FailedMessage="Couldn't open the database" Initialize="() => new TaskCompletionSource().Task">
+                <p>App content.</p>
+            </StartupGate>
+        </Template>
+    </Story>
+
+    <Story Name="Load failed">
+        <Template>
+            <StartupGate Title="My App" FailedMessage="Couldn't open the database" Initialize="() => Task.FromException(new InvalidOperationException())">
+                <p>App content.</p>
+            </StartupGate>
+        </Template>
+    </Story>
+
+    <Story Name="Load failed, no retry">
+        <Template>
+            <StartupGate Title="My App" FailedMessage="Couldn't open the database" Retryable="false" Initialize="() => Task.FromException(new InvalidOperationException())">
+                <p>App content.</p>
+            </StartupGate>
+        </Template>
+    </Story>
+
+    <Story Name="Ready">
+        <Template>
+            <StartupGate FailedMessage="Couldn't open the database" Initialize="() => Task.CompletedTask">
+                <p>App content.</p>
+            </StartupGate>
+        </Template>
+    </Story>
+
+</Stories>

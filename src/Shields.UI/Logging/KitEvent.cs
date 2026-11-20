@@ -6,6 +6,15 @@ namespace Shields.UI.Logging;
 /// </summary>
 internal enum KitEvent
 {
+    /// <summary><see cref="Components.Layout.StartupGate"/>: start-up work finished.</summary>
+    StartupFinished = 2001,
+
+    /// <summary><see cref="Components.Layout.StartupGate"/>: start-up work failed.</summary>
+    StartupFailed = 2002,
+
+    /// <summary><see cref="Components.Layout.AppErrorBoundary"/>: unhandled error in a screen.</summary>
+    ScreenError = 2101,
+
     /// <summary><see cref="Navigation.BackButton"/>: back handled by the page.</summary>
     BackHandled = 2201,
 

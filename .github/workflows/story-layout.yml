@@ -1,0 +1,50 @@
+# Runs on every PR to main or into an epic branch (epic/**, see docs/epics.md) that is not a draft.
+# Fails when a story under Components/ clips, overflows or wraps at the narrowest card.
+name: Story layout
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [main, "epic/**"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: story-layout-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  story-layout:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Build the stories
+        run: dotnet build src/Shields.UI.Stories.Host
+
+      - name: Check the story layout
+        run: |
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          dotnet run --project src/Shields.UI.Stories.Host --no-build --urls http://localhost:5056 > "$RUNNER_TEMP/stories.log" 2>&1 &
+          SERVER_PID=$!
+          ready=false
+          for _ in $(seq 60); do
+            if curl -fs -o /dev/null http://localhost:5056/iframe.html; then ready=true; break; fi
+            kill -0 "$SERVER_PID" 2>/dev/null || break
+            sleep 1
+          done
+          if [ "$ready" != true ]; then
+            echo "Stories server did not come up:"
+            cat "$RUNNER_TEMP/stories.log"
+            exit 1
+          fi
+          node .github/scripts/check-story-layout.mjs http://localhost:5056 "$(command -v google-chrome)" || { cat "$RUNNER_TEMP/stories.log"; exit 1; }

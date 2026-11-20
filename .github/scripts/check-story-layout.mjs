@@ -12,7 +12,7 @@ if (!baseUrl || !chromePath) {
   process.exit(64);
 }
 
-// The story preview adds 96px around the story, so 424 leaves 328px: a 360dp phone less 16px side padding.
+// 424px is the narrowest preview width: a 360dp phone plus the 96px the story preview adds around the story.
 const WIDTH = 424;
 // Exploration knob (Android font size scales rem); not run in CI.
 const FONT_SCALE = Number(process.env.STORY_FONT_SCALE ?? 1);
@@ -53,8 +53,8 @@ function inspect() {
   if (!frame && document.documentElement.scrollWidth > viewport) {
     findings.push(`page scrolls sideways (${document.documentElement.scrollWidth}px > ${viewport}px)`);
   }
-  const card = app.querySelector('.card');
-  if (card?.parentElement) {
+  for (const card of app.querySelectorAll('.card')) {
+    if (!card.parentElement) continue;
     const box = card.getBoundingClientRect();
     const container = card.parentElement.getBoundingClientRect();
     if (box.left < container.left - 1 || box.right > container.right + 1) {

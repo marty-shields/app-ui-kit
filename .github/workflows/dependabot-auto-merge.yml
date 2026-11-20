@@ -1,12 +1,12 @@
-# Squash-merges Dependabot's minor and patch update PRs once every check that ran on them is green (Build and test and
-# PR checks). A major update, or a PR with a failed or cancelled check, is left for a person.
+# Squash-merges Dependabot's minor and patch update PRs once every check that ran on them is green (Build and test, PR checks
+# and Story layout). A major update, or a PR with a failed or cancelled check, is left for a person.
 #
 # It runs when a PR workflow finishes, from the copy of this file on main, and never checks out the PR's code.
 name: Dependabot auto-merge
 
 on:
   workflow_run:
-    workflows: ["Build and test", "PR checks"]
+    workflows: ["Build and test", "PR checks", "Story layout"]
     types: [completed]
 
 permissions:

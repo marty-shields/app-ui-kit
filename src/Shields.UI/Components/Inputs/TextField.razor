@@ -1,3 +1,4 @@
+@using Microsoft.JSInterop
 <div class="field @(Invalid ? "invalid" : null)">
     <label class="box">
         <span class="visually-hidden">@Label</span>
@@ -10,6 +11,8 @@
                aria-invalid="@(Invalid ? "true" : null)"
                aria-describedby="@(Invalid ? messageId : null)"
                data-testid="@InputTestId"
+               @key="generation"
+               @ref="input"
                @oninput="OnInput" />
     </label>
     @if (Invalid)
@@ -23,7 +26,64 @@
     private bool Invalid => !string.IsNullOrEmpty(InvalidMessage);
     private string InputTestId => TestId ?? "text-field";
 
-    private Task OnInput(ChangeEventArgs e) => ValueChanged.InvokeAsync(e.Value?.ToString() ?? "");
+    private int generation;
+    private bool inputSettled;
+    private bool restoreFocus;
+    private string? staleInputId;
+    private string? previousValue;
+    private string typed = "";
+    private ElementReference input;
+
+    private async Task OnInput(ChangeEventArgs e)
+    {
+        typed = e.Value?.ToString() ?? "";
+        previousValue = Value;
+        try
+        {
+            await ValueChanged.InvokeAsync(typed);
+        }
+        finally
+        {
+            inputSettled = true;
+        }
+    }
+
+    /// <summary>Redraws the input when the parent put the text back to what it was before the keystroke, so the browser drops the typed text, and puts focus back on it.</summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (restoreFocus)
+        {
+            // The reference only points at the new input once the browser has drawn it.
+            if (input.Id != staleInputId)
+            {
+                restoreFocus = false;
+                try
+                {
+                    await input.FocusAsync();
+                }
+                catch (JSDisconnectedException)
+                {
+                    // The page is gone, and the input with it.
+                }
+            }
+
+            return;
+        }
+
+        if (!inputSettled)
+        {
+            return;
+        }
+
+        inputSettled = false;
+        if (Value == previousValue && typed != (Value ?? ""))
+        {
+            staleInputId = input.Id;
+            generation++;
+            restoreFocus = true;
+            StateHasChanged();
+        }
+    }
 
     /// <summary>What the text is, e.g. Serving name. Names the field for screen readers and is not shown.</summary>
     [Parameter, EditorRequired]

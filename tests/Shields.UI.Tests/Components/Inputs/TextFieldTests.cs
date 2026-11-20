@@ -56,9 +56,49 @@ public class TextFieldTests : ComponentTestBase
         });
     }
 
+    [TestCase(null)]
+    [TestCase("")]
+    public void NoInvalidMessage_ShowsNoError(string? invalid)
+    {
+        var cut = Render(invalid: invalid);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.FindAll("[role=alert]"), Is.Empty);
+            Assert.That(cut.Find("input").HasAttribute("aria-invalid"), Is.False);
+        });
+    }
+
     [Test]
-    public void NoInvalidMessage_ShowsNoError() =>
-        Assert.That(Render().FindAll("[role=alert]"), Is.Empty);
+    public void TypingTheParentPutsBack_RedrawsOnceSoTheTypedTextGoes()
+    {
+        var cut = Render("abc");
+        var renders = cut.RenderCount;
+
+        cut.Find("input").Input("abcd");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.RenderCount - renders, Is.EqualTo(2));
+            Assert.That(cut.Find("input").GetAttribute("value"), Is.EqualTo("abc"));
+        });
+    }
+
+    [Test]
+    public void TypingTheParentTakes_DoesNotRedraw()
+    {
+        IRenderedComponent<TextField> cut = null!;
+        cut = Render("abc", changed: v => cut.Render(p => p.Add(x => x.Value, v)));
+        var renders = cut.RenderCount;
+
+        cut.Find("input").Input("abcd");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.RenderCount - renders, Is.EqualTo(2));
+            Assert.That(cut.Find("input").GetAttribute("value"), Is.EqualTo("abcd"));
+        });
+    }
 
     [Test]
     public void Disabled_DisablesTheInput() =>

@@ -70,10 +70,15 @@ public class RadioGroupTests : ComponentTestBase
     public void TappingAnOption_TheParentDoesNotTake_ChecksTheParentsValueAgain()
     {
         var cut = Render(value: 1);
+        var renders = cut.RenderCount;
 
         cut.Find("[data-testid=two]").Change(true);
 
-        Assert.That(cut.FindAll("input").Select(i => i.HasAttribute("checked")), Is.EqualTo(new[] { true, false }));
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.RenderCount - renders, Is.EqualTo(2));
+            Assert.That(cut.FindAll("input").Select(i => i.HasAttribute("checked")), Is.EqualTo(new[] { true, false }));
+        });
     }
 
     [Test]

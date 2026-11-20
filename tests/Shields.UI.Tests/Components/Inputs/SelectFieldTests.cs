@@ -74,12 +74,58 @@ public class SelectFieldTests : ComponentTestBase
     }
 
     [Test]
-    public void ValueChangedNotTakenByTheParent_RedrawsSoTheChosenOptionStays()
+    public void ValueChangedNotTakenByTheParent_RedrawsOnceSoTheChosenOptionStays()
     {
         var cut = Render(10);
+        var renders = cut.RenderCount;
 
         cut.Find("select").Change("1");
 
-        Assert.That(cut.FindAll("option").Select(o => o.HasAttribute("selected")), Is.EqualTo(new[] { true, false, false }));
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.RenderCount - renders, Is.EqualTo(2));
+            Assert.That(cut.FindAll("option").Select(o => o.HasAttribute("selected")), Is.EqualTo(new[] { true, false, false }));
+        });
+    }
+
+    [Test]
+    public void ValueChangedTakenByTheParent_DoesNotRedraw()
+    {
+        IRenderedComponent<SelectField<int>> cut = null!;
+        cut = Render(10, changed: v => cut.Render(p => p.Add(x => x.Value, v)));
+        var renders = cut.RenderCount;
+
+        cut.Find("select").Change("1");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.RenderCount - renders, Is.EqualTo(2));
+            Assert.That(cut.FindAll("option").Select(o => o.HasAttribute("selected")), Is.EqualTo(new[] { false, true, false }));
+        });
+    }
+
+    [Test]
+    public async Task AsyncParentHandler_RenderingBeforeItFinishes_DoesNotRedrawWhenTheParentTakesTheValue()
+    {
+        var cut = Render(10);
+        var finish = new TaskCompletionSource();
+        cut.Render(p => p.Add(x => x.ValueChanged, async (int v) =>
+        {
+            await finish.Task;
+            cut.Render(q => q.Add(x => x.Value, v));
+        }));
+        var before = cut.RenderCount;
+
+        var change = cut.Find("select").ChangeAsync(new Microsoft.AspNetCore.Components.ChangeEventArgs { Value = "1" });
+        cut.Render();
+        var whileWaiting = cut.RenderCount - before;
+        finish.SetResult();
+        await change;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(whileWaiting, Is.EqualTo(2), "renders while the parent had not answered");
+            Assert.That(cut.FindAll("option").Select(o => o.HasAttribute("selected")), Is.EqualTo(new[] { false, true, false }));
+        });
     }
 }

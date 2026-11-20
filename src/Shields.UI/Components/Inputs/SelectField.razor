@@ -1,4 +1,5 @@
 @typeparam TValue
+@using Microsoft.JSInterop
 <div class="field">
     <label class="box">
         <span class="visually-hidden">@Label</span>
@@ -6,6 +7,7 @@
                 disabled="@Disabled"
                 data-testid="@TestId"
                 @key="generation"
+                @ref="select"
                 @onchange="Pick">
             @for (var i = 0; i < Options.Count; i++)
             {
@@ -19,11 +21,13 @@
 
 @code {
     private int generation;
-    private bool picked;
+    private bool pickSettled;
+    private bool restoreFocus;
+    private string? staleSelectId;
+    private ElementReference select;
+    private TValue? pickedValue;
 
     private bool IsChosen(TValue optionValue) => EqualityComparer<TValue>.Default.Equals(optionValue, Value);
-
-    private TValue? pickedValue;
 
     private async Task Pick(ChangeEventArgs e)
     {
@@ -33,22 +37,49 @@
         }
 
         pickedValue = Options[index].Value;
-        picked = true;
-        await ValueChanged.InvokeAsync(pickedValue);
+        try
+        {
+            await ValueChanged.InvokeAsync(pickedValue);
+        }
+        finally
+        {
+            pickSettled = true;
+        }
     }
 
-    /// <summary>Redraws the list when the parent didn't take the picked value, so the browser shows the chosen one.</summary>
-    protected override void OnAfterRender(bool firstRender)
+    /// <summary>Redraws the list when the parent didn't take the picked value, so the browser shows the chosen one, and puts focus back on it.</summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!picked)
+        if (restoreFocus)
+        {
+            // The reference only points at the new select once the browser has drawn it.
+            if (select.Id != staleSelectId)
+            {
+                restoreFocus = false;
+                try
+                {
+                    await select.FocusAsync();
+                }
+                catch (JSDisconnectedException)
+                {
+                    // The page is gone, and the list with it.
+                }
+            }
+
+            return;
+        }
+
+        if (!pickSettled)
         {
             return;
         }
 
-        picked = false;
+        pickSettled = false;
         if (!EqualityComparer<TValue>.Default.Equals(pickedValue, Value))
         {
+            staleSelectId = select.Id;
             generation++;
+            restoreFocus = true;
             StateHasChanged();
         }
     }

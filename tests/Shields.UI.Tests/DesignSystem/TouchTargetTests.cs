@@ -33,6 +33,10 @@ public partial class TouchTargetTests
     }
 
     [Test]
+    public void TouchTargetToken_Is48px() =>
+        Assert.That(RepoFiles.Read("src", "Shields.UI", "wwwroot", "css", "tokens.css"), Does.Contain("--touch-target: 48px;"));
+
+    [Test]
     public void IconButton_IsATouchTarget_AndCompactStaysAtTheCompactTarget()
     {
         var css = Rules(RepoFiles.Read("src", "Shields.UI", "Components", "Actions", "IconButton.razor.css")).ToList();

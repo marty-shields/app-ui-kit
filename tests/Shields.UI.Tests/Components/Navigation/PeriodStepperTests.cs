@@ -102,7 +102,8 @@ public class PeriodStepperTests : ComponentTestBase
 
         Assert.Multiple(() =>
         {
-            Assert.That(Rule(css, ".label"), Does.Contain("overflow-wrap: anywhere;"));
+            Assert.That(Rule(css, ".label"), Does.Contain("overflow-wrap: break-word;"));
+            Assert.That(Rule(css, ".label"), Does.Not.Contain("overflow-wrap: anywhere;"));
             Assert.That(Rule(css, ".label"), Does.Contain("min-width: 0;"));
             Assert.That(Rule(css, ".label"), Does.Not.Contain("text-overflow"));
             Assert.That(Rule(css, ".label"), Does.Not.Contain("white-space: nowrap;"));

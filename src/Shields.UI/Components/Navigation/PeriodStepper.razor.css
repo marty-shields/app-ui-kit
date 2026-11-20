@@ -11,7 +11,7 @@
     font-weight: var(--font-weight-bold);
     font-variant-numeric: tabular-nums;
     text-align: center;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
 }
 
 .stepper ::deep .icon-btn {

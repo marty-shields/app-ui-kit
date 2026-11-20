@@ -1,0 +1,96 @@
+# Publishes the kit on every push to main except one that changes only docs or CI (docs/release.md): works out the next
+# version from the semver labels of the PRs merged since the last v* tag, packs Shields.UI, Shields.UI.Stories and
+# Shields.UI.Testing at that version, pushes them to nuget.org with Trusted Publishing (no API key is stored) and creates
+# the v<version> tag with a GitHub release.
+name: Release
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "**.md"
+      - ".github/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      release: ${{ steps.next.outputs.release }}
+      version: ${{ steps.next.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Next version
+        id: next
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: .github/scripts/next-version.sh v "$GITHUB_SHA"
+
+  publish:
+    needs: version
+    if: needs.version.outputs.release == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      id-token: write
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: NuGet user set
+        env:
+          NUGET_USER: ${{ vars.NUGET_USER }}
+        run: |
+          if [[ -z "$NUGET_USER" ]]; then
+            echo "::error title=Release::The repo variable NUGET_USER is empty: set it to the nuget.org user name (docs/release.md)."
+            exit 1
+          fi
+
+      # The packages are built before the token exchange, so no key exists while project code runs.
+      - name: Pack
+        run: |
+          for project in Shields.UI Shields.UI.Stories Shields.UI.Testing; do
+            dotnet pack "src/$project" -c Release -p:Version="$VERSION" -o "$RUNNER_TEMP/packages"
+          done
+          test "$(find "$RUNNER_TEMP/packages" -name "*.$VERSION.nupkg" | wc -l)" -eq 3
+
+      - name: NuGet login
+        id: login
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
+        with:
+          user: ${{ vars.NUGET_USER }}
+
+      # --skip-duplicate lets a re-run finish after a push that got only some of the packages through.
+      - name: Push to nuget.org
+        env:
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+        run: dotnet nuget push "$RUNNER_TEMP/packages/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY" --skip-duplicate
+
+      # Creates the v* tag on this commit with the release.
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "v$VERSION" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "v$VERSION" --generate-notes

@@ -13,7 +13,7 @@ The shared UI kit (.NET 11 Blazor) for the Calorie Tracker and Workout Log apps:
 - Pack the test helpers: `dotnet pack src/Shields.UI.Testing -o <folder>` (embeds the kit's `tokens.css` and `base.css`).
 - Stories site: `dotnet run --project src/Shields.UI.Stories.Host` → http://localhost:5056
 
-The story-layout check, the stories Pages site and the release workflow are still to come ([epic issues](https://github.com/marty-shields/app-ui-kit/issues)).
+Releases and beta packages: [docs/release.md](docs/release.md). The story-layout check and the stories Pages site are still to come ([epic issues](https://github.com/marty-shields/app-ui-kit/issues)).
 
 ## How the code fits
 - Projects: `Shields.UI` (components, tokens, base styles), `Shields.UI.Stories` (the stories shell), `Shields.UI.Stories.Host` (the site), `Shields.UI.Testing` (package of design checks and the kit's tokens for the apps' tests; no test-framework dependency) and `tests/Shields.UI.Tests`.

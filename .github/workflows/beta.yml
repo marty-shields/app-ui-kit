@@ -1,0 +1,80 @@
+# Publishes prerelease packages of a PR into main that has the publish-beta label (docs/release.md), so an app can try a
+# kit change before it merges: Shields.UI, Shields.UI.Stories and Shields.UI.Testing at <next release>-pr.<PR>.<run number>,
+# pushed to nuget.org with Trusted Publishing (no API key is stored). A PR without the label, or from a fork, publishes nothing.
+# It uses pull_request, never pull_request_target, so a fork's code never runs with the publishing token.
+name: Beta packages
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, labeled]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: beta-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  beta:
+    # Labelling a PR with anything but publish-beta publishes nothing.
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository
+      && contains(github.event.pull_request.labels.*.name, 'publish-beta')
+      && (github.event.action != 'labeled' || github.event.label.name == 'publish-beta')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: NuGet user set
+        env:
+          NUGET_USER: ${{ vars.NUGET_USER }}
+        run: |
+          if [[ -z "$NUGET_USER" ]]; then
+            echo "::error title=Beta::The repo variable NUGET_USER is empty: set it to the nuget.org user name (docs/release.md)."
+            exit 1
+          fi
+
+      # The version the PR's merge would release, with the PR's own semver label counted, from main as it is now.
+      - name: Next version
+        id: next
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PENDING_LABELS: ${{ join(github.event.pull_request.labels.*.name, ' ') }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: .github/scripts/next-version.sh v "$BASE_SHA"
+
+      # A run number never repeats or goes down, so each push to the PR gets a higher version; the packages are built before the token exchange.
+      - name: Pack
+        env:
+          VERSION: ${{ steps.next.outputs.version }}-pr.${{ github.event.pull_request.number }}.${{ github.run_number }}
+        run: |
+          echo "Beta version $VERSION"
+          for project in Shields.UI Shields.UI.Stories Shields.UI.Testing; do
+            dotnet pack "src/$project" -c Release -p:Version="$VERSION" -o "$RUNNER_TEMP/packages"
+          done
+          test "$(find "$RUNNER_TEMP/packages" -name "*.$VERSION.nupkg" | wc -l)" -eq 3
+
+      - name: NuGet login
+        id: login
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
+        with:
+          user: ${{ vars.NUGET_USER }}
+
+      - name: Push to nuget.org
+        env:
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+        run: dotnet nuget push "$RUNNER_TEMP/packages/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY" --skip-duplicate

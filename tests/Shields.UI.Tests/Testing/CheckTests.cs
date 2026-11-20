@@ -167,11 +167,10 @@ public class CheckTests
     }
 
     [Test]
-    public void Contrast_OfAnAppColour_CanBeMeasuredAgainstAKitToken()
+    public void Contrast_OfATokenOnlyTheKitDeclares_ThrowsNamingIt()
     {
-        var result = ContrastCheck.Measure(":root { --app-fg: #000000; }", "--app-fg", "--color-bg", ContrastCheck.Text, ColourScheme.Light);
-
-        Assert.That(result.BackgroundColour, Is.EqualTo(DesignTokens.Colour("--color-bg").Light));
+        Assert.That(() => ContrastCheck.Measure(":root { --app-fg: #000000; }", "--app-fg", "--color-bg", ContrastCheck.Text, ColourScheme.Light),
+            Throws.InvalidOperationException.With.Message.Contain("--color-bg"));
     }
 
     [Test]

@@ -74,7 +74,7 @@ public class LoadFailedTests : ComponentTestBase
 
         var cut = Render();
 
-        cut.WaitForAssertion(() => Assert.That(logger.Records, Is.EqualTo(new[] { (3301, LogLevel.Warning, "Focusing Try again failed") })));
+        cut.WaitForAssertion(() => Assert.That(logger.Records, Is.EqualTo(new[] { (9401, LogLevel.Warning, "Focusing Try again failed") })));
         Assert.Multiple(() =>
         {
             Assert.That(logger.LastException, Is.TypeOf<JSException>());

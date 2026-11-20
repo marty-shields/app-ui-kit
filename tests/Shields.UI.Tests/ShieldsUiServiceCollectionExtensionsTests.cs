@@ -26,14 +26,19 @@ public class ShieldsUiServiceCollectionExtensionsTests
     }
 
     [Test]
-    public void AddShieldsUi_RegistersTheSnackbarServiceAsOneInstanceAcrossScopes()
+    public void AddShieldsUi_RegistersTheSnackbarServicePerScope()
     {
         using var provider = new ServiceCollection().AddShieldsUi().BuildServiceProvider(validateScopes: true);
         using var first = provider.CreateScope();
         using var second = provider.CreateScope();
+        var inFirst = first.ServiceProvider.GetRequiredService<SnackbarService>();
 
-        Assert.That(first.ServiceProvider.GetRequiredService<SnackbarService>(),
-            Is.SameAs(second.ServiceProvider.GetRequiredService<SnackbarService>()));
+        Assert.Multiple(() =>
+        {
+            Assert.That(inFirst, Is.SameAs(first.ServiceProvider.GetRequiredService<SnackbarService>()));
+            Assert.That(inFirst,
+                Is.Not.SameAs(second.ServiceProvider.GetRequiredService<SnackbarService>()));
+        });
     }
 
     [Test]

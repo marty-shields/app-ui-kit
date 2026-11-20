@@ -617,10 +617,10 @@ public class SnackbarTests : ComponentTestBase
     {
         var cut = Context.Render<Snackbar>();
         await Context.Renderer.Dispatcher.InvokeAsync(() => Service.Show("First", "Undo", () => Task.CompletedTask));
-        clock.Advance(TimeSpan.FromSeconds(4));
+        clock.Advance(TimeSpan.FromSeconds(9));
 
         await Context.Renderer.Dispatcher.InvokeAsync(() => Service.Show("Second"));
-        clock.Advance(TimeSpan.FromSeconds(4));
+        clock.Advance(TimeSpan.FromSeconds(9));
 
         Assert.Multiple(() =>
         {

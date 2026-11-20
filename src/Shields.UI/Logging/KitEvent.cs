@@ -1,44 +1,44 @@
 namespace Shields.UI.Logging;
 
 /// <summary>
-/// Event ids of the kit's log messages. Each keeps the number the apps logged it under, so ids sit in the apps' 2000–4999 range
-/// at their old block. Values never change once logged; ids are never reused.
+/// Event ids of the kit's log messages. The kit's own range is 9000–9999, grouped by component in steps of 100
+/// (start-up 90x, screen 91x, back 92x, and so on). Values never change once logged; ids are never reused.
 /// </summary>
 internal enum KitEvent
 {
     /// <summary><see cref="Components.Layout.StartupGate"/>: start-up work finished.</summary>
-    StartupFinished = 2001,
+    StartupFinished = 9001,
 
     /// <summary><see cref="Components.Layout.StartupGate"/>: start-up work failed.</summary>
-    StartupFailed = 2002,
+    StartupFailed = 9002,
 
     /// <summary><see cref="Components.Layout.AppErrorBoundary"/>: unhandled error in a screen.</summary>
-    ScreenError = 2101,
+    ScreenError = 9101,
 
     /// <summary><see cref="Navigation.BackButton"/>: back handled by the page.</summary>
-    BackHandled = 2201,
+    BackHandled = 9201,
 
     /// <summary><see cref="Navigation.BackButton"/>: back pressed with no handler.</summary>
-    BackNotHandled = 2202,
+    BackNotHandled = 9202,
 
     /// <summary><see cref="Navigation.BackButton"/>: a back handler failed.</summary>
-    BackHandlerFailed = 2203,
+    BackHandlerFailed = 9203,
 
     /// <summary><see cref="Lifecycle.AppLifecycle"/>: an app start handler failed.</summary>
-    AppStartHandlerFailed = 3201,
+    AppStartHandlerFailed = 9301,
 
     /// <summary><see cref="Components.Feedback.LoadFailed"/>: focusing Try again failed.</summary>
-    LoadFailedFocusFailed = 3301,
+    LoadFailedFocusFailed = 9401,
 
-    /// <summary><see cref="Components.Feedback.Snackbar"/>: focusing the action failed. Workout Log's id; Calorie Tracker uses 3901 for something else, in its own app.</summary>
-    UndoFocusFailed = 3901,
+    /// <summary><see cref="Components.Feedback.Snackbar"/>: focusing the action failed.</summary>
+    UndoFocusFailed = 9501,
 
-    /// <summary><see cref="Components.Feedback.Snackbar"/>: checking the action for keyboard focus failed, so the timer runs on. Workout Log's id; Calorie Tracker uses 3902 for something else, in its own app.</summary>
-    UndoFocusCheckFailed = 3902,
+    /// <summary><see cref="Components.Feedback.Snackbar"/>: checking the action for keyboard focus failed, so the timer runs on.</summary>
+    UndoFocusCheckFailed = 9502,
 
-    /// <summary><see cref="Components.Inputs.NumberField"/>: focusing the input on show failed. Calorie Tracker's id; Workout Log uses 3701 for something else, in its own app.</summary>
-    NumberFieldFocusFailed = 3701,
+    /// <summary><see cref="Components.Inputs.NumberField"/>: focusing the input on show failed.</summary>
+    NumberFieldFocusFailed = 9601,
 
     /// <summary><see cref="Components.Layout.AppScreen"/>: setting up pull to refresh failed.</summary>
-    PullRefreshFailed = 4001,
+    PullRefreshFailed = 9701,
 }

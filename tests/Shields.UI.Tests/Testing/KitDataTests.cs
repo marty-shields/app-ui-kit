@@ -1,6 +1,3 @@
-using Microsoft.AspNetCore.Components;
-using Shields.UI.Components.Actions;
-
 namespace Shields.UI.Tests.Testing;
 
 public class KitDataTests
@@ -27,9 +24,7 @@ public class KitDataTests
     [Test]
     public void Components_AreEveryExportedComponentOfTheKit()
     {
-        var exported = typeof(AppButton).Assembly.GetExportedTypes()
-            .Where(t => typeof(IComponent).IsAssignableFrom(t) && !t.IsAbstract)
-            .Select(t => t.Name.Split('`')[0]);
+        var exported = KitComponents.Exported.Select(t => t.Name.Split('`')[0]);
 
         Assert.That(KitNames.Components, Is.EquivalentTo(exported));
     }

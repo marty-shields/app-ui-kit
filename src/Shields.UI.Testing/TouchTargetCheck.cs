@@ -46,7 +46,7 @@ public static partial class TouchTargetCheck
 
     /// <summary>Problems of every control in the <c>.razor</c> files under a folder, each checked against its <c>.razor.css</c>.</summary>
     public static IReadOnlyList<string> ProblemsInFolder(string folder) =>
-        CssFiles.Find(folder, "*.razor")
+        SourceFiles.Find(folder, "*.razor")
             .SelectMany(file => Controls(File.ReadAllText(file)).SelectMany(control =>
                 File.Exists(file + ".css")
                     ? Problems(control, File.ReadAllText(file + ".css")).Select(p => $"{Path.GetFileName(file)}: {p}")
@@ -55,7 +55,7 @@ public static partial class TouchTargetCheck
 
     /// <summary>Trimmed declarations of every rule in a piece of CSS whose selector list contains the selector.</summary>
     public static IReadOnlyList<string> Declarations(string css, string selector) =>
-        Rule().Matches(Comment().Replace(css, ""))
+        Rule().Matches(SourceFiles.StripComments(css))
             .Where(m => m.Groups[1].Value.Split(',', StringSplitOptions.TrimEntries).Contains(selector))
             .SelectMany(m => m.Groups[2].Value.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
             .ToList();
@@ -74,7 +74,4 @@ public static partial class TouchTargetCheck
 
     [GeneratedRegex(@"([^{}]+)\{([^{}]*)\}")]
     private static partial Regex Rule();
-
-    [GeneratedRegex(@"/\*.*?\*/", RegexOptions.Singleline)]
-    private static partial Regex Comment();
 }

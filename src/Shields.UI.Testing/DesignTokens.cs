@@ -31,9 +31,10 @@ public static partial class DesignTokens
     /// <summary>Trimmed value of a custom property declared in the kit's tokens.css.</summary>
     public static string Value(string name) => Value(KitCss.Tokens, name);
 
-    /// <summary>Trimmed value of a custom property declared in a piece of CSS.</summary>
+    /// <summary>Trimmed value of a custom property declared in a piece of CSS; the last declaration wins, as in the cascade.</summary>
     public static string Value(string css, string name) =>
-        Declaration().Matches(css).Single(m => m.Groups[1].Value == name).Groups[2].Value.Trim();
+        Declaration().Matches(css).LastOrDefault(m => m.Groups[1].Value == name)?.Groups[2].Value.Trim()
+        ?? throw new InvalidOperationException($"{name} is not declared.");
 
     /// <summary>Custom properties used through <c>var()</c> in a piece of CSS.</summary>
     public static IEnumerable<string> Uses(string css) => Use().Matches(css).Select(m => m.Groups[1].Value);
@@ -46,7 +47,7 @@ public static partial class DesignTokens
             ? Rgb.Parse(text)
             : throw new FormatException($"{name}: expected a single #rrggbb colour but found '{text}'.");
 
-    [GeneratedRegex(@"^\s*(--[a-z0-9-]+)\s*:([^;]*);", RegexOptions.Multiline)]
+    [GeneratedRegex(@"(?:^|(?<=[{;]))\s*(--[a-z0-9-]+)\s*:([^;}]*)(?=[;}])", RegexOptions.Multiline)]
     private static partial Regex Declaration();
 
     [GeneratedRegex(@"^light-dark\(([^,()]*),([^,()]*)\)$")]

@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace Shields.UI.Testing;
 
 /// <summary>One foreground and background token pair measured in one theme.</summary>
@@ -6,7 +8,7 @@ public readonly record struct ContrastResult(string Foreground, string Backgroun
     public bool Passes => Ratio >= Minimum;
 
     public override string ToString() =>
-        $"{Foreground} {ForegroundColour} on {Background} {BackgroundColour} ({Scheme}): {Ratio:0.00}, needs {Minimum}";
+        $"{Foreground} {ForegroundColour} on {Background} {BackgroundColour} ({Scheme}): {Ratio.ToString("0.00", CultureInfo.InvariantCulture)}, needs {Minimum.ToString(CultureInfo.InvariantCulture)}";
 }
 
 /// <summary>WCAG contrast of a pair of colour tokens.</summary>
@@ -22,11 +24,14 @@ public static class ContrastCheck
     public static ContrastResult Measure(string foreground, string background, double minimum, ColourScheme scheme) =>
         Measure(KitCss.Tokens, foreground, background, minimum, scheme);
 
-    /// <summary>Measures a pair of colour tokens declared in a piece of CSS, such as an app's own tokens.css.</summary>
+    /// <summary>Measures a pair of colour tokens declared in a piece of CSS, such as an app's own tokens.css. A token that CSS does not declare is read from the kit's tokens.css.</summary>
     public static ContrastResult Measure(string tokensCss, string foreground, string background, double minimum, ColourScheme scheme)
     {
-        var fg = DesignTokens.Colour(tokensCss, foreground).In(scheme);
-        var bg = DesignTokens.Colour(tokensCss, background).In(scheme);
+        var fg = Colour(tokensCss, foreground).In(scheme);
+        var bg = Colour(tokensCss, background).In(scheme);
         return new(foreground, background, scheme, fg, bg, Rgb.Contrast(fg, bg), minimum);
     }
+
+    private static ThemedColour Colour(string css, string name) =>
+        DesignTokens.Declares(css).Contains(name) ? DesignTokens.Colour(css, name) : DesignTokens.Colour(name);
 }

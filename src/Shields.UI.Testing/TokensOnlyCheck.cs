@@ -5,34 +5,40 @@ namespace Shields.UI.Testing;
 /// <summary>No literal colours or sizes outside a tokens file, and only declared tokens used. Each method returns what it found; empty means the check holds.</summary>
 public static partial class TokensOnlyCheck
 {
-    // Literal values every app may keep: the safe-area fallbacks and the visually-hidden helper in base.css.
-    private static readonly HashSet<string> BaseAllowed =
+    // Literal lines the kit's own base.css keeps: the safe-area fallbacks and the visually-hidden helper.
+    private static readonly string[] BaseAllowed =
     [
-        "base.css: --inset-top: env(safe-area-inset-top, 0px);",
-        "base.css: --inset-bottom: env(safe-area-inset-bottom, 0px);",
-        "base.css: width: 1px;",
-        "base.css: height: 1px;",
-        "base.css: margin: -1px;",
+        "--inset-top: env(safe-area-inset-top, 0px);",
+        "--inset-bottom: env(safe-area-inset-bottom, 0px);",
+        "width: 1px;",
+        "height: 1px;",
+        "margin: -1px;",
     ];
 
-    /// <summary>Lines of a stylesheet with a literal colour or size, as <c>file.css: line</c>, less the allowed lines.</summary>
-    /// <param name="allowed">Further lines to accept, in the same <c>file.css: line</c> form.</param>
-    public static IReadOnlyList<string> Literals(string css, string fileName, IEnumerable<string>? allowed = null)
+    /// <summary>Lines of a stylesheet with a literal colour or size, as <c>name: line</c>, less the allowed lines. The kit's own base.css keeps its safe-area and visually-hidden literals; an app's stylesheet does not.</summary>
+    /// <param name="name">How the file is reported: its file name, or its path inside the checked folder.</param>
+    /// <param name="allowed">Lines to accept, in the same <c>name: line</c> form.</param>
+    public static IReadOnlyList<string> Literals(string css, string name, IEnumerable<string>? allowed = null)
     {
-        var accepted = BaseAllowed.Concat(allowed ?? []).ToHashSet();
-        return StripComments(css).Split('\n')
+        var accepted = (allowed ?? []).ToHashSet();
+        if (IsKitBase(css))
+        {
+            accepted.UnionWith(BaseAllowed.Select(line => $"{name}: {line}"));
+        }
+
+        return SourceFiles.StripComments(css).Split('\n')
             .Select(line => line.Trim())
             .Where(line => Literal().IsMatch(line))
-            .Select(line => $"{fileName}: {line}")
+            .Select(line => $"{name}: {line}")
             .Where(line => !accepted.Contains(line))
             .ToList();
     }
 
-    /// <summary>Literals of every <c>.css</c> file under a folder except tokens.css, which is where literals belong.</summary>
+    /// <summary>Literals of every <c>.css</c> file under a folder except tokens.css, which is where literals belong. Files are reported, and allowed, by path relative to the folder with <c>/</c> separators.</summary>
     public static IReadOnlyList<string> LiteralsInFolder(string folder, IEnumerable<string>? allowed = null) =>
-        CssFiles.Find(folder, "*.css")
+        SourceFiles.Find(folder, "*.css")
             .Where(file => Path.GetFileName(file) != "tokens.css")
-            .SelectMany(file => Literals(File.ReadAllText(file), Path.GetFileName(file), allowed))
+            .SelectMany(file => Literals(File.ReadAllText(file), SourceFiles.Relative(folder, file), allowed))
             .ToList();
 
     /// <summary>Inline <c>style="..."</c> values in markup that hold a literal colour or size.</summary>
@@ -44,22 +50,24 @@ public static partial class TokensOnlyCheck
 
     /// <summary>Inline style literals of every <c>.razor</c> file under a folder, as <c>file.razor: style</c>.</summary>
     public static IReadOnlyList<string> InlineStyleLiteralsInFolder(string folder) =>
-        CssFiles.Find(folder, "*.razor")
+        SourceFiles.Find(folder, "*.razor")
             .SelectMany(file => InlineStyleLiterals(File.ReadAllText(file)).Select(style => $"{Path.GetFileName(file)}: {style}"))
             .ToList();
 
-    /// <summary>Tokens a stylesheet reads through <c>var()</c> that are neither declared in it nor in <paramref name="known"/>, which defaults to the kit's tokens.</summary>
+    /// <summary>Tokens a stylesheet reads through <c>var()</c> that are not declared in it, in the kit, or in <paramref name="known"/>, which adds an app's own tokens to the kit's.</summary>
     public static IReadOnlyList<string> UnknownTokens(string css, IEnumerable<string>? known = null) =>
-        DesignTokens.Uses(css).Except(known ?? DesignTokens.Names).Except(DesignTokens.Declares(css)).Distinct().ToList();
+        DesignTokens.Uses(css).Except(DesignTokens.Names).Except(known ?? []).Except(DesignTokens.Declares(css)).Distinct().ToList();
 
     /// <summary>Lines using the <c>background</c> shorthand, which resets the pressed layer's background-image.</summary>
     public static IReadOnlyList<string> BackgroundShorthands(string css) =>
-        StripComments(css).Split('\n')
+        SourceFiles.StripComments(css).Split('\n')
             .Select(line => line.Trim())
             .Where(line => BackgroundShorthand().IsMatch(line))
             .ToList();
 
-    private static string StripComments(string css) => Comment().Replace(css, "");
+    private static bool IsKitBase(string css) => Normalise(css) == Normalise(KitCss.Base);
+
+    private static string Normalise(string text) => text.Replace("\r\n", "\n");
 
     [GeneratedRegex(@"(?<![-\w])background\s*:")]
     private static partial Regex BackgroundShorthand();
@@ -83,9 +91,6 @@ public static partial class TokensOnlyCheck
         "rebeccapurple|red|rosybrown|royalblue|saddlebrown|salmon|sandybrown|seagreen|seashell|sienna|silver|skyblue|" +
         "slateblue|slategray|slategrey|snow|springgreen|steelblue|tan|teal|thistle|tomato|turquoise|violet|wheat|white|" +
         "whitesmoke|yellow|yellowgreen";
-
-    [GeneratedRegex(@"/\*.*?\*/", RegexOptions.Singleline)]
-    private static partial Regex Comment();
 
     [GeneratedRegex("\\bstyle=\"([^\"]*)\"")]
     private static partial Regex InlineStyle();

@@ -18,8 +18,8 @@ public class SnackbarServiceTests
     public void DisposeService() => service.Dispose();
 
     [Test]
-    public void DefaultDuration_IsFiveSeconds() =>
-        Assert.That(SnackbarService.DefaultDuration, Is.EqualTo(TimeSpan.FromSeconds(5)));
+    public void DefaultDuration_IsTenSeconds() =>
+        Assert.That(SnackbarService.DefaultDuration, Is.EqualTo(TimeSpan.FromSeconds(10)));
 
     [Test]
     public void Show_RaisesChangedAndSetsCurrent()

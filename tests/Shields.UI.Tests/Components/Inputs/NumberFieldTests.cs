@@ -505,7 +505,7 @@ public class NumberFieldTests : ComponentTestBase
         Assert.Multiple(() =>
         {
             Assert.That(cut.FindAll("[data-testid=num]"), Has.Count.EqualTo(1));
-            Assert.That(logger.Records, Is.EqualTo(new[] { (3701, LogLevel.Warning, "Focusing the number field failed") }));
+            Assert.That(logger.Records, Is.EqualTo(new[] { (9601, LogLevel.Warning, "Focusing the number field failed") }));
             Assert.That(logger.Records.Single().Id, Is.EqualTo((int)KitEvent.NumberFieldFocusFailed));
             Assert.That(logger.LastException, Is.TypeOf<JSException>());
         });

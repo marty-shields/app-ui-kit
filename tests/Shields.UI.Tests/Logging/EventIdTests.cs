@@ -4,7 +4,7 @@ using Shields.UI.Logging;
 namespace Shields.UI.Tests.Logging;
 
 /// <summary>
-/// Event ids are named values: <c>KitEvent</c> keeps the numbers the apps logged. Values are unique and fixed.
+/// Event ids are named values: <c>KitEvent</c> has its own range, 9000-9999. Values are unique and fixed.
 /// No <c>[LoggerMessage]</c> in the source uses a bare number.
 /// </summary>
 public partial class EventIdTests
@@ -18,25 +18,25 @@ public partial class EventIdTests
         Assert.That(Enum.GetValues<KitEvent>().Select(e => (int)e), Is.Unique);
 
     [Test]
-    public void KitEvent_ValuesAreInTheAppsRange() =>
-        Assert.That(Enum.GetValues<KitEvent>().Select(e => (int)e), Is.All.InRange(2000, 4999));
+    public void KitEvent_ValuesAreInTheKitsRange() =>
+        Assert.That(Enum.GetValues<KitEvent>().Select(e => (int)e), Is.All.InRange(9000, 9999));
 
     [Test]
     public void KitEvent_ValuesAreFixed() =>
         Assert.That(Enum.GetValues<KitEvent>().ToDictionary(e => e, e => (int)e), Is.EqualTo(new Dictionary<KitEvent, int>
         {
-            [KitEvent.StartupFinished] = 2001,
-            [KitEvent.StartupFailed] = 2002,
-            [KitEvent.ScreenError] = 2101,
-            [KitEvent.BackHandled] = 2201,
-            [KitEvent.BackNotHandled] = 2202,
-            [KitEvent.BackHandlerFailed] = 2203,
-            [KitEvent.AppStartHandlerFailed] = 3201,
-            [KitEvent.LoadFailedFocusFailed] = 3301,
-            [KitEvent.UndoFocusFailed] = 3901,
-            [KitEvent.UndoFocusCheckFailed] = 3902,
-            [KitEvent.NumberFieldFocusFailed] = 3701,
-            [KitEvent.PullRefreshFailed] = 4001,
+            [KitEvent.StartupFinished] = 9001,
+            [KitEvent.StartupFailed] = 9002,
+            [KitEvent.ScreenError] = 9101,
+            [KitEvent.BackHandled] = 9201,
+            [KitEvent.BackNotHandled] = 9202,
+            [KitEvent.BackHandlerFailed] = 9203,
+            [KitEvent.AppStartHandlerFailed] = 9301,
+            [KitEvent.LoadFailedFocusFailed] = 9401,
+            [KitEvent.UndoFocusFailed] = 9501,
+            [KitEvent.UndoFocusCheckFailed] = 9502,
+            [KitEvent.NumberFieldFocusFailed] = 9601,
+            [KitEvent.PullRefreshFailed] = 9701,
         }));
 
     [TestCaseSource(nameof(SourceFiles))]

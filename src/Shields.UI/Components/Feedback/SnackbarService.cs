@@ -4,11 +4,11 @@ namespace Shields.UI.Components.Feedback;
 /// The one snackbar message the app shows, kept apart from any screen so a message posted before a screen change is there on the
 /// next screen. A new message replaces the one showing. It goes away when its action runs, after its duration, or on <see cref="Dismiss"/>.
 /// </summary>
-/// <remarks>One instance serves the whole app process, which suits MAUI Blazor Hybrid and WebAssembly. It doesn't suit Blazor Server, where every circuit would share it.</remarks>
+/// <remarks>Registered scoped: one instance per BlazorWebView scope in MAUI Blazor Hybrid, per WebAssembly app and per Blazor Server circuit. The root provider holds a separate instance, so inject it only from components or scoped services.</remarks>
 public sealed class SnackbarService : IDisposable
 {
     /// <summary>How long a message shows when <see cref="Show"/> gets no duration.</summary>
-    public static readonly TimeSpan DefaultDuration = TimeSpan.FromSeconds(5);
+    public static readonly TimeSpan DefaultDuration = TimeSpan.FromSeconds(10);
 
     private readonly TimeProvider time;
     private readonly object gate = new();

@@ -21,8 +21,9 @@
        so retuning those does not change the chip. */
     --color-chip: light-dark(#6a9594, #587a7a);
     --color-on-chip: light-dark(#141819, #ffffff);
-    /* The secondary add chip: in dark a touch darker than the chip, in light about the same, since both must reach 3:1 on the page. */
-    --color-chip-soft: light-dark(#669897, #557676);
+    /* The secondary add chip is outlined: its border is --color-chip, which carries the 3:1 on the page, and its fill is
+       lighter than the chip in light and darker in dark, at least 1.5:1 from it, so Soft and Filled read as different. */
+    --color-chip-soft: light-dark(#d4e8e7, #2b4444);
     --color-on-chip-soft: light-dark(#1a2b2b, #ffffff);
     --color-accent: light-dark(#29494c, #acd5d2);
     --color-focus: light-dark(#488286, #8cc4c1);

@@ -32,8 +32,6 @@ public class ContrastTests
         ("--color-on-chip-soft", "--color-chip-soft", Text),
         ("--color-chip", "--color-bg", LargeTextOrControl),
         ("--color-chip", "--color-surface", LargeTextOrControl),
-        ("--color-chip-soft", "--color-bg", LargeTextOrControl),
-        ("--color-chip-soft", "--color-surface", LargeTextOrControl),
         ("--color-focus", "--color-bg", LargeTextOrControl),
         ("--color-focus", "--color-surface", LargeTextOrControl),
     ];
@@ -49,6 +47,17 @@ public class ContrastTests
         var result = ContrastCheck.Measure(foreground, background, minimum, scheme);
 
         Assert.That(result.Passes, Is.True, result.ToString());
+    }
+
+    // The Soft chip's border is --color-chip (already checked above on bg and surface); its fill must read as different from the Filled chip.
+    [TestCase(ColourScheme.Light)]
+    [TestCase(ColourScheme.Dark)]
+    public void SoftChipFill_DiffersFromFilledChip(ColourScheme scheme)
+    {
+        var soft = DesignTokens.Colour("--color-chip-soft").In(scheme);
+        var filled = DesignTokens.Colour("--color-chip").In(scheme);
+
+        Assert.That(Rgb.Contrast(soft, filled), Is.GreaterThanOrEqualTo(1.5), $"{soft} vs {filled}");
     }
 
     // Both apps keep the status bar's icons light in both themes, and Android draws them white over the top bar.

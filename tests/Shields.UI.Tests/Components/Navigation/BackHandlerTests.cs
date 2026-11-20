@@ -98,6 +98,7 @@ public class BackHandlerTests : ComponentTestBase
     {
         var back = 0;
         var activity = new object();
+        backButton.Attach(activity);
         Context.Render<BackHandler>(p => p.Add(x => x.OnBack, () => back++));
 
         backButton.Detach(activity);
@@ -121,6 +122,41 @@ public class BackHandlerTests : ComponentTestBase
         await backButton.HandleAsync();
 
         Assert.That(back, Is.EqualTo(2));
+    }
+
+    [Test]
+    public async Task AttachedTwiceWhileTheRendererIsBusy_LeavesNoHandlerOnceDisposed()
+    {
+        var cut = Context.Render<BackHandler>(p => p.Add(x => x.OnBack, () => { }));
+        var busy = new TaskCompletionSource();
+        var release = new TaskCompletionSource();
+        var blocker = Task.Run(() => Context.Renderer.Dispatcher.InvokeAsync(() =>
+        {
+            busy.SetResult();
+            release.Task.Wait();
+        }));
+        await busy.Task;
+
+        backButton.Attach(new object());
+        backButton.Attach(new object());
+        release.SetResult();
+        await blocker;
+        await WaitForRendererAsync();
+        cut.Instance.Dispose();
+
+        Assert.That(backButton.HasHandler, Is.False);
+    }
+
+    [Test]
+    public async Task AttachedAfterDispose_DoesNotRegister()
+    {
+        var cut = Context.Render<BackHandler>(p => p.Add(x => x.OnBack, () => { }));
+        cut.Instance.Dispose();
+
+        backButton.Attach(new object());
+        await WaitForRendererAsync();
+
+        Assert.That(backButton.HasHandler, Is.False);
     }
 
     [Test]

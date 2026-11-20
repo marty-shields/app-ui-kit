@@ -31,6 +31,7 @@
     {
         if (!disposed)
         {
+            registration?.Dispose();
             registration = null;
             OnParametersSet();
         }

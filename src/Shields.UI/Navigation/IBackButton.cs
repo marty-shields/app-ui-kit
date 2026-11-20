@@ -9,8 +9,16 @@ public interface IBackButton
     /// <summary>Raised when a handler is registered or removed.</summary>
     event Action? Changed;
 
-    /// <summary>Raised after <see cref="Attach"/> has removed the earlier handlers, so pages still on screen can register again.</summary>
-    event Action? Attached;
+    /// <summary>
+    /// Raised after every <see cref="Attach"/>, once the earlier handlers are removed, so pages still on screen can register again.
+    /// They register through the renderer, so <see cref="HasHandler"/> can be briefly false after Attach, and they register in the order they subscribed.
+    /// The default does nothing, so a host's own implementation keeps compiling.
+    /// </summary>
+    event Action? Attached
+    {
+        add { }
+        remove { }
+    }
 
     /// <summary>Registers a handler for back. The newest handler runs; disposing the result removes it.</summary>
     IDisposable Register(Func<Task> handler);

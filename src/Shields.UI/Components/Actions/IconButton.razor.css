@@ -28,6 +28,7 @@
 
 .soft {
     background-color: var(--color-chip-soft);
+    box-shadow: inset 0 0 0 var(--border-width) var(--color-chip);
     color: var(--color-on-chip-soft);
 }
 

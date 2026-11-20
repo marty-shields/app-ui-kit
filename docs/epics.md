@@ -18,8 +18,8 @@ How a feature made of several tasks is built and reviewed. The person reviews on
 ## What CI runs
 | PR | Runs |
 | --- | --- |
-| Into `epic/**` | `pr-checks` and `Build and test`. |
-| Epic PR into `main` | The same, once it is marked ready. |
+| Into `epic/**` | `pr-checks`, `Build and test` and `Story layout`. |
+| Epic PR into `main` | `pr-checks`, `Build and test` and `Story layout`, once it is marked ready. |
 
 ## The epic PR
 - Its description holds the summary, a checklist of the sub-issues, the screenshots and the collected open questions. The person answers them at the end.

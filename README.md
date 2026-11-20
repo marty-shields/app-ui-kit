@@ -24,7 +24,7 @@ dotnet test tests/Shields.UI.Tests
 dotnet run --project src/Shields.UI.Stories.Host     # http://localhost:5056
 ```
 
-The site shows the kit's Foundations (Introduction, Tokens) and its components. The trial that also showed the apps' screens is in [docs/trial/README.md](https://github.com/marty-shields/app-ui-kit/blob/main/docs/trial/README.md).
+The stories site is published at <https://marty-shields.github.io/app-ui-kit/>; the command above runs it locally. It shows the kit's Foundations (Introduction, Tokens) and its components. The trial that also showed the apps' screens is in [docs/trial/README.md](https://github.com/marty-shields/app-ui-kit/blob/main/docs/trial/README.md).
 
 ## Licence
 

@@ -79,6 +79,50 @@ public class ShieldsUiServiceCollectionExtensionsTests
     }
 
     [Test]
+    public void AddShieldsUi_KeepsTheHostsAppLifecycle()
+    {
+        var own = new AppLifecycle(NullLogger<AppLifecycle>.Instance);
+        using var provider = new ServiceCollection().AddLogging().AddSingleton(own).AddShieldsUi().BuildServiceProvider();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(provider.GetRequiredService<AppLifecycle>(), Is.SameAs(own));
+            Assert.That(provider.GetRequiredService<IAppStart>(), Is.SameAs(own));
+            Assert.That(provider.GetRequiredService<IAppLifecycle>(), Is.SameAs(own));
+        });
+    }
+
+    [Test]
+    public void AddShieldsUi_WithAHostLifecycle_DoesNotSplitStartFromLifecycle()
+    {
+        IAppLifecycle own = new AppLifecycle(NullLogger<AppLifecycle>.Instance);
+        var services = new ServiceCollection().AddLogging().AddSingleton(own).AddShieldsUi();
+
+        using var provider = services.BuildServiceProvider();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(provider.GetRequiredService<IAppLifecycle>(), Is.SameAs(own));
+            Assert.That(provider.GetService<IAppStart>(), Is.Null);
+        });
+    }
+
+    [Test]
+    public void AddShieldsUi_WithAHostAppStart_DoesNotSplitStartFromLifecycle()
+    {
+        IAppStart own = new AppLifecycle(NullLogger<AppLifecycle>.Instance);
+        var services = new ServiceCollection().AddLogging().AddSingleton(own).AddShieldsUi();
+
+        using var provider = services.BuildServiceProvider();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(provider.GetRequiredService<IAppStart>(), Is.SameAs(own));
+            Assert.That(provider.GetService<IAppLifecycle>(), Is.Null);
+        });
+    }
+
+    [Test]
     public void AddShieldsUi_KeepsTheHostsClock()
     {
         var clock = new ManualClock();

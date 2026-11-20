@@ -49,6 +49,17 @@ public class BackHandlerTests : ComponentTestBase
     }
 
     [Test]
+    public void OnBackReplacedThenCleared_LeavesNoHandler()
+    {
+        var cut = Context.Render<BackHandler>(p => p.Add(x => x.OnBack, () => { }));
+        cut.Render(p => p.Add(x => x.OnBack, () => { }));
+
+        cut.Render(p => p.Add(x => x.OnBack, default(EventCallback)));
+
+        Assert.That(backButton.HasHandler, Is.False);
+    }
+
+    [Test]
     public void Removed_Unregisters()
     {
         RenderFragment handler = b =>

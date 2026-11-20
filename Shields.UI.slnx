@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/Shields.UI/Shields.UI.csproj" />
+    <Project Path="src/Shields.UI.Testing/Shields.UI.Testing.csproj" />
     <Project Path="src/Shields.UI.Stories/Shields.UI.Stories.csproj" />
     <Project Path="src/Shields.UI.Stories.Host/Shields.UI.Stories.Host.csproj" />
   </Folder>

@@ -2,8 +2,8 @@ namespace Shields.UI.Tests.DesignSystem;
 
 public class ContrastTests
 {
-    private const double Text = 4.5;
-    private const double LargeTextOrControl = 3.0;
+    private const double Text = ContrastCheck.Text;
+    private const double LargeTextOrControl = ContrastCheck.LargeTextOrControl;
 
     // Minimums are WCAG AA contrast ratios.
     private static readonly (string Foreground, string Background, double Minimum)[] Pairs =
@@ -37,28 +37,25 @@ public class ContrastTests
     ];
 
     private static IEnumerable<TestCaseData> Cases() =>
-        Pairs.SelectMany(p => new[] { "light", "dark" }.Select(theme =>
-            new TestCaseData(p.Foreground, p.Background, p.Minimum, theme)
-                .SetArgDisplayNames($"{p.Foreground} on {p.Background} ({theme})")));
+        Pairs.SelectMany(p => Enum.GetValues<ColourScheme>().Select(scheme =>
+            new TestCaseData(p.Foreground, p.Background, p.Minimum, scheme)
+                .SetArgDisplayNames($"{p.Foreground} on {p.Background} ({scheme})")));
 
     [TestCaseSource(nameof(Cases))]
-    public void Pair_MeetsWcagAA(string foreground, string background, double minimum, string theme)
+    public void Pair_MeetsWcagAA(string foreground, string background, double minimum, ColourScheme scheme)
     {
-        var fg = Pick(DesignTokens.Colour(foreground), theme);
-        var bg = Pick(DesignTokens.Colour(background), theme);
+        var result = ContrastCheck.Measure(foreground, background, minimum, scheme);
 
-        Assert.That(Rgb.Contrast(fg, bg), Is.GreaterThanOrEqualTo(minimum), $"{fg} on {bg}");
+        Assert.That(result.Passes, Is.True, result.ToString());
     }
 
     // Both apps keep the status bar's icons light in both themes, and Android draws them white over the top bar.
-    [TestCase("light")]
-    [TestCase("dark")]
-    public void StatusBarIcons_OnTheTopBar_MeetWcagAA(string theme)
+    [TestCase(ColourScheme.Light)]
+    [TestCase(ColourScheme.Dark)]
+    public void StatusBarIcons_OnTheTopBar_MeetWcagAA(ColourScheme scheme)
     {
-        var bar = Pick(DesignTokens.Colour("--color-bar"), theme);
+        var bar = DesignTokens.Colour("--color-bar").In(scheme);
 
         Assert.That(Rgb.Contrast(Rgb.Parse("#ffffff"), bar), Is.GreaterThanOrEqualTo(LargeTextOrControl), $"#ffffff on {bar}");
     }
-
-    internal static Rgb Pick((Rgb Light, Rgb Dark) colour, string theme) => theme == "light" ? colour.Light : colour.Dark;
 }

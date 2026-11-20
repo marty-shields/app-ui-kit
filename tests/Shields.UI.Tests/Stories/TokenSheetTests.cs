@@ -1,5 +1,4 @@
 using Shields.UI.Stories.Shared;
-using Shields.UI.Tests.DesignSystem;
 
 namespace Shields.UI.Tests.Stories;
 

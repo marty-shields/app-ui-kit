@@ -26,6 +26,9 @@ public sealed partial class BackButton(ILogger<BackButton> logger) : IBackButton
     public event Action? Changed;
 
     /// <inheritdoc />
+    public event Action? Attached;
+
+    /// <inheritdoc />
     public IDisposable Register(Func<Task> handler)
     {
         var registration = new Registration(this, handler);
@@ -78,6 +81,8 @@ public sealed partial class BackButton(ILogger<BackButton> logger) : IBackButton
         {
             Changed?.Invoke();
         }
+
+        Attached?.Invoke();
     }
 
     /// <inheritdoc />

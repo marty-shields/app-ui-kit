@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using Shields.UI.Components.Inputs;
 
 namespace Shields.UI.Tests.Components.Inputs;
@@ -171,6 +172,43 @@ public class SegmentedControlTests : ComponentTestBase
             .Add(x => x.ValueChanged, (int? _) => { }));
 
         Assert.That(cut.FindAll("input").Select(i => i.HasAttribute("checked")), Is.EqualTo(new[] { false, true }));
+    }
+
+    [Test]
+    public async Task TappingASegment_TheParentDeclines_PutsFocusBackEvenWhenTheRadioReferencesAreSlowToUpdate()
+    {
+        Context.JSInterop.Mode = JSRuntimeMode.Loose;
+        var cut = Context.Render<SlowReferenceRadios>(p => p
+            .Add(x => x.Label, "Choose")
+            .Add(x => x.Options, [new RadioOption<int>(1, "One", "one"), new RadioOption<int>(2, "Two", "two")])
+            .Add(x => x.Value, 1)
+            .Add(x => x.ValueChanged, (int _) => { }));
+
+        await cut.Find("input").ChangeAsync(new ChangeEventArgs { Value = true });
+
+        cut.WaitForAssertion(() => Assert.That(Context.JSInterop.Invocations["Blazor._internal.domWrapper.focus"], Has.Count.EqualTo(1)));
+    }
+
+    /// <summary>Hands out the same element reference for the chosen radio for the first renders after a pick, as the browser does until it has drawn the new radios.</summary>
+    private sealed class SlowReferenceRadios : RadioGroupBase<int>
+    {
+        private const int StaleRenders = 3;
+        private int renders;
+
+        [Inject]
+        private IJSRuntime JS { get; set; } = null!;
+
+        protected override void BuildRenderTree(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder)
+        {
+            renders++;
+            var id = renders <= StaleRenders ? "stale" : $"drawn-{renders}";
+            Radios[0] = new ElementReference(id, new WebElementReferenceContext(JS));
+            builder.OpenElement(0, "input");
+            builder.AddAttribute(1, "type", "radio");
+            builder.AddAttribute(2, "onchange", EventCallback.Factory.Create<ChangeEventArgs>(this, () => Pick(2)));
+            builder.SetKey(Generation);
+            builder.CloseElement();
+        }
     }
 
     private IRenderedComponent<SegmentedControl<int>> RenderTracking(int value)

@@ -6,6 +6,18 @@ namespace Shields.UI.Logging;
 /// </summary>
 internal enum KitEvent
 {
+    /// <summary><see cref="Navigation.BackButton"/>: back handled by the page.</summary>
+    BackHandled = 2201,
+
+    /// <summary><see cref="Navigation.BackButton"/>: back pressed with no handler.</summary>
+    BackNotHandled = 2202,
+
+    /// <summary><see cref="Navigation.BackButton"/>: a back handler failed.</summary>
+    BackHandlerFailed = 2203,
+
+    /// <summary><see cref="Lifecycle.AppLifecycle"/>: an app start handler failed.</summary>
+    AppStartHandlerFailed = 3201,
+
     /// <summary><see cref="Components.Feedback.LoadFailed"/>: focusing Try again failed.</summary>
     LoadFailedFocusFailed = 3301,
 

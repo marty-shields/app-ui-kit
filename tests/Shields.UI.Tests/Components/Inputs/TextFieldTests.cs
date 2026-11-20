@@ -101,6 +101,21 @@ public class TextFieldTests : ComponentTestBase
     }
 
     [Test]
+    public async Task TypingTheParentPutsBack_FocusesTheNewInputWithoutAnotherRender()
+    {
+        Context.JSInterop.Mode = JSRuntimeMode.Loose;
+        var cut = Render("abc");
+
+        await cut.Find("input").InputAsync("abcd");
+        cut.WaitForState(() => FocusCalls() == 1);
+        await WaitForRendererAsync();
+
+        Assert.That(FocusCalls(), Is.EqualTo(1));
+    }
+
+    private int FocusCalls() => Context.JSInterop.Invocations.Count(i => i.Identifier == "Blazor._internal.domWrapper.focus");
+
+    [Test]
     public void Disabled_DisablesTheInput() =>
         Assert.That(Render(disabled: true).Find("input").HasAttribute("disabled"), Is.True);
 }

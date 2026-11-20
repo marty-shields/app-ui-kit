@@ -53,6 +53,13 @@ function inspect() {
   if (!frame && document.documentElement.scrollWidth > viewport) {
     findings.push(`page scrolls sideways (${document.documentElement.scrollWidth}px > ${viewport}px)`);
   }
+  // The story root is the preview box ThemeLayout puts around a story. It must be 328px wide inside: a 360dp phone less 16px padding either side, so a changed WIDTH fails here.
+  const storyRoot = app.querySelector('[data-testid=preview]');
+  if (storyRoot) {
+    const style = getComputedStyle(storyRoot);
+    const area = storyRoot.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+    if (Math.abs(area - 328) > 1) findings.push(`story area is ${Math.round(area)}px wide, expected 328px`);
+  }
   for (const card of app.querySelectorAll('.card')) {
     if (!card.parentElement) continue;
     const box = card.getBoundingClientRect();

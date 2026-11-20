@@ -1,0 +1,33 @@
+@typeparam TValue
+@inherits RadioGroupBase<TValue>
+<fieldset class="group" disabled="@Disabled" data-testid="@TestId" @key="Generation">
+    <legend class="legend">@Label</legend>
+    @for (var i = 0; i < Options.Count; i++)
+    {
+        var index = i;
+        var option = Options[i];
+        <label class="option">
+            <input type="radio"
+                   class="radio"
+                   name="@GroupName"
+                   checked="@IsSelected(option)"
+                   data-testid="@option.TestId"
+                   @ref="Radios[index]"
+                   @onchange="() => Pick(option.Value)" />
+            <span class="dot" aria-hidden="true"></span>
+            <span class="texts">
+                <span class="text">@option.Label</span>
+                @if (option.Hint is not null)
+                {
+                    <span class="hint">@option.Hint</span>
+                }
+            </span>
+        </label>
+    }
+</fieldset>
+
+@code {
+    /// <summary>Disables every choice.</summary>
+    [Parameter]
+    public bool Disabled { get; set; }
+}

@@ -33,6 +33,10 @@ public partial class TouchTargetTests
     }
 
     [Test]
+    public void TouchTargetToken_Is48px() =>
+        Assert.That(RepoFiles.Read("src", "Shields.UI", "wwwroot", "css", "tokens.css"), Does.Contain("--touch-target: 48px;"));
+
+    [Test]
     public void IconButton_IsATouchTarget_AndCompactStaysAtTheCompactTarget()
     {
         var css = Rules(RepoFiles.Read("src", "Shields.UI", "Components", "Actions", "IconButton.razor.css")).ToList();
@@ -58,8 +62,8 @@ public partial class TouchTargetTests
             m.Groups[1].Value.Split(',', StringSplitOptions.TrimEntries),
             m.Groups[2].Value.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)));
 
-    // Opening tag of a button or input; quoted attribute values may contain '>'.
-    [GeneratedRegex("""<(button|input)\b((?:[^>"]|"[^"]*")*)>""")]
+    // Opening tag of a button, input or select; quoted attribute values may contain '>'.
+    [GeneratedRegex("""<(button|input|select)\b((?:[^>"]|"[^"]*")*)>""")]
     private static partial Regex Element();
 
     [GeneratedRegex("\\bclass=\"([^\"]*)\"")]

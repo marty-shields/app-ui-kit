@@ -115,4 +115,52 @@ public class BottomNavTests : ComponentTestBase
             Assert.That(navigated, Is.Empty);
         });
     }
+
+    [Test]
+    public void Render_AddButtonAttributes_LandOnTheRaisedButton_WithoutReplacingItsOwn()
+    {
+        var attributes = new Dictionary<string, object> { ["data-sheet-opener"] = "", ["data-testid"] = "other" };
+        var cut = Render([Home, Stats], Home, p => p.Add(x => x.AddButtonAttributes, attributes));
+
+        var add = cut.Find("[data-testid=add-button]");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(add.HasAttribute("data-sheet-opener"), Is.True);
+            Assert.That(cut.FindAll("[data-sheet-opener]"), Has.Count.EqualTo(1));
+        });
+    }
+
+    private static string RuleBody(string selector)
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Layout", "BottomNav.razor.css");
+        var start = css.IndexOf(selector + " {", StringComparison.Ordinal);
+        Assert.That(start, Is.GreaterThanOrEqualTo(0), selector);
+        return css[start..css.IndexOf('}', start)];
+    }
+
+    [Test]
+    public void Css_RaisedButton_ShowsTheFocusRingOnTheSquare_NotTheButton()
+    {
+        Assert.Multiple(() =>
+        {
+            Assert.That(RuleBody(".add:focus-visible"), Does.Contain("outline: none;"));
+            Assert.That(RuleBody(".add:focus-visible .fab"), Does.Contain("outline: var(--focus-width) solid var(--color-focus);"));
+            Assert.That(RuleBody(".fab"), Does.Contain("border-radius: var(--radius-md);").And.Contain("margin-top: calc(-1 * var(--add-button-lift));"));
+        });
+    }
+
+    [Test]
+    public void Css_PressedLayer_ShowsOnlyOnThePillAndTheSquare_BeatingTheGlobalRule()
+    {
+        const string global = ":not(:disabled):not([aria-busy=\"true\"]):active";
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(RuleBody("button.item" + global), Does.Contain("background-image: none;"));
+            Assert.That(RuleBody("button.add" + global), Does.Contain("background-image: none;"));
+            Assert.That(RuleBody(".item:active .indicator"), Does.Contain("var(--state-pressed)"));
+            Assert.That(RuleBody(".add:active .fab"), Does.Contain("var(--state-pressed)"));
+        });
+    }
 }

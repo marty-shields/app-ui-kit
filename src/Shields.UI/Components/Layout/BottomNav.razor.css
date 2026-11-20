@@ -1,16 +1,16 @@
 .bottom-nav {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    display: flex;
     padding-bottom: var(--inset-bottom);
 }
 
+/* The sides only group the tabs for the markup; every tab and the raised button get an equal share of the bar. */
 .side {
-    display: flex;
-    min-width: 0;
+    display: contents;
 }
 
 /* The raised button: a primary rounded square lifted above the bar, its label level with the tab labels, centred between the two sides. */
 .add {
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -37,6 +37,10 @@
     background-color: var(--color-primary);
     color: var(--color-on-primary);
     box-shadow: var(--shadow-raised);
+}
+
+button.add:not(:disabled):not([aria-busy="true"]):active {
+    background-image: none;
 }
 
 .add:active .fab {
@@ -87,7 +91,7 @@
 }
 
 /* The pressed layer shows on the indicator pill, as Material's does, not across the whole item. */
-.item:active {
+button.item:not(:disabled):not([aria-busy="true"]):active {
     background-image: none;
 }
 

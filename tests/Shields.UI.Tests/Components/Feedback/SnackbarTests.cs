@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using Shields.UI.Components.Feedback;
+using Shields.UI.Components.Layout;
 using Shields.UI.Logging;
 
 namespace Shields.UI.Tests.Components.Feedback;
@@ -681,6 +682,27 @@ public class SnackbarTests : ComponentTestBase
         await Context.Renderer.Dispatcher.InvokeAsync(() => Service.Show("Entry added"));
 
         Assert.That(cut.Markup.Trim(), Is.Empty);
+    }
+
+    [Test]
+    public void InAppScreen_SitsInThePoliteStatusRegion()
+    {
+        var cut = Context.Render<AppScreen>(p => p
+            .Add(x => x.Title, "Foods")
+            .Add(x => x.Status, (RenderFragment)(b =>
+            {
+                b.OpenComponent<Snackbar>(0);
+                b.CloseComponent();
+            })));
+        Service.Show("Entry deleted", "Undo", () => Task.CompletedTask);
+        cut.WaitForState(() => cut.FindAll("[data-testid=snackbar]").Count == 1);
+
+        var region = cut.Find(".status-slot");
+        Assert.Multiple(() =>
+        {
+            Assert.That(region.GetAttribute("aria-live"), Is.EqualTo("polite"));
+            Assert.That(region.QuerySelector("[data-testid=snackbar-action]"), Is.Not.Null);
+        });
     }
 
     private IRenderedComponent<Snackbar> RenderMessage(Action? onAction = null, Action? onTimeout = null, bool takeFocus = false) =>

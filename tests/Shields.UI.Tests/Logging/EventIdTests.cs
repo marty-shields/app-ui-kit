@@ -36,6 +36,7 @@ public partial class EventIdTests
             [KitEvent.UndoFocusFailed] = 3901,
             [KitEvent.UndoFocusCheckFailed] = 3902,
             [KitEvent.NumberFieldFocusFailed] = 3701,
+            [KitEvent.PullRefreshFailed] = 4001,
         }));
 
     [TestCaseSource(nameof(SourceFiles))]

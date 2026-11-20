@@ -23,6 +23,19 @@
 
 <p>Stories: <a href="./?path=/docs/components-layout-bottomnav--docs">BottomNav</a></p>
 
+<h2><code>AppScreen</code></h2>
+<p>The frame of a screen: a top bar with <code>Title</code>, <code>Subtitle</code>, <code>Actions</code> and a back arrow, an optional <code>Toolbar</code>, the scrolling <code>ChildContent</code>, and a footer with <code>Status</code>, <code>BottomBar</code> and the bottom navigation bar, in that order from the top.</p>
+<ul>
+    <li><code>OnBack</code> shows the back arrow (<code>data-testid</code> <code>BackTestId</code>, default <code>back</code>) and takes Android back. Unset, Android back leaves the app, except on a top-level screen other than the first of <code>NavItems</code>: it raises <code>OnNavigate</code> with that first item.</li>
+    <li><code>NavItems</code> makes the screen top-level and shows a <code>BottomNav</code> with <code>Current</code> marked; <code>AddLabel</code>, <code>AddIcon</code>, <code>AddHasPopup</code>, <code>AddButtonAttributes</code>, <code>OnNavigate</code> and <code>OnAdd</code> go to the bar.</li>
+    <li><code>Status</code> sits in a polite live region above the bar, and above the raised button when there is one. Without a bar it floats over the foot of the content.</li>
+    <li>The content ends clear of the raised button and the status message, so screens add no bottom padding of their own.</li>
+    <li><code>OnRefresh</code> adds pull-to-refresh to the content; a failure to set it up is logged (4001) and the screen works without it.</li>
+    <li><code>data-testid</code>: <code>screen-title</code>, <code>screen-subtitle</code>, <code>bottom-bar</code> and <code>pull-refresh</code>.</li>
+</ul>
+
+<p>Stories: <a href="./?path=/docs/components-layout-appscreen--docs">AppScreen</a></p>
+
 <h2><code>StartupGate</code></h2>
 <p>Runs <code>Initialize</code> once before showing its content, with a <code>StartupView</code> meanwhile. A failure is logged (2002) and shown; with <code>Retryable</code> (the default) Try again runs <code>Initialize</code> again. The app passes its own wording: <code>Title</code>, <code>LoadingLabel</code> and <code>FailedMessage</code>.</p>
 

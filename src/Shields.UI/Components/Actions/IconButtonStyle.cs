@@ -9,6 +9,6 @@ public enum IconButtonStyle
     /// <summary>Icon on a round chip filled with <c>--color-chip</c>, for the main add action of a section.</summary>
     Filled,
 
-    /// <summary>Icon on a lighter round chip filled with <c>--color-chip-soft</c>, for a secondary add action next to the filled one.</summary>
+    /// <summary>Icon on an outlined round chip: a <c>--color-chip-soft</c> fill (lighter than <see cref="Filled"/> in light, darker in dark) with a <c>--color-chip</c> border, for a secondary add action.</summary>
     Soft,
 }

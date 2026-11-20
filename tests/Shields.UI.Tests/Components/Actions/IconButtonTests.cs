@@ -164,7 +164,7 @@ public class IconButtonTests : ComponentTestBase
     }
 
     [Test]
-    public void SoftChip_FillsFromTheSoftTokens()
+    public void SoftChip_FillsAndOutlinesFromTokens()
     {
         var root = RepoFiles.Find("*.razor", "src", "Shields.UI").Single(f => f.EndsWith("IconButton.razor"));
         var css = File.ReadAllText(root + ".css");
@@ -173,7 +173,7 @@ public class IconButtonTests : ComponentTestBase
         Assert.That(start, Is.GreaterThanOrEqualTo(0));
         var end = css.IndexOf('}', start);
         Assert.That(end, Is.GreaterThan(start));
-        Assert.That(css[start..end], Does.Contain("background-color: var(--color-chip-soft);").And.Contain("color: var(--color-on-chip-soft);"));
+        Assert.That(css[start..end], Does.Contain("background-color: var(--color-chip-soft);").And.Contain("color: var(--color-on-chip-soft);").And.Contain("box-shadow: inset 0 0 0 var(--border-width) var(--color-chip);"));
     }
 
     [Test]

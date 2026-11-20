@@ -81,6 +81,23 @@ public class AppErrorBoundaryTests : ComponentTestBase
         });
     }
 
+    [Test]
+    public void Restart_WithAsyncOnRestart_ShowsTheContentAgain()
+    {
+        broken = true;
+        var cut = Context.Render<AppErrorBoundary>(p => p
+            .Add(x => x.OnRestart, async () =>
+            {
+                await Task.Yield();
+                broken = false;
+            })
+            .AddChildContent(Content));
+
+        cut.Find("[data-testid=error-restart]").Click();
+
+        cut.WaitForAssertion(() => Assert.That(cut.FindAll("[data-testid=content]"), Has.Count.EqualTo(1)));
+    }
+
     private IRenderedComponent<AppErrorBoundary> Render(Action onRestart) =>
         Context.Render<AppErrorBoundary>(p => p
             .Add(x => x.OnRestart, onRestart)

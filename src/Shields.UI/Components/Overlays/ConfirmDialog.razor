@@ -1,3 +1,4 @@
+@using Microsoft.JSInterop
 @using Shields.UI.Components.Navigation
 <div class="scrim" data-testid="@TestId">
     <BackHandler OnBack="OnCancel" />
@@ -19,7 +20,7 @@
     private readonly string messageId = $"dialog-message-{Guid.NewGuid():N}";
     private AppButton cancel = null!;
 
-    /// <summary>Question asked, e.g. Delete this workout?</summary>
+    /// <summary>Question asked, e.g. Delete this item?</summary>
     [Parameter, EditorRequired]
     public string Title { get; set; } = "";
 
@@ -55,7 +56,14 @@
     {
         if (firstRender)
         {
-            await cancel.FocusAsync();
+            try
+            {
+                await cancel.FocusAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // The page is gone, and the button with it.
+            }
         }
     }
 }

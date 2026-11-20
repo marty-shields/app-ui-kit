@@ -129,6 +129,39 @@ public class ConfirmDialogTests : ComponentTestBase
     }
 
     [Test]
+    public void NotDanger_StylesConfirmAsPrimary()
+    {
+        var cut = Context.Render<ConfirmDialog>(p => p
+            .Add(x => x.Title, "Discard changes?")
+            .Add(x => x.ConfirmText, "Discard"));
+
+        var confirm = cut.Find("[data-testid=confirm-dialog-confirm]");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(confirm.ClassList, Does.Contain("primary"));
+            Assert.That(confirm.ClassList, Does.Not.Contain("danger"));
+        });
+    }
+
+    [Test]
+    public void TestIdAndCancelText_NameTheScrimButtonsAndCancelLabel()
+    {
+        var cut = Context.Render<ConfirmDialog>(p => p
+            .Add(x => x.Title, "Discard changes?")
+            .Add(x => x.ConfirmText, "Discard")
+            .Add(x => x.CancelText, "Keep editing")
+            .Add(x => x.TestId, "discard"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.FindAll(".scrim[data-testid=discard]"), Has.Count.EqualTo(1));
+            Assert.That(cut.Find("[data-testid=discard-confirm]").TextContent.Trim(), Is.EqualTo("Discard"));
+            Assert.That(cut.Find("[data-testid=discard-cancel]").TextContent.Trim(), Is.EqualTo("Keep editing"));
+        });
+    }
+
+    [Test]
     public void Buttons_AreFullWidthWithSecondaryCancel()
     {
         var cut = Context.Render<ConfirmDialog>(p => p

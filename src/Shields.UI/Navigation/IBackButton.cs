@@ -1,6 +1,7 @@
 namespace Shields.UI.Navigation;
 
 /// <summary>Passes the Android back button to the page that registered for it.</summary>
+/// <remarks>Registered scoped. The host must resolve it from the BlazorWebView's (or circuit's) scope, the one the pages use. The root provider holds a separate instance with no handlers, and throws under scope validation.</remarks>
 public interface IBackButton
 {
     /// <summary>True when a handler is registered, so back stays in the app.</summary>

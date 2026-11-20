@@ -28,11 +28,16 @@
 
     private int generation;
     private bool inputSettled;
+    private const int MaxStaleChecks = 10;
     private bool restoreFocus;
+    private int staleChecks;
     private string? staleInputId;
     private string? previousValue;
     private string typed = "";
     private ElementReference input;
+
+    // Seam for tests: the browser hands out the new reference late, which bUnit does not do.
+    internal virtual ElementReference CurrentInput => input;
 
     private async Task OnInput(ChangeEventArgs e)
     {
@@ -54,17 +59,28 @@
         if (restoreFocus)
         {
             // The reference only points at the new input once the browser has drawn it.
-            if (input.Id != staleInputId)
+            var current = CurrentInput;
+            if (current.Id != staleInputId)
             {
                 restoreFocus = false;
                 try
                 {
-                    await input.FocusAsync();
+                    await current.FocusAsync();
                 }
                 catch (JSDisconnectedException)
                 {
                     // The page is gone, and the input with it.
                 }
+            }
+            else if (++staleChecks <= MaxStaleChecks)
+            {
+                // Nothing else may render, so ask for another render to look again, a few times at most.
+                await Task.Yield();
+                StateHasChanged();
+            }
+            else
+            {
+                restoreFocus = false;
             }
 
             return;
@@ -78,9 +94,10 @@
         inputSettled = false;
         if (Value == previousValue && typed != (Value ?? ""))
         {
-            staleInputId = input.Id;
+            staleInputId = CurrentInput.Id;
             generation++;
             restoreFocus = true;
+            staleChecks = 0;
             StateHasChanged();
         }
     }

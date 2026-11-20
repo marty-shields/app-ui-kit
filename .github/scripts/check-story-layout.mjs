@@ -12,7 +12,7 @@ if (!baseUrl || !chromePath) {
   process.exit(64);
 }
 
-// 424px is the narrowest preview width: a 360dp phone plus the 96px the story preview adds around the story.
+// 424px is the narrowest preview width: a 328px story area (a 360dp phone less 16px padding either side) plus the 96px the story preview adds around it.
 const WIDTH = 424;
 // Exploration knob (Android font size scales rem); not run in CI.
 const FONT_SCALE = Number(process.env.STORY_FONT_SCALE ?? 1);
@@ -52,6 +52,15 @@ function inspect() {
   const viewport = frame ? frame.getBoundingClientRect().right : document.documentElement.clientWidth;
   if (!frame && document.documentElement.scrollWidth > viewport) {
     findings.push(`page scrolls sideways (${document.documentElement.scrollWidth}px > ${viewport}px)`);
+  }
+  // The story root is the preview box ThemeLayout puts around a story. It must be 328px wide inside: a 360dp phone less 16px padding either side, so a changed WIDTH fails here.
+  const storyRoot = app.querySelector('[data-testid=preview]');
+  if (storyRoot) {
+    const style = getComputedStyle(storyRoot);
+    const area = storyRoot.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+    if (Math.abs(area - 328) > 1) findings.push(`story area is ${Math.round(area)}px wide, expected 328px`);
+  } else if (!frame) {
+    findings.push('no story root found (neither the phone frame nor [data-testid=preview]), so the width was not checked');
   }
   for (const card of app.querySelectorAll('.card')) {
     if (!card.parentElement) continue;

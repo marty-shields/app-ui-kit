@@ -57,16 +57,20 @@ public class ShieldsUiServiceCollectionExtensionsTests
     }
 
     [Test]
-    public void AddShieldsUi_RegistersTheBackButtonAndLifecycleAsOneInstanceEach()
+    public void AddShieldsUi_RegistersTheBackButtonAndLifecyclePerScope()
     {
         using var provider = new ServiceCollection().AddLogging().AddShieldsUi().BuildServiceProvider(validateScopes: true);
         using var first = provider.CreateScope();
         using var second = provider.CreateScope();
+        var inFirst = first.ServiceProvider.GetRequiredService<IBackButton>();
 
         Assert.Multiple(() =>
         {
-            Assert.That(first.ServiceProvider.GetRequiredService<IBackButton>(),
-                Is.SameAs(second.ServiceProvider.GetRequiredService<IBackButton>()));
+            Assert.That(inFirst, Is.SameAs(first.ServiceProvider.GetRequiredService<IBackButton>()));
+            Assert.That(inFirst,
+                Is.Not.SameAs(second.ServiceProvider.GetRequiredService<IBackButton>()));
+            Assert.That(first.ServiceProvider.GetRequiredService<IAppLifecycle>(),
+                Is.Not.SameAs(second.ServiceProvider.GetRequiredService<IAppLifecycle>()));
             Assert.That(first.ServiceProvider.GetRequiredService<IAppStart>(), Is.SameAs(first.ServiceProvider.GetRequiredService<AppLifecycle>()));
             Assert.That(first.ServiceProvider.GetRequiredService<IAppLifecycle>(), Is.SameAs(first.ServiceProvider.GetRequiredService<AppLifecycle>()));
         });

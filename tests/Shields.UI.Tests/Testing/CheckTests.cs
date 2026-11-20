@@ -174,6 +174,13 @@ public class CheckTests
     }
 
     [Test]
+    public void Contrast_OfAForegroundTokenOnlyTheKitDeclares_ThrowsNamingIt()
+    {
+        Assert.That(() => ContrastCheck.Measure(":root { --app-bg: #ffffff; }", "--color-text", "--app-bg", ContrastCheck.Text, ColourScheme.Light),
+            Throws.InvalidOperationException.With.Message.Contain("--color-text"));
+    }
+
+    [Test]
     public void Contrast_OfAMissingToken_NamesIt()
     {
         Assert.That(() => ContrastCheck.Measure(":root { --a: #000000; }", "--a", "--nope", 1, ColourScheme.Light),

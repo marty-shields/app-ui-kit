@@ -2,7 +2,7 @@ namespace Shields.UI.Logging;
 
 /// <summary>
 /// Event ids of the kit's log messages. The kit's own range is 9000–9999, grouped by component in steps of 100
-/// (start-up 90x, screen 91x, back 92x, and so on). Values never change once logged; ids are never reused.
+/// (start-up 90xx, screen 91xx, back 92xx, and so on). Values never change once logged; ids are never reused.
 /// </summary>
 internal enum KitEvent
 {

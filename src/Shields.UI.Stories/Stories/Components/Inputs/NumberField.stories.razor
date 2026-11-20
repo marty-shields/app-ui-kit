@@ -1,0 +1,71 @@
+@attribute [Stories("Components/Inputs/NumberField")]
+
+<Stories TComponent="NumberField" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Empty">
+        <Template>
+            <NumberField Label="Daily target" Unit="kcal" @bind-Value="empty" TestId="example-number" />
+        </Template>
+    </Story>
+
+    <Story Name="Filled">
+        <Template>
+            <NumberField Label="Daily target" Unit="kcal" @bind-Value="daily" TestId="example-number" />
+        </Template>
+    </Story>
+
+    <Story Name="Visible label, required">
+        <Template>
+            <NumberField Label="Reps" ShowLabel="true" Required="true" AllowDecimal="false" @bind-Value="reps" TestId="example-number" />
+        </Template>
+    </Story>
+
+    <Story Name="Focused">
+        <Template>
+            <NumberField Label="Daily target" Unit="kcal" @bind-Value="focused" AutoFocus="true" TestId="example-number" />
+        </Template>
+    </Story>
+
+    <Story Name="With stepper">
+        <Template>
+            <NumberField Label="Amount" Unit="g" @bind-Value="amount" Stepper="true" Step="10" Minimum="10" TestId="example-number" />
+        </Template>
+    </Story>
+
+    <Story Name="Stepper at the minimum">
+        <Template>
+            <NumberField Label="Amount" Unit="g" @bind-Value="atMin" Stepper="true" Step="10" Minimum="10" TestId="example-number" />
+        </Template>
+    </Story>
+
+    <Story Name="Error">
+        <Template>
+            <NumberField Label="Amount" Unit="g" @bind-Value="invalid" Stepper="true" Step="10" Minimum="10" InvalidMessage="Enter an amount of 10 g or more." TestId="example-number" />
+        </Template>
+    </Story>
+
+    <Story Name="Error without a message">
+        <Template>
+            <NumberField Label="Reps" ShowLabel="true" Invalid="true" AllowDecimal="false" @bind-Value="repsInvalid" TestId="example-number" />
+        </Template>
+    </Story>
+
+    <Story Name="Disabled">
+        <Template>
+            <NumberField Label="Amount" Unit="g" @bind-Value="disabled" Stepper="true" Step="10" Minimum="10" Disabled="true" TestId="example-number" />
+        </Template>
+    </Story>
+
+</Stories>
+
+@code {
+    private decimal? empty;
+    private decimal? daily = 2000;
+    private decimal? reps = 8;
+    private decimal? repsInvalid = 8;
+    private decimal? focused = 2000;
+    private decimal? amount = 150;
+    private decimal? atMin = 10;
+    private decimal? invalid = 5;
+    private decimal? disabled = 150;
+}

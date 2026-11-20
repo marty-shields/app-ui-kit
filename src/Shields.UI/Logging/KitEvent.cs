@@ -14,4 +14,7 @@ internal enum KitEvent
 
     /// <summary><see cref="Components.Feedback.Snackbar"/>: checking the action for keyboard focus failed, so the timer runs on. Workout Log's id; Calorie Tracker uses 3902 for something else, in its own app.</summary>
     UndoFocusCheckFailed = 3902,
+
+    /// <summary><see cref="Components.Inputs.NumberField"/>: focusing the input on show failed. Calorie Tracker's id; Workout Log uses 3701 for something else, in its own app.</summary>
+    NumberFieldFocusFailed = 3701,
 }

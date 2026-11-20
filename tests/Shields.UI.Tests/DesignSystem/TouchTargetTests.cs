@@ -9,12 +9,12 @@ public partial class TouchTargetTests
     private static IEnumerable<TestCaseData> Controls() =>
         RepoFiles.Find("*.razor", "src", "Shields.UI")
             .SelectMany(file => Element().Matches(File.ReadAllText(file)).Select(m => (File: file, Tag: m.Groups[1].Value, Attributes: m.Groups[2].Value)))
-            .Select(c => (c.File, c.Tag, Class: FirstClass(c.Attributes)))
+            .Select(c => (c.File, c.Tag, Class: FirstClass(c.Attributes), Icon: c.Tag == "button" && c.Attributes.Contains("aria-label=")))
             .Distinct()
-            .Select(c => new TestCaseData(c.File, c.Class).SetArgDisplayNames($"{Path.GetFileName(c.File)} {c.Tag}.{c.Class}"));
+            .Select(c => new TestCaseData(c.File, c.Class, c.Icon).SetArgDisplayNames($"{Path.GetFileName(c.File)} {c.Tag}.{c.Class}"));
 
     [TestCaseSource(nameof(Controls))]
-    public void Control_IsAtLeastATouchTarget(string razorFile, string? cssClass)
+    public void Control_IsAtLeastATouchTarget(string razorFile, string? cssClass, bool icon)
     {
         Assert.That(cssClass, Is.Not.Null, "Buttons and inputs need a class that sizes them");
         var declarations = Rules(File.ReadAllText(razorFile + ".css"))
@@ -22,7 +22,14 @@ public partial class TouchTargetTests
             .SelectMany(r => r.Declarations)
             .ToList();
 
-        Assert.That(declarations, Has.Member($"min-height: {TouchTarget}"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(declarations, Has.Member($"min-height: {TouchTarget}"));
+            if (icon)
+            {
+                Assert.That(declarations, Has.Member($"min-width: {TouchTarget}"));
+            }
+        });
     }
 
     [Test]

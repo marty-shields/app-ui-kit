@@ -14,22 +14,6 @@
     overflow-wrap: anywhere;
 }
 
-.step {
-    display: inline-flex;
+.stepper ::deep .icon-btn {
     flex: none;
-    align-items: center;
-    justify-content: center;
-    min-width: var(--touch-target);
-    min-height: var(--touch-target);
-    padding: 0;
-    border: none;
-    border-radius: var(--radius-round);
-    background-color: transparent;
-    color: var(--color-text);
-    cursor: pointer;
-}
-
-.step:disabled {
-    opacity: var(--opacity-disabled);
-    cursor: default;
 }

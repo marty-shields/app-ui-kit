@@ -87,6 +87,53 @@ public class PeriodStepperTests : ComponentTestBase
         Assert.That(cut.FindAll("[data-testid]"), Is.Empty);
     }
 
+    [Test]
+    public void Label_IsMarkedWrapOk()
+    {
+        var cut = Render(PeriodKind.Week, canPrevious: true, canNext: true);
+
+        Assert.That(cut.FindAll(".label[data-wrap-ok]"), Has.Count.EqualTo(1));
+    }
+
+    [Test]
+    public void Css_WrapsTheLabel_AndKeepsTheArrowsWhole()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Navigation", "PeriodStepper.razor.css");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(Rule(css, ".label"), Does.Contain("overflow-wrap: anywhere;"));
+            Assert.That(Rule(css, ".label"), Does.Contain("min-width: 0;"));
+            Assert.That(Rule(css, ".label"), Does.Not.Contain("text-overflow"));
+            Assert.That(Rule(css, ".label"), Does.Not.Contain("white-space: nowrap;"));
+            Assert.That(Rule(css, ".stepper ::deep .icon-btn"), Does.Contain("flex: none;"));
+        });
+    }
+
+    [Test]
+    public void WhenTheParentDisablesThePressedArrow_FocusMovesToTheOtherArrow()
+    {
+        var cut = Render(PeriodKind.Week, canPrevious: true, canNext: true);
+
+        cut.Find("[data-testid=stepper-next]").Click();
+        cut.Render(p => p.Add(x => x.CanGoNext, false));
+
+        Context.JSInterop.VerifyFocusAsyncInvoke().Arguments[0].ShouldBeElementReferenceTo(cut.Find("[data-testid=stepper-previous]"));
+    }
+
+    [Test]
+    public void WhenThePressedArrowStaysEnabled_FocusIsLeftAlone()
+    {
+        var cut = Render(PeriodKind.Week, canPrevious: true, canNext: true);
+
+        cut.Find("[data-testid=stepper-next]").Click();
+
+        Assert.That(Context.JSInterop.Invocations.Where(i => i.Identifier.EndsWith("focus")), Is.Empty);
+    }
+
+    private static string Rule(string css, string selector) =>
+        System.Text.RegularExpressions.Regex.Match(css, System.Text.RegularExpressions.Regex.Escape(selector) + @"\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
+
     private IRenderedComponent<PeriodStepper> Render(PeriodKind kind, bool canPrevious, bool canNext, Action? onNext = null, Action? onPrevious = null) =>
         Context.Render<PeriodStepper>(p => p
             .Add(x => x.Kind, kind)

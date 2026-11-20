@@ -90,7 +90,7 @@ section + section {
     width: var(--stories-splash-width);
     height: var(--stories-splash-height);
     border: var(--stories-splash-border-width) solid var(--stories-bezel-colour);
-    border-radius: var(--radius-lg);
+    border-radius: var(--stories-splash-radius);
 }
 
 .splash.light {

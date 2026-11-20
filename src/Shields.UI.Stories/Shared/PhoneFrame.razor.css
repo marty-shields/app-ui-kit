@@ -4,8 +4,8 @@
 }
 
 .phone {
-    --inset-top: var(--space-8);
-    --inset-bottom: var(--space-8);
+    --inset-top: var(--stories-phone-inset);
+    --inset-bottom: var(--stories-phone-inset);
     position: relative;
     box-sizing: content-box;
     width: var(--stories-phone-width);
@@ -41,7 +41,7 @@
 .status-bar {
     top: 0;
     height: var(--inset-top);
-    padding: 0 var(--space-6);
+    padding: 0 var(--stories-phone-bar-padding);
     background-color: var(--color-bar);
     color: var(--color-on-bar);
 }

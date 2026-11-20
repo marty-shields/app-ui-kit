@@ -21,6 +21,8 @@
 .viewport {
     position: absolute;
     inset: 0;
+    /* Lets a story fill the frame with 100cqh, as a screen fills the viewport in an app. */
+    container-type: size;
 }
 
 .status-bar,

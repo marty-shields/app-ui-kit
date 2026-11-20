@@ -4,17 +4,21 @@
 
     <Story Name="Error">
         <Template>
-            <AppErrorBoundary Title="My App">
-                <ThrowOnRender />
-            </AppErrorBoundary>
+            <div class="themed">
+                <AppErrorBoundary Title="My App">
+                    <ThrowOnRender />
+                </AppErrorBoundary>
+            </div>
         </Template>
     </Story>
 
     <Story Name="No error">
         <Template>
-            <AppErrorBoundary Title="My App">
-                <p>App content.</p>
-            </AppErrorBoundary>
+            <div class="themed">
+                <AppErrorBoundary Title="My App">
+                    <p>App content.</p>
+                </AppErrorBoundary>
+            </div>
         </Template>
     </Story>
 

@@ -4,19 +4,25 @@
 
     <Story Name="Starting">
         <Template>
-            <StartupView Title="My App" FailedMessage="Couldn't open the database" />
+            <div class="themed">
+                <StartupView Title="My App" FailedMessage="Couldn't open the database" />
+            </div>
         </Template>
     </Story>
 
     <Story Name="Failed">
         <Template>
-            <StartupView Title="My App" FailedMessage="Couldn't open the database" Failed />
+            <div class="themed">
+                <StartupView Title="My App" FailedMessage="Couldn't open the database" Failed />
+            </div>
         </Template>
     </Story>
 
     <Story Name="Failed with Try again">
         <Template>
-            <StartupView Title="My App" FailedMessage="Couldn't open the database" Failed OnRetry="() => { }" />
+            <div class="themed">
+                <StartupView Title="My App" FailedMessage="Couldn't open the database" Failed OnRetry="() => { }" />
+            </div>
         </Template>
     </Story>
 

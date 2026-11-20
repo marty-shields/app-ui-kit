@@ -1,5 +1,5 @@
 .themed {
-    height: 100%;
+    height: 100cqh;
     background-color: var(--color-bg);
     color: var(--color-text);
 }

@@ -4,33 +4,41 @@
 
     <Story Name="Loading">
         <Template>
-            <StartupGate Title="My App" FailedMessage="Couldn't open the database" Initialize="() => new TaskCompletionSource().Task">
-                <p>App content.</p>
-            </StartupGate>
+            <div class="themed">
+                <StartupGate Title="My App" FailedMessage="Couldn't open the database" Initialize="() => new TaskCompletionSource().Task">
+                    <p>App content.</p>
+                </StartupGate>
+            </div>
         </Template>
     </Story>
 
     <Story Name="Load failed">
         <Template>
-            <StartupGate Title="My App" FailedMessage="Couldn't open the database" Initialize="() => Task.FromException(new InvalidOperationException())">
-                <p>App content.</p>
-            </StartupGate>
+            <div class="themed">
+                <StartupGate Title="My App" FailedMessage="Couldn't open the database" Initialize="() => Task.FromException(new InvalidOperationException())">
+                    <p>App content.</p>
+                </StartupGate>
+            </div>
         </Template>
     </Story>
 
     <Story Name="Load failed, no retry">
         <Template>
-            <StartupGate Title="My App" FailedMessage="Couldn't open the database" Retryable="false" Initialize="() => Task.FromException(new InvalidOperationException())">
-                <p>App content.</p>
-            </StartupGate>
+            <div class="themed">
+                <StartupGate Title="My App" FailedMessage="Couldn't open the database" Retryable="false" Initialize="() => Task.FromException(new InvalidOperationException())">
+                    <p>App content.</p>
+                </StartupGate>
+            </div>
         </Template>
     </Story>
 
     <Story Name="Ready">
         <Template>
-            <StartupGate FailedMessage="Couldn't open the database" Initialize="() => Task.CompletedTask">
-                <p>App content.</p>
-            </StartupGate>
+            <div class="themed">
+                <StartupGate FailedMessage="Couldn't open the database" Initialize="() => Task.CompletedTask">
+                    <p>App content.</p>
+                </StartupGate>
+            </div>
         </Template>
     </Story>
 

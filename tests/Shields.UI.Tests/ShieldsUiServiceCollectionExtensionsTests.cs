@@ -1,5 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging.Abstractions;
 using Shields.UI.Components.Feedback;
+using Shields.UI.Lifecycle;
+using Shields.UI.Navigation;
 using Shields.UI.Theme;
 
 namespace Shields.UI.Tests;
@@ -46,6 +49,33 @@ public class ShieldsUiServiceCollectionExtensionsTests
             Assert.That(provider.GetRequiredService<SnackbarService>(), Is.SameAs(own));
             Assert.That(services.Count(d => d.ServiceType == typeof(SnackbarService)), Is.EqualTo(1));
         });
+    }
+
+    [Test]
+    public void AddShieldsUi_RegistersTheBackButtonAndLifecycleAsOneInstanceEach()
+    {
+        using var provider = new ServiceCollection().AddLogging().AddShieldsUi().BuildServiceProvider(validateScopes: true);
+        using var first = provider.CreateScope();
+        using var second = provider.CreateScope();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(first.ServiceProvider.GetRequiredService<IBackButton>(),
+                Is.SameAs(second.ServiceProvider.GetRequiredService<IBackButton>()));
+            Assert.That(first.ServiceProvider.GetRequiredService<IAppStart>(), Is.SameAs(first.ServiceProvider.GetRequiredService<AppLifecycle>()));
+            Assert.That(first.ServiceProvider.GetRequiredService<IAppLifecycle>(), Is.SameAs(first.ServiceProvider.GetRequiredService<AppLifecycle>()));
+        });
+    }
+
+    [Test]
+    public void AddShieldsUi_KeepsTheHostsBackButton()
+    {
+        var own = new BackButton(NullLogger<BackButton>.Instance);
+        var services = new ServiceCollection().AddSingleton<IBackButton>(own).AddShieldsUi();
+
+        using var provider = services.BuildServiceProvider();
+
+        Assert.That(provider.GetRequiredService<IBackButton>(), Is.SameAs(own));
     }
 
     [Test]

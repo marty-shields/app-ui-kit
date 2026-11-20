@@ -25,6 +25,10 @@ public partial class EventIdTests
     public void KitEvent_ValuesAreFixed() =>
         Assert.That(Enum.GetValues<KitEvent>().ToDictionary(e => e, e => (int)e), Is.EqualTo(new Dictionary<KitEvent, int>
         {
+            [KitEvent.BackHandled] = 2201,
+            [KitEvent.BackNotHandled] = 2202,
+            [KitEvent.BackHandlerFailed] = 2203,
+            [KitEvent.AppStartHandlerFailed] = 3201,
             [KitEvent.LoadFailedFocusFailed] = 3301,
             [KitEvent.UndoFocusFailed] = 3901,
             [KitEvent.UndoFocusCheckFailed] = 3902,

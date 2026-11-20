@@ -1,0 +1,21 @@
+@attribute [Stories("Components/Navigation/BackHandler")]
+@using Shields.UI.Navigation
+@inject IBackButton BackButton
+
+<Stories TComponent="BackHandler" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Registered">
+        <Template>
+            <BackHandler OnBack="() => pressed++" />
+            <AppButton TestId="press-back" OnClick="PressBackAsync">Press back</AppButton>
+            <p data-testid="back-count">Handled @pressed time(s)</p>
+        </Template>
+    </Story>
+
+</Stories>
+
+@code {
+    private int pressed;
+
+    private Task PressBackAsync() => BackButton.HandleAsync();
+}

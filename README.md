@@ -12,6 +12,8 @@ It will hold what the two apps should always have in common, so a change is made
 
 Screens and app-only components stay in each app's repo. The apps install the kit as NuGet packages: `Shields.UI`, `Shields.UI.Stories` and `Shields.UI.Testing`.
 
+A stories host (its `index.html` and `iframe.html`) must link `_content/Shields.UI.Stories/css/tokens.css` after the kit's `_content/Shields.UI/css/tokens.css`; `index.html` needs it for `blazor-ui.css`, and the phone frame and sheets take their sizes from it. Without it they lose their size.
+
 ## Status
 
 A trial is in place: `Shields.UI.Testing` (the kit's tokens and the tokens-only, contrast and touch-target checks, for an app's design tests), `Shields.UI` (with `AppButton`, `IconButton`, `Icon`, `Spinner`, `LoadFailed`, `Snackbar`, `SegmentedControl`, `FilterChips`, `FieldInput`, `NumberField`, `RadioGroup`, `TextField`, `SelectField`, `DateStrip`, `ListRow`, `EmptyState`, `Card`, `StatTile`, `ChartLegend`, `PeriodStepper`, the tokens and base styles), `Shields.UI.Stories` and a stories site, `Shields.UI.Stories.Host`. The trial code is the start of the repo. It already sets the solution-wide build rules (`Directory.Build.props` and `.editorconfig`, copied from Workout Log); CI and [AGENTS.md](https://github.com/marty-shields/app-ui-kit/blob/main/AGENTS.md) are in place; the finished rules come with the later epics. The plan and the decisions behind it are in [docs/design/shared-ui-kit.html](https://github.com/marty-shields/app-ui-kit/blob/main/docs/design/shared-ui-kit.html) (download it and open it in a browser). The work is tracked in this repo's epic issues.

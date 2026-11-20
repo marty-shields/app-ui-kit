@@ -58,8 +58,8 @@ public partial class TouchTargetTests
             m.Groups[1].Value.Split(',', StringSplitOptions.TrimEntries),
             m.Groups[2].Value.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)));
 
-    // Opening tag of a button or input; quoted attribute values may contain '>'.
-    [GeneratedRegex("""<(button|input)\b((?:[^>"]|"[^"]*")*)>""")]
+    // Opening tag of a button, input or select; quoted attribute values may contain '>'.
+    [GeneratedRegex("""<(button|input|select)\b((?:[^>"]|"[^"]*")*)>""")]
     private static partial Regex Element();
 
     [GeneratedRegex("\\bclass=\"([^\"]*)\"")]

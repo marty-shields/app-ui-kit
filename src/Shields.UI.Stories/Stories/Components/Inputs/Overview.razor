@@ -1,0 +1,54 @@
+@attribute [CustomPage("Components/Inputs/Overview")]
+
+<h1>Inputs</h1>
+<p>Number inputs use the phone's numeric keyboard and 20px text. An invalid input has a red 2px border.</p>
+
+<h2><code>SegmentedControl</code></h2>
+<p>A full-width row of 2–4 segments; one is chosen and filled with <code>--color-selected</code>. For choosing between a few views or ranges. Each segment is a radio with a 48px touch target; <code>Label</code> names the group for screen readers only. An option's <code>AriaLabel</code>, when set, is what screen readers read instead of its label, e.g. <em>Last month</em> for <em>1M</em>. When <code>Value</code> matches no option, no segment is chosen.</p>
+<ul>
+    <li><code>data-testid</code>: <code>TestId</code> on the control; each option's <code>TestId</code> on its radio.</li>
+</ul>
+
+<h2><code>FilterChips</code></h2>
+<p>A row of rounded chips that wraps onto more lines when it must; one is chosen and filled with <code>--color-selected</code>. Each chip is a radio with a 48px touch target; <code>Label</code> names the group for screen readers only.</p>
+<ul>
+    <li><code>data-testid</code>: <code>TestId</code> on the group; each option's <code>TestId</code> on its radio.</li>
+</ul>
+
+<h2><code>FieldInput</code></h2>
+<p>Wraps an input: shows the field's label above it (kept for screen readers only when <code>ShowLabel</code> is off), an asterisk when <code>Required</code>, and an error <code>Message</code> under it in the error tone, announced to screen readers.</p>
+<ul>
+    <li><code>data-testid</code>: <code>MessageTestId</code> on the message.</li>
+</ul>
+
+<h2><code>NumberField</code></h2>
+<p>A numeric input for amounts and targets. <code>Unit</code> (e.g. <em>g</em>, <em>kcal</em>) sits after the number. <code>Stepper</code> adds − and + buttons that move the number by <code>Step</code>; they never go below <code>Minimum</code>, and − is off once the number reaches it. Typing is not clamped: the field raises <code>ValueChanged</code> on every keystroke with the typed number (null when the text isn't one) and the parent decides whether it is valid. <code>TextChanged</code> raises the typed text itself, just before <code>ValueChanged</code>, for a parent that must tell an empty field from unreadable text; the stepper does not raise it. A phone shows the numeric keypad. <code>InvalidMessage</code> shows an error under the field in the error tone (<code>--color-error</code>, a thicker border) and is announced to screen readers (<code>role="alert"</code>, <code>aria-invalid</code>, <code>aria-describedby</code>). <code>Disabled</code> greys out the input and both buttons. <code>AutoFocus</code> puts the cursor in the field when it first appears. <code>Label</code> names the field for screen readers only. The input and each button have a 48px touch target.</p>
+<ul>
+    <li><code>data-testid</code>: <code>TestId</code> on the input; the buttons, unit and message add <code>-minus</code>, <code>-plus</code>, <code>-unit</code> and <code>-error</code>.</li>
+</ul>
+
+<h2><code>RadioGroup</code></h2>
+<p>A labelled group of choices; one is chosen. Each choice is a full-width row with a radio, its label and an optional hint under it. The chosen row is highlighted. <code>Disabled</code> dims every row and ignores taps. When the parent doesn't take a tapped value the radios are drawn again to show the chosen one, and focus returns to it.</p>
+<ul>
+    <li><code>data-testid</code>: <code>TestId</code> on the group; each option's <code>TestId</code> on its radio.</li>
+</ul>
+
+<h2><code>TextField</code></h2>
+<p>A single-line text input for a short name. Left-aligned in the same bordered box as <code>NumberField</code>, 48px touch target. <code>ValueChanged</code> is raised on every keystroke with the typed text. <code>MaxLength</code> stops the phone's keyboard at that many characters (the parent still checks the text); <code>Placeholder</code> shows while it is empty. <code>InvalidMessage</code> shows an error under the field in the error tone (<code>--color-error</code>, a thicker border) and is announced to screen readers (<code>role="alert"</code>, <code>aria-invalid</code>, <code>aria-describedby</code>). <code>Disabled</code> greys it out. <code>Label</code> names the field for screen readers only.</p>
+<ul>
+    <li><code>data-testid</code>: <code>TestId</code> on the input; the message adds <code>-error</code>.</li>
+</ul>
+
+<h2><code>SelectField</code></h2>
+<p>A drop-down list for choosing one of a few named options. A native <code>&lt;select&gt;</code> in a bordered box with a 48px touch target, in the same bold text as <code>NumberField</code>. <code>Options</code> are <code>RadioOption</code>s; only each option's <code>Value</code> and <code>Label</code> are used. <code>Value</code> picks the shown option; when it matches none the browser shows the first. <code>ValueChanged</code> is raised with the option picked; when the parent doesn't take the value the list redraws to show the chosen one again. <code>Disabled</code> greys it out. <code>Label</code> names the list for screen readers only. Long labels are cut with an ellipsis in the closed list.</p>
+<ul>
+    <li><code>data-testid</code>: <code>TestId</code> on the <code>&lt;select&gt;</code>.</li>
+</ul>
+
+<h2><code>DateStrip</code></h2>
+<p>A previous button, a label and a next button on one row, for moving between days. The label reads <em>Today, 15 Nov</em>, <em>Yesterday, 14 Nov</em>, <em>Tomorrow, 16 Nov</em> or the weekday and date (with the year when it is not this year). Tapping the label raises <code>OnToday</code> from any day. There is no limit in either direction. The caller passes <code>Date</code> and <code>Today</code>, so the strip never reads the clock; the parent changes <code>Date</code> in the callbacks. Every target is 48px: the buttons are named <em>Previous day</em> and <em>Next day</em>, the label <em>&lt;label&gt;, go to today</em>.</p>
+<ul>
+    <li><code>data-testid</code>: <code>TestId</code> (default <code>date-strip</code>) on the strip, with <code>-previous</code>, <code>-label</code> and <code>-next</code> on its buttons.</li>
+</ul>
+
+<p>Stories: <a href="./?path=/docs/components-inputs-segmentedcontrol--docs">SegmentedControl</a>, <a href="./?path=/docs/components-inputs-filterchips--docs">FilterChips</a>, <a href="./?path=/docs/components-inputs-fieldinput--docs">FieldInput</a>, <a href="./?path=/docs/components-inputs-numberfield--docs">NumberField</a>, <a href="./?path=/docs/components-inputs-radiogroup--docs">RadioGroup</a>, <a href="./?path=/docs/components-inputs-textfield--docs">TextField</a>, <a href="./?path=/docs/components-inputs-selectfield--docs">SelectField</a>, <a href="./?path=/docs/components-inputs-datestrip--docs">DateStrip</a></p>

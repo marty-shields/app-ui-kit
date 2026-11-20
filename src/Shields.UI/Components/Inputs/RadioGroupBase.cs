@@ -19,11 +19,11 @@ public abstract class RadioGroupBase<TValue> : ComponentBase
     /// <summary>Name shared by the radios of this group so the browser treats them as one.</summary>
     protected string GroupName { get; } = $"radio-{Guid.NewGuid():N}";
 
-    /// <summary>What the choices pick, e.g. Range. Read by screen readers only.</summary>
+    /// <summary>What the choices pick, e.g. Range. Read by screen readers only, except in <see cref="RadioGroup{TValue}"/>, which shows it.</summary>
     [Parameter, EditorRequired]
     public string Label { get; set; } = "";
 
-    /// <summary>Choices, in order. Hints are not shown.</summary>
+    /// <summary>Choices, in order. Only <see cref="RadioGroup{TValue}"/> shows the hints.</summary>
     [Parameter, EditorRequired]
     public IReadOnlyList<RadioOption<TValue>> Options { get; set; } = [];
 

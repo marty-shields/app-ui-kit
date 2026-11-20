@@ -28,6 +28,7 @@ public partial class EventIdTests
             [KitEvent.LoadFailedFocusFailed] = 3301,
             [KitEvent.UndoFocusFailed] = 3901,
             [KitEvent.UndoFocusCheckFailed] = 3902,
+            [KitEvent.NumberFieldFocusFailed] = 3701,
         }));
 
     [TestCaseSource(nameof(SourceFiles))]

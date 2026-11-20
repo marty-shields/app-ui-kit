@@ -1,0 +1,8 @@
+.example {
+    min-height: var(--touch-target);
+    padding: 0 var(--space-2);
+    border: var(--border-width) solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    background-color: var(--color-surface);
+    color: var(--color-text);
+}

@@ -126,6 +126,33 @@ public class BackButtonTests
     }
 
     [Test]
+    public void Attach_RaisesAttachedEachTime_EvenWithNothingRegistered()
+    {
+        var attached = 0;
+        backButton.Attached += () => attached++;
+
+        backButton.Attach(new object());
+        backButton.Register(() => Task.CompletedTask);
+        backButton.Attach(new object());
+
+        Assert.That(attached, Is.EqualTo(2));
+    }
+
+    [Test]
+    public void Detach_DoesNotRaiseAttached()
+    {
+        var attached = 0;
+        var activity = new object();
+        backButton.Attach(activity);
+        backButton.Register(() => Task.CompletedTask);
+        backButton.Attached += () => attached++;
+
+        backButton.Detach(activity);
+
+        Assert.That(attached, Is.Zero);
+    }
+
+    [Test]
     public async Task Detach_CurrentActivity_RemovesEveryHandlerAndRaisesChangedOnce()
     {
         var calls = 0;

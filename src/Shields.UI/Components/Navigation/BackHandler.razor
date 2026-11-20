@@ -8,6 +8,10 @@
     public EventCallback OnBack { get; set; }
 
     private IDisposable? registration;
+    private bool running;
+    private bool disposed;
+
+    protected override void OnInitialized() => BackButton.Attached += OnAttached;
 
     protected override void OnParametersSet()
     {
@@ -22,9 +26,27 @@
         }
     }
 
+    // Attach removed this handler's registration without telling it; register again with the new activity.
+    private void OnAttached() => _ = InvokeAsync(() =>
+    {
+        if (!disposed)
+        {
+            registration?.Dispose();
+            registration = null;
+            OnParametersSet();
+        }
+    });
+
     // Passes a failure to the nearest error boundary, as an exception from a button click would.
     private async Task HandleAsync()
     {
+        // A press queued before the handler was removed must not run it, nor may a second press while the first runs.
+        if (registration is null || running)
+        {
+            return;
+        }
+
+        running = true;
         try
         {
             await OnBack.InvokeAsync();
@@ -33,7 +55,17 @@
         {
             await DispatchExceptionAsync(exception);
         }
+        finally
+        {
+            running = false;
+        }
     }
 
-    public void Dispose() => registration?.Dispose();
+    public void Dispose()
+    {
+        disposed = true;
+        BackButton.Attached -= OnAttached;
+        registration?.Dispose();
+        registration = null;
+    }
 }

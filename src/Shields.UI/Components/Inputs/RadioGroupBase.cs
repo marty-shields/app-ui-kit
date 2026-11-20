@@ -5,10 +5,12 @@ namespace Shields.UI.Components.Inputs;
 /// <summary>Shared behaviour of the radio groups: after a tap the parent may decline the value, and the browser must then show the value the parent kept.</summary>
 public abstract class RadioGroupBase<TValue> : ComponentBase
 {
+    private const int MaxStaleChecks = 10;
     private TValue? pickedValue;
     private bool pickSettled;
     private string? staleRadioId;
     private bool restoreFocus;
+    private int staleChecks;
 
     /// <summary>The radios by option index, filled by the markup's element references.</summary>
     protected Dictionary<int, ElementReference> Radios { get; } = [];
@@ -73,6 +75,18 @@ public abstract class RadioGroupBase<TValue> : ComponentBase
             {
                 restoreFocus = false;
                 await radio.FocusAsync();
+                return;
+            }
+
+            // Nothing else may render, so ask for another render to look again, a few times at most.
+            if (++staleChecks <= MaxStaleChecks)
+            {
+                await Task.Yield();
+                StateHasChanged();
+            }
+            else
+            {
+                restoreFocus = false;
             }
 
             return;
@@ -90,6 +104,7 @@ public abstract class RadioGroupBase<TValue> : ComponentBase
             staleRadioId = chosen >= 0 && Radios.TryGetValue(chosen, out var stale) ? stale.Id : null;
             Generation++;
             restoreFocus = true;
+            staleChecks = 0;
             StateHasChanged();
         }
     }

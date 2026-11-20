@@ -14,8 +14,7 @@ internal static class RepoFiles
 
     /// <summary>Files under a repo folder matching a pattern, excluding bin and obj.</summary>
     public static IEnumerable<string> Find(string pattern, params string[] folder) =>
-        Directory.EnumerateFiles(PathOf(folder), pattern, SearchOption.AllDirectories)
-            .Where(f => !f.Split(Path.DirectorySeparatorChar).Any(part => part is "bin" or "obj"));
+        SourceFiles.Find(PathOf(folder), pattern);
 
     private static string FindRoot()
     {

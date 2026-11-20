@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <PackageId>Shields.UI.Testing</PackageId>
+    <Description>Design checks for apps built on Shields.UI: the kit's tokens, tokens-only, contrast and touch-target checks. No test-framework dependency.</Description>
+    <Authors>Martin Shields</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/marty-shields/app-ui-kit</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/marty-shields/app-ui-kit</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="/" />
+    <None Include="../../NOTICE" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <!-- The kit's own files, embedded at build time so the package cannot drift from them. -->
+  <ItemGroup>
+    <EmbeddedResource Include="../Shields.UI/wwwroot/css/tokens.css" LogicalName="tokens.css" />
+    <EmbeddedResource Include="../Shields.UI/wwwroot/css/base.css" LogicalName="base.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Shields.UI.Tests" />
+  </ItemGroup>
+
+</Project>

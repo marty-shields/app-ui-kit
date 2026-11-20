@@ -393,6 +393,9 @@
           "Shields.UI": "[1.0.0, )"
         }
       },
+      "shields.ui.testing": {
+        "type": "Project"
+      },
       "BlazingStory": {
         "type": "CentralTransitive",
         "requested": "[1.0.0-preview.97, )",

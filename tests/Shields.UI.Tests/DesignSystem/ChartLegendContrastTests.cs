@@ -11,15 +11,15 @@ public partial class ChartLegendContrastTests
 
     private static IEnumerable<TestCaseData> Cases() =>
         new[] { ("marker", "color", Text), ("swatch.accent", "background-color", Graphic), ("swatch.chip", "background-color", Graphic), ("swatch.error", "background-color", Graphic), ("swatch.outline", "border", Graphic), ("swatch.line", "border-top", Graphic) }
-            .SelectMany(c => new[] { "--color-bg", "--color-surface" }.SelectMany(background => new[] { "light", "dark" }
-                .Select(theme => new TestCaseData(c.Item1, c.Item2, background, c.Item3, theme).SetArgDisplayNames($".{c.Item1} {c.Item2} on {background} ({theme})"))));
+            .SelectMany(c => new[] { "--color-bg", "--color-surface" }.SelectMany(background => Enum.GetValues<ColourScheme>()
+                .Select(scheme => new TestCaseData(c.Item1, c.Item2, background, c.Item3, scheme).SetArgDisplayNames($".{c.Item1} {c.Item2} on {background} ({scheme})"))));
 
     [TestCaseSource(nameof(Cases))]
-    public void LegendColour_IsReadableOnTheBackground(string selector, string property, string background, double minimum, string theme)
+    public void LegendColour_IsReadableOnTheBackground(string selector, string property, string background, double minimum, ColourScheme scheme)
     {
         var token = Declaration(selector, property);
-        var fg = ContrastTests.Pick(DesignTokens.Colour(token), theme);
-        var bg = ContrastTests.Pick(DesignTokens.Colour(background), theme);
+        var fg = DesignTokens.Colour(token).In(scheme);
+        var bg = DesignTokens.Colour(background).In(scheme);
 
         Assert.That(Rgb.Contrast(fg, bg), Is.GreaterThanOrEqualTo(minimum), $"{token} {fg} on {bg}");
     }

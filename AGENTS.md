@@ -10,12 +10,13 @@ The shared UI kit (.NET 11 Blazor) for the Calorie Tracker and Workout Log apps:
 - CI lint (needs `shellcheck`): `.github/scripts/lint-ci.sh` runs shellcheck over the scripts and actionlint over the workflows; CI runs it in `Build and test`.
 - Filler comments: `python3 -I .github/scripts/check-filler-comments.py` fails a `<summary>` or `<param>` that only restates the name; CI runs it in `Build and test`.
 - Docs: `python3 -I .github/scripts/check-docs.py` fails on a relative link or `#anchor` in a tracked `*.md` that doesn't resolve; CI runs it in `Build and test`.
+- Pack the test helpers: `dotnet pack src/Shields.UI.Testing -o <folder>` (embeds the kit's `tokens.css` and `base.css`).
 - Stories site: `dotnet run --project src/Shields.UI.Stories.Host` → http://localhost:5056
 
 The story-layout check, the stories Pages site and the release workflow are still to come ([epic issues](https://github.com/marty-shields/app-ui-kit/issues)).
 
 ## How the code fits
-- Projects: `Shields.UI` (components, tokens, base styles), `Shields.UI.Stories` (the stories shell), `Shields.UI.Stories.Host` (the site) and `tests/Shields.UI.Tests`.
+- Projects: `Shields.UI` (components, tokens, base styles), `Shields.UI.Stories` (the stories shell), `Shields.UI.Stories.Host` (the site), `Shields.UI.Testing` (package of design checks and the kit's tokens for the apps' tests; no test-framework dependency) and `tests/Shields.UI.Tests`.
 - Styling: tokens only, no literal colours or sizes.
 - A component or token that only one app needs does not belong here. It stays in that app's repo.
 

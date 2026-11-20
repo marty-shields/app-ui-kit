@@ -1,7 +1,6 @@
 using System.Text.RegularExpressions;
 using BlazingStory.Types;
 using Microsoft.AspNetCore.Components;
-using Shields.UI.Components.Actions;
 using Shields.UI.Stories.Shared;
 
 namespace Shields.UI.Tests.Stories;
@@ -10,10 +9,7 @@ public partial class StoryCoverageTests
 {
     private const string ComponentsNamespace = "Shields.UI.Components.";
 
-    private static readonly Type[] ExportedComponents =
-        typeof(AppButton).Assembly.GetExportedTypes()
-            .Where(t => typeof(IComponent).IsAssignableFrom(t) && !t.IsAbstract)
-            .ToArray();
+    private static readonly IReadOnlyList<Type> ExportedComponents = KitComponents.Exported;
 
     private static IEnumerable<TestCaseData> Components() =>
         ExportedComponents

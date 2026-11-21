@@ -44,6 +44,12 @@
         </Template>
     </Story>
 
+    <Story Name="All zero on the page">
+        <Template>
+            <StackedBar Label="Sales by region" Unit="units" EmptyText="Nothing recorded yet" Segments="@([new StackedBarSegment("North", 0, DataSeries.One), new StackedBarSegment("South", 0, DataSeries.Two)])" TestId="bar" />
+        </Template>
+    </Story>
+
     <Story Name="Light">
         <Template>
             <div class="themed" data-theme="light">

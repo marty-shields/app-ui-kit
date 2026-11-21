@@ -1,0 +1,19 @@
+@attribute [CustomPage("Components/Feedback/Overview")]
+
+<h1>Feedback</h1>
+
+<h2><code>InlineAlert</code></h2>
+<p>A box for an error that belongs to the content around it: an error border (<code>--border-width-error</code>), the surface background and error text, announced to screen readers (<code>role="alert"</code>). Shows <code>Message</code>, then <code>ChildContent</code>.</p>
+<ul>
+    <li><code>Tone</code> (<code>AlertTone</code>): <code>Error</code>, the only tone and the default; the enum leaves room for others.</li>
+    <li><code>data-testid</code>: <code>TestId</code>.</li>
+</ul>
+
+<h2><code>Banner</code></h2>
+<p>A short bold highlight, such as "Adding to Lunch": a <code>--radius-lg</code> pill with a small padding, in the normal text colour on the selected background (<code>--color-selected</code>, 4.5:1). The screen decides where it sits.</p>
+<ul>
+    <li><code>Tone</code> (<code>BannerTone</code>): <code>Selected</code>, the only tone and the default.</li>
+    <li><code>data-testid</code>: <code>TestId</code>.</li>
+</ul>
+
+<p>Stories: <a href="./?path=/docs/components-feedback-inlinealert--docs">InlineAlert</a>, <a href="./?path=/docs/components-feedback-banner--docs">Banner</a></p>

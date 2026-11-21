@@ -1,0 +1,53 @@
+@attribute [Stories("Components/Layout/Text")]
+
+<Stories TComponent="Text" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Variants">
+        <Template>
+            <div class="sheet">
+                <Text Variant="TextVariant.Body" As="TextElement.P">Body: the normal text colour at the surrounding size.</Text>
+                <Text Variant="TextVariant.Label" As="TextElement.H2">Section label</Text>
+                <Text Variant="TextVariant.Muted" As="TextElement.P">Muted: a note or detail.</Text>
+                <Text Variant="TextVariant.MutedSmall" As="TextElement.P">Muted small: a caption or a notice.</Text>
+                <Text Variant="TextVariant.Strong" As="TextElement.P">Strong: bold.</Text>
+                <Text Variant="TextVariant.Figure" As="TextElement.P">521</Text>
+                <Text Variant="TextVariant.Error" As="TextElement.P">Error: couldn't save.</Text>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Strong inside Muted">
+        <Template>
+            <Text Variant="TextVariant.Muted" As="TextElement.P">You have <Text Variant="TextVariant.Strong">3 items</Text> left today.</Text>
+        </Template>
+    </Story>
+
+    <Story Name="Label as a heading">
+        <Template>
+            <Text Variant="TextVariant.Label" As="TextElement.H3" TestId="heading">Recent</Text>
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed sheet" data-theme="light">
+                <Text Variant="TextVariant.Label" As="TextElement.H2">Section label</Text>
+                <Text Variant="TextVariant.Muted" As="TextElement.P">Muted with <Text Variant="TextVariant.Strong">strong</Text> text.</Text>
+                <Text Variant="TextVariant.Figure" As="TextElement.P">521</Text>
+                <Text Variant="TextVariant.Error" As="TextElement.P">Couldn't save.</Text>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed sheet" data-theme="dark">
+                <Text Variant="TextVariant.Label" As="TextElement.H2">Section label</Text>
+                <Text Variant="TextVariant.Muted" As="TextElement.P">Muted with <Text Variant="TextVariant.Strong">strong</Text> text.</Text>
+                <Text Variant="TextVariant.Figure" As="TextElement.P">521</Text>
+                <Text Variant="TextVariant.Error" As="TextElement.P">Couldn't save.</Text>
+            </div>
+        </Template>
+    </Story>
+
+</Stories>

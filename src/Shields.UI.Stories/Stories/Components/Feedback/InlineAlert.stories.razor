@@ -1,0 +1,35 @@
+@attribute [Stories("Components/Feedback/InlineAlert")]
+
+<Stories TComponent="InlineAlert" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Message">
+        <Template>
+            <InlineAlert Message="Couldn't save this serving." TestId="alert" />
+        </Template>
+    </Story>
+
+    <Story Name="With content">
+        <Template>
+            <InlineAlert Message="Couldn't save.">
+                <strong>Check the amount and try again.</strong>
+            </InlineAlert>
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <InlineAlert Message="Couldn't save this serving." />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <InlineAlert Message="Couldn't save this serving." />
+            </div>
+        </Template>
+    </Story>
+
+</Stories>

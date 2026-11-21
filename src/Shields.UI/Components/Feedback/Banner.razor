@@ -1,0 +1,17 @@
+<div class="banner @ToneClass" data-testid="@TestId">@ChildContent</div>
+
+@code {
+    /// <summary>The text.</summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>Background colour.</summary>
+    [Parameter]
+    public BannerTone Tone { get; set; }
+
+    /// <summary>Value of the data-testid attribute.</summary>
+    [Parameter]
+    public string? TestId { get; set; }
+
+    private string ToneClass => Tone.ToString().ToLowerInvariant();
+}

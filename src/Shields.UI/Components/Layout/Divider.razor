@@ -1,0 +1,19 @@
+<div class="divider @(Vertical ? "vertical" : "horizontal")"
+     role="@(Decorative ? null : "separator")"
+     aria-orientation="@(Decorative ? null : Vertical ? "vertical" : "horizontal")"
+     aria-hidden="@(Decorative ? "true" : null)"
+     data-testid="@TestId"></div>
+
+@code {
+    /// <summary>Draws a vertical line that stretches to the height of a flex row, instead of a horizontal line across the width.</summary>
+    [Parameter]
+    public bool Vertical { get; set; }
+
+    /// <summary>Hides the line from screen readers, for one that only separates what is already grouped. Otherwise it is a separator with its orientation.</summary>
+    [Parameter]
+    public bool Decorative { get; set; }
+
+    /// <summary>Value of the data-testid attribute.</summary>
+    [Parameter]
+    public string? TestId { get; set; }
+}

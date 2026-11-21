@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.JSInterop;
 using Shields.UI.Components.Inputs;
 
 namespace Shields.UI.Tests.Components.Inputs;
@@ -127,6 +128,64 @@ public class ValueFieldTests : ComponentTestBase
     [TestCase(ValueKind.Duration, "field-h")]
     public void TestId_GoesOnTheInputOrPrefixesTheBoxes(ValueKind kind, string expected) =>
         Assert.That(Render(kind).Find("input").GetAttribute("data-testid"), Is.EqualTo(expected));
+
+    [Test]
+    public void Compact_MakesTheNumberBoxCompact()
+    {
+        var compact = Render(ValueKind.Whole, p => p.Add(x => x.Compact, true));
+        var normal = Render(ValueKind.Whole);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(compact.Find("[data-testid=field-box]").ClassList, Does.Contain("input-box-compact"));
+            Assert.That(normal.Find("[data-testid=field-box]").ClassList, Does.Not.Contain("input-box-compact"));
+        });
+    }
+
+    [TestCase(ValueKind.Whole)]
+    [TestCase(ValueKind.Duration)]
+    public void Disabled_DisablesEveryInput(ValueKind kind) =>
+        Assert.That(Render(kind, p => p.Add(x => x.Disabled, true)).FindAll("input").Select(i => i.HasAttribute("disabled")), Is.All.True);
+
+    [TestCase(ValueKind.Whole)]
+    [TestCase(ValueKind.Duration)]
+    public void ShowLabelOff_KeepsTheLabelForScreenReadersOnly(ValueKind kind)
+    {
+        var hidden = Render(kind, p => p.Add(x => x.ShowLabel, false)).Find("label").ClassList.Contains("visually-hidden");
+        var shown = Render(kind).Find("label").ClassList.Contains("visually-hidden");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(hidden, Is.True);
+            Assert.That(shown, Is.False);
+        });
+    }
+
+    [TestCase(ValueKind.Whole, "field")]
+    [TestCase(ValueKind.Duration, "field-h")]
+    public async Task FocusAsync_FocusesTheFirstInput(ValueKind kind, string testId)
+    {
+        var cut = Render(kind);
+
+        await cut.InvokeAsync(() => cut.Instance.FocusAsync().AsTask());
+
+        Assert.That(Focuses().Single().Arguments[0], Is.Not.Null);
+        Focuses().Single().Arguments[0].ShouldBeElementReferenceTo(cut.Find($"[data-testid={testId}]"));
+    }
+
+    [Test]
+    public async Task FocusAsync_AfterTheKindChanges_FocusesTheCurrentControl()
+    {
+        var cut = Render(ValueKind.Whole);
+        cut.Render(p => p.Add(x => x.Kind, ValueKind.Duration));
+
+        await cut.InvokeAsync(() => cut.Instance.FocusAsync().AsTask());
+
+        Focuses().Single().Arguments[0].ShouldBeElementReferenceTo(cut.Find("[data-testid=field-h]"));
+    }
+
+    private IReadOnlyList<JSRuntimeInvocation> Focuses() =>
+        Context.JSInterop.Invocations["Blazor._internal.domWrapper.focus"];
 
     private IRenderedComponent<ValueField> Render(ValueKind kind, Action<ComponentParameterCollectionBuilder<ValueField>>? more = null) =>
         Context.Render<ValueField>(p =>

@@ -11,7 +11,7 @@
             }
             else
             {
-                <Icon Name="Change.Direction == ChangeDirection.Up ? IconName.Up : IconName.Down" Tone="Change.Direction == ChangeDirection.Up ? IconTone.Success : IconTone.Error" Size="IconSize.Small" />
+                <Icon Name="Change.Direction == ChangeDirection.Up ? IconName.Up : IconName.Down" Tone="Compact ? IconTone.Muted : Change.Direction == ChangeDirection.Up ? IconTone.Success : IconTone.Error" Size="IconSize.Small" />
                 <span class="visually-hidden">@(Change.Direction == ChangeDirection.Up ? "up " : "down ")</span>
                 @Change.Amount
             }

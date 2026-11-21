@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.JSInterop;
 using Shields.UI.Components.Inputs;
 
 namespace Shields.UI.Tests.Components.Inputs;
@@ -179,6 +180,66 @@ public class DurationFieldTests : ComponentTestBase
     [Test]
     public void TestId_PrefixesTheBoxes() =>
         Assert.That(Render(p => p.Add(x => x.TestId, "time")).FindAll("input").Select(i => i.GetAttribute("data-testid")), Is.EqualTo(new[] { "time-h", "time-mm", "time-ss" }));
+
+    [TestCase("1:2", "0:12:")]
+    [TestCase("a1b", "0:1:")]
+    public void PastedText_KeepsOnlyDigits(string pasted, string expected)
+    {
+        string? value = null;
+        var cut = Render(p => p.Add(x => x.Value, "0::").Add(x => x.ValueChanged, (string? v) => value = v));
+
+        cut.Find("[data-testid=duration-mm]").Input(pasted);
+
+        Assert.That(value, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public async Task Disposed_BeforeTheFocusWaitEnds_RaisesNothing()
+    {
+        string? raised = null;
+        var cut = Render(p => p.Add(x => x.Value, "1::").Add(x => x.ValueChanged, (string? v) => raised = v));
+
+        var leaving = cut.Find("[role=group]").FocusOutAsync(new FocusEventArgs());
+        await Context.DisposeComponentsAsync();
+        clock.Advance(TimeSpan.FromMilliseconds(10));
+        await leaving;
+
+        Assert.That(raised, Is.Null);
+    }
+
+    [Test]
+    public void ClickingABox_FocusesIt()
+    {
+        var cut = Render();
+
+
+        cut.Find("[data-testid=duration-mm-box]").Click();
+
+        Assert.That(Focuses(), Has.Count.EqualTo(1));
+    }
+
+    [Test]
+    public void ClickingABox_WhenDisabled_DoesNotFocus()
+    {
+        var cut = Render(p => p.Add(x => x.Disabled, true));
+
+        cut.Find("[data-testid=duration-h-box]").Click();
+
+        Assert.That(Context.JSInterop.Invocations, Is.Empty);
+    }
+
+    [Test]
+    public async Task FocusAsync_FocusesTheHoursBox()
+    {
+        var cut = Render();
+
+        await cut.InvokeAsync(() => cut.Instance.FocusAsync().AsTask());
+
+        Focuses().Single().Arguments[0].ShouldBeElementReferenceTo(cut.Find("[data-testid=duration-h]"));
+    }
+
+    private IReadOnlyList<JSRuntimeInvocation> Focuses() =>
+        Context.JSInterop.Invocations["Blazor._internal.domWrapper.focus"];
 
     private IRenderedComponent<DurationField> Render(Action<ComponentParameterCollectionBuilder<DurationField>>? more = null) =>
         Context.Render<DurationField>(p =>

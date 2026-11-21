@@ -392,6 +392,70 @@ public class RangeCalendarTests : ComponentTestBase
         Assert.That(cut.Find(".day.today").GetAttribute("data-testid"), Is.EqualTo("range-day-2026-11-06"));
     }
 
+    [Test]
+    public void MonthOutsideMinAndMax_AnnouncesNoCount()
+    {
+        var counts = new Dictionary<DateOnly, int> { [new DateOnly(2025, 2, 20)] = 5, [new DateOnly(2025, 3, 12)] = 3 };
+        var cut = Context.Render<RangeCalendar>(p => p
+            .Add(x => x.Min, new DateOnly(2025, 3, 3)).Add(x => x.Max, Today).Add(x => x.Dates, new DateRange(new(2025, 3, 3), new(2025, 3, 12)))
+            .Add(x => x.DayCounts, counts).Add(x => x.CountText, n => $"{n} entries").Add(x => x.OpenOnMonths, true));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find("[data-testid=range-month-2025-02]").GetAttribute("aria-label"), Is.EqualTo("February 2025"));
+            Assert.That(cut.Find("[data-testid=range-month-2025-03]").GetAttribute("aria-label"), Is.EqualTo("March 2025, 3 entries"));
+        });
+    }
+
+    [Test]
+    public void MonthCount_CountsOnlyDaysWithinMinAndMax()
+    {
+        var counts = new Dictionary<DateOnly, int> { [new DateOnly(2025, 3, 1)] = 5, [new DateOnly(2025, 3, 12)] = 3, [new DateOnly(2025, 3, 31)] = 2 };
+        var cut = Context.Render<RangeCalendar>(p => p
+            .Add(x => x.Min, new DateOnly(2025, 3, 3)).Add(x => x.Max, new DateOnly(2025, 3, 20)).Add(x => x.Dates, new DateRange(new(2025, 3, 3), new(2025, 3, 12)))
+            .Add(x => x.DayCounts, counts).Add(x => x.OpenOnMonths, true));
+
+        Assert.That(cut.Find("[data-testid=range-month-count-2025-03]").TextContent, Is.EqualTo("3"));
+    }
+
+    [Test]
+    public void ReversedDates_AreTurnedRound()
+    {
+        var applied = new List<DateRange>();
+        var cut = Render(new DateRange(new(2026, 11, 5), new(2026, 11, 2)), applied.Add);
+
+        cut.Find("[data-testid=range-apply]").Click();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find("[data-testid=range-from-value]").TextContent, Is.EqualTo("Mon 2 Nov 26"));
+            Assert.That(applied, Is.EqualTo(new[] { new DateRange(new(2026, 11, 2), new(2026, 11, 5)) }));
+        });
+    }
+
+    [TestCase(2030, 1, 5, "November 2026")]
+    [TestCase(2020, 1, 5, "March 2025")]
+    public void ShownMonth_IsKeptInsideMinAndMax(int year, int month, int day, string expected)
+    {
+        var cut = Render(new DateRange(new(year, month, day), new(year, month, day)));
+
+        Assert.That(cut.Find("[data-testid=range-month-name]").TextContent.Trim(), Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void FromBox_WithTheMonthGridOpen_ReturnsToTheDays()
+    {
+        var cut = Render(Autumn, openOnMonths: true);
+
+        cut.Find("[data-testid=range-from]").Click();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.FindAll(".months"), Is.Empty);
+            Assert.That(cut.Find("[data-testid=range-hint]").TextContent, Is.EqualTo("Tap the first day"));
+        });
+    }
+
     private static string Hidden(IRenderedComponent<RangeCalendar> cut, string date) =>
         cut.Find($"[data-testid=range-day-{date}] .visually-hidden").TextContent;
 

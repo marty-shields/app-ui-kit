@@ -23,7 +23,7 @@
             @for (var m = 1; m <= 12; m++)
             {
                 var month = new DateOnly(year, m, 1);
-                var outside = month < FirstOfMonth(Min) || month > FirstOfMonth(Max);
+                var outside = OutsideBounds(month);
                 var count = CountIn(year, m);
                 <button type="button"
                         class="month"
@@ -106,7 +106,7 @@
     [Parameter, EditorRequired]
     public DateOnly Max { get; set; }
 
-    /// <summary>Range shown when the calendar opens, with the month of <see cref="DateRange.To"/> in view. Later changes to it are ignored.</summary>
+    /// <summary>Range shown when the calendar opens, with the month of its later end in view, kept inside <see cref="Min"/> and <see cref="Max"/>. A range given backwards is turned round. Later changes to it are ignored.</summary>
     [Parameter, EditorRequired]
     public DateRange Dates { get; set; }
 
@@ -154,9 +154,9 @@
 
     protected override void OnInitialized()
     {
-        from = Dates.From;
-        to = Dates.To;
-        shown = FirstOfMonth(Dates.To);
+        (from, to) = Dates.From <= Dates.To ? (Dates.From, Dates.To) : (Dates.To, Dates.From);
+        var last = FirstOfMonth(to!.Value);
+        shown = last < FirstOfMonth(Min) ? FirstOfMonth(Min) : last > FirstOfMonth(Max) ? FirstOfMonth(Max) : last;
         pickingYear = OpenOnMonths ? shown.Year : null;
     }
 
@@ -186,10 +186,10 @@
     }
 
     private int CountIn(int year, int month) =>
-        DayCounts?.Where(d => d.Key.Year == year && d.Key.Month == month).Sum(d => d.Value) ?? 0;
+        DayCounts?.Where(d => d.Key.Year == year && d.Key.Month == month && d.Key >= Min && d.Key <= Max).Sum(d => d.Value) ?? 0;
 
     private string MonthLabel(DateOnly month, int count) =>
-        DayCounts is null ? MonthText(month) : $"{MonthText(month)}, {CountText?.Invoke(count) ?? count.ToString(CultureInfo.InvariantCulture)}";
+        DayCounts is null || OutsideBounds(month) ? MonthText(month) : $"{MonthText(month)}, {CountText?.Invoke(count) ?? count.ToString(CultureInfo.InvariantCulture)}";
 
     private void Choose(End end)
     {
@@ -241,6 +241,8 @@
             day == today ? "today" : null,
         }.OfType<string>());
     }
+
+    private bool OutsideBounds(DateOnly month) => month < FirstOfMonth(Min) || month > FirstOfMonth(Max);
 
     private static DateOnly FirstOfMonth(DateOnly day) => new(day.Year, day.Month, 1);
 }

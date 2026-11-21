@@ -44,8 +44,22 @@ public class StatTileTests : ComponentTestBase
             Assert.That(css, Does.Contain("padding: var(--stat-tile-compact-padding);"));
             Assert.That(css, Does.Contain("font-size: var(--stat-tile-compact-value-size);"));
             Assert.That(css, Does.Contain("white-space: nowrap;"));
-            Assert.That(css, Does.Contain(".compact .up,"));
+            Assert.That(css, Does.Contain(".compact .change,\n.compact .up,\n.compact .down {\n    color: var(--color-text-muted);"));
             Assert.That(KitCss.Tokens, Does.Contain("--stat-tile-compact-value-size: var(--font-size-md);"));
+        });
+    }
+
+    [Test]
+    public void Compact_MutesTheChangeArrowToo()
+    {
+        var change = new StatChange(ChangeDirection.Up, "35m");
+        var compact = Context.Render<StatTile>(p => p.Add(x => x.Label, "Time").Add(x => x.Value, "3").Add(x => x.Change, change).Add(x => x.Compact, true));
+        var normal = Context.Render<StatTile>(p => p.Add(x => x.Label, "Time").Add(x => x.Value, "3").Add(x => x.Change, change));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(compact.Find(".change svg, .change .icon").ClassList, Does.Contain("muted"));
+            Assert.That(normal.Find(".change svg, .change .icon").ClassList, Does.Not.Contain("muted"));
         });
     }
 

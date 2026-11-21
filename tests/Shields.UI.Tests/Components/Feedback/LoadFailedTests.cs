@@ -64,6 +64,18 @@ public class LoadFailedTests : ComponentTestBase
     }
 
     [Test]
+    public void Css_Plain_CentresTheMessageAndDropsTheBorderAndPadding()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Feedback", "LoadFailed.razor.css");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(css, Does.Contain(".plain {\n    text-align: center;"));
+            Assert.That(css, Does.Contain(".plain .error {\n    padding: 0;\n    border: 0;"));
+        });
+    }
+
+    [Test]
     public void TryAgain_RaisesOnRetry()
     {
         var retries = 0;

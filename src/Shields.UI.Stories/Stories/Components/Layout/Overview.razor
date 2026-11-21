@@ -7,6 +7,7 @@
 <ul>
     <li><code>Title</code>: a bold heading at the top. Null shows a plain card with no heading and no aside.</li>
     <li><code>Aside</code>: muted text at the right of the title, e.g. "1 this week". It stays on one line. Only shown with a title.</li>
+    <li><code>Compact</code>: for cards that hold rows with their own bottom space: padding 16px, 16px, 0 and an 8px gap under the title (<code>--card-compact-padding</code>, <code>--card-compact-title-gap</code>).</li>
     <li><code>data-testid</code>: <code>TestId</code>, and <code>{TestId}-aside</code> on the aside.</li>
 </ul>
 
@@ -40,7 +41,7 @@
 <p>Runs <code>Initialize</code> once before showing its content, with a <code>StartupView</code> meanwhile. A failure is logged (9002) and shown; with <code>Retryable</code> (the default) Try again runs <code>Initialize</code> again. The app passes its own wording: <code>Title</code>, <code>LoadingLabel</code> and <code>FailedMessage</code>.</p>
 
 <h2><code>StartupView</code></h2>
-<p>The start-up screen: a spinner, or <code>FailedMessage</code> with Try again when <code>OnRetry</code> is set. <code>data-testid</code>: <code>startup-top-bar</code>, <code>startup-loading</code>, <code>startup-error</code> and <code>startup-retry</code>.</p>
+<p>The start-up screen: a spinner, or <code>FailedMessage</code> with Try again when <code>OnRetry</code> is set. <code>data-testid</code>: <code>startup-top-bar</code>, <code>startup-loading</code>, <code>startup-error</code>, <code>startup-retry</code> and <code>startup-failed</code> (on the content while failed, with or without Try again). With Try again the failure is shown plain: centred, without the red border (<code>LoadFailed</code> with <code>Plain</code>).</p>
 
 <h2><code>AppErrorBoundary</code></h2>
 <p>Shows an <code>ErrorView</code> instead of its content when the content throws, and logs the error (9101). Restart raises <code>OnRestart</code>, then shows the content again.</p>

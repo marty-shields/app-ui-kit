@@ -88,7 +88,8 @@ else
     public string? TestId { get; set; }
 
     /// <summary>Moves focus to the number input, or the first box of a duration.</summary>
-    public ValueTask FocusAsync() => duration?.FocusAsync() ?? number?.FocusAsync() ?? ValueTask.CompletedTask;
+    public ValueTask FocusAsync() =>
+        (Kind == ValueKind.Duration ? duration?.FocusAsync() : number?.FocusAsync()) ?? ValueTask.CompletedTask;
 
     private Task OnText(string text) => SetValue(string.IsNullOrEmpty(text) ? null : text);
 

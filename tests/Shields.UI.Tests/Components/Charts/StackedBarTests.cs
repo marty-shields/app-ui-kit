@@ -51,6 +51,19 @@ public class StackedBarTests : ComponentTestBase
     }
 
     [Test]
+    public void Render_WithBlankValueText_FallsBackToTheFormattedValue()
+    {
+        var cut = Render([new("A", 10, DataSeries.One, ""), new("B", 10, DataSeries.Two, "  ")]);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find("[data-testid=bar-label-0]").TextContent, Is.EqualTo("A 10 g"));
+            Assert.That(cut.Find("[data-testid=bar-label-1]").TextContent, Is.EqualTo("B 10 g"));
+            Assert.That(Text(cut), Is.EqualTo("Sales by region: A 10 g, 50%; B 10 g, 50%."));
+        });
+    }
+
+    [Test]
     public void Render_WithValueTextAndAllZero_UsesItInTheTextAlternative()
     {
         var cut = Render([new("A", 0, DataSeries.One, "none")]);

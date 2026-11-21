@@ -34,14 +34,23 @@
 }
 
 .label {
+    display: flex;
+    align-items: center;
     max-width: 100%;
     min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap;
 }
 
+/* Only the text shrinks, so the value always stays visible. */
+.label-text {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .label strong {
+    flex-shrink: 0;
+    margin-left: var(--space-1);
     color: var(--color-text);
     font-weight: var(--font-weight-bold);
 }
@@ -51,6 +60,7 @@
     display: inline-block;
     width: var(--legend-swatch-size);
     height: var(--legend-swatch-size);
+    flex-shrink: 0;
     margin-right: var(--space-1);
     border-radius: var(--radius-round);
 }

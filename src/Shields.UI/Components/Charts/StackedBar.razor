@@ -16,7 +16,7 @@
             @for (var i = 0; i < Segments.Count; i++)
             {
                 var segment = Segments[i];
-                <span class="label @segment.Series.CssClass()" data-testid="@Id($"label-{i}")">@segment.Label <strong>@ValueText(segment)</strong></span>
+                <span class="label @segment.Series.CssClass()" data-testid="@Id($"label-{i}")"><span class="label-text">@segment.Label</span> <strong>@ValueText(segment)</strong></span>
             }
         </div>
     }

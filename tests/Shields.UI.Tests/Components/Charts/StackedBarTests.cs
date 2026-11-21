@@ -156,6 +156,35 @@ public class StackedBarTests : ComponentTestBase
         });
     }
 
+    [Test]
+    public void Render_LabelText_IsItsOwnSpan_SoTheValueSitsOutsideTheEllipsis()
+    {
+        var cut = Render(Three);
+
+        var label = cut.Find("[data-testid=bar-label-0]");
+        Assert.Multiple(() =>
+        {
+            Assert.That(label.QuerySelector(".label-text")!.TextContent, Is.EqualTo("North"));
+            Assert.That(label.QuerySelector("strong")!.TextContent, Is.EqualTo("30 g"));
+            Assert.That(label.QuerySelector(".label-text strong"), Is.Null);
+        });
+    }
+
+    [Test]
+    public void Css_OnlyTheLabelTextEllipsises_AndTheValueAndSwatchDoNotShrink()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Charts", "StackedBar.razor.css");
+        string Rule(string selector) => Regex.Match(css, Regex.Escape(selector) + @"\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(Rule(".label-text"), Does.Contain("min-width: 0;").And.Contain("overflow: hidden;").And.Contain("text-overflow: ellipsis;"));
+            Assert.That(Rule(".label"), Does.Not.Contain("overflow").And.Not.Contain("text-overflow"));
+            Assert.That(Rule(".label strong"), Does.Contain("flex-shrink: 0;"));
+            Assert.That(Rule(".label::before"), Does.Contain("flex-shrink: 0;"));
+        });
+    }
+
     [TestCase(1, 1, 1, "North 1 g, 34%", "South 1 g, 33%; East 1 g, 33%")]
     [TestCase(2, 2, 3, "North 2 g, 29%", "South 2 g, 28%; East 3 g, 43%")]
     public void Render_PercentagesAddUpToOneHundred(double a, double b, double c, string first, string rest)

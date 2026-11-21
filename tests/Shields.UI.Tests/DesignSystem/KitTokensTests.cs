@@ -20,7 +20,7 @@ public class KitTokensTests
         "--snackbar-enter-duration", "--radio-size", "--radio-dot-size", "--nav-indicator-width", "--nav-indicator-height",
     ];
 
-    // Tokens only one app has that a kit component needs, and the decided names for the raised button and legend.
+    // Tokens only one app has that a kit component needs, and the decided names for the raised button, legend, chart band and snackbar gap.
     private static readonly string[] KitComponents =
     [
         "--color-chip", "--color-on-chip", "--color-chip-soft", "--color-on-chip-soft", "--letter-spacing-label",

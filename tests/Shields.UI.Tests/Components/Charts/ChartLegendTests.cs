@@ -38,6 +38,7 @@ public class ChartLegendTests : ComponentTestBase
             Assert.That(rule, Does.Contain("width: calc(var(--legend-swatch-size) * 2);"));
             Assert.That(rule, Does.Not.Contain("background"));
             Assert.That(rule, Does.Contain("box-shadow: inset 0 0 0 var(--border-width) var(--color-chart-band);"));
+            Assert.That(rule, Does.Contain("border-radius: calc(var(--radius-sm) / 4);"));
         });
     }
 

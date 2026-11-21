@@ -20,6 +20,8 @@ public class ContrastTests
         ("--color-on-bar", "--color-bar", Text),
         ("--color-on-bar-muted", "--color-bar", Text),
         ("--color-on-primary", "--color-primary", Text),
+        ("--color-primary", "--color-bg", LargeTextOrControl),
+        ("--color-primary", "--color-surface", LargeTextOrControl),
         ("--color-on-secondary", "--color-secondary", Text),
         ("--color-on-danger", "--color-danger", Text),
         ("--color-on-primary", "--color-accent", Text),

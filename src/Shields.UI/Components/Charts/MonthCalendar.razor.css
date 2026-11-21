@@ -79,3 +79,52 @@ button.cell {
     font-size: var(--font-size-sm);
     line-height: var(--line-height-tight);
 }
+
+/* Marks style: the day number sits in a circle, solid when recorded and dashed when not; the target is not used. */
+.marks .cell {
+    background-color: transparent;
+    border-color: transparent;
+}
+
+.marks .num {
+    display: inline-grid;
+    place-items: center;
+    box-sizing: border-box;
+    width: var(--calendar-day-size);
+    height: var(--calendar-day-size);
+    border: var(--border-width) dashed var(--color-border-strong);
+    border-radius: var(--radius-round);
+    font-variant-numeric: tabular-nums;
+}
+
+.marks .cell.marked {
+    color: var(--color-on-primary);
+}
+
+.marks .cell.marked .num {
+    border-style: solid;
+    border-color: var(--color-primary);
+    background-color: var(--color-primary);
+}
+
+/* Only the circle shows the pressed state, not the cell around it. */
+.marks button.cell:not(:disabled):active {
+    background-image: none;
+}
+
+.marks button.cell:active .num {
+    background-image: linear-gradient(var(--state-pressed), var(--state-pressed));
+}
+
+.marks .cell.today {
+    box-shadow: none;
+}
+
+.marks .cell.today .num {
+    outline: var(--border-width-error) solid var(--color-text);
+    outline-offset: var(--focus-offset);
+}
+
+.marks .cell.today:focus-visible {
+    outline-offset: var(--focus-offset);
+}

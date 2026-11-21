@@ -337,4 +337,92 @@ public class MonthCalendarTests : ComponentTestBase
 
         Assert.That(cut.FindAll(".marker"), Is.Empty);
     }
+
+    private IRenderedComponent<MonthCalendar> RenderMarks(params CalendarDay[] days) =>
+        Context.Render<MonthCalendar>(p => p
+            .Add(x => x.Month, new DateOnly(2026, 11, 20)).Add(x => x.Days, days).Add(x => x.Target, 2000).Add(x => x.Today, Today).Add(x => x.Unit, "pts")
+            .Add(x => x.Style, CalendarStyle.Marks).Add(x => x.TestId, "cal"));
+
+    [Test]
+    public void Render_Marks_RecordedDayIsMarkedAndTargetIsIgnored()
+    {
+        var cut = RenderMarks(Day(3, 1000), Day(5, 2500));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find(".calendar").ClassList, Does.Contain("marks"));
+            Assert.That(cut.Find(Selector(3)).ClassList, Does.Contain("marked"));
+            Assert.That(cut.Find(Selector(5)).ClassList, Does.Contain("marked").And.Not.Contain("over"));
+            Assert.That(cut.FindAll(".marker"), Is.Empty);
+        });
+    }
+
+    [Test]
+    public void Render_Marks_EachDayNameCarriesItsState()
+    {
+        var cut = RenderMarks(Day(3, 1000));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(NameOf(cut.Find(Selector(3))), Is.EqualTo("Tue 3 Nov, 1,000 pts, recorded"));
+            Assert.That(NameOf(cut.Find(Selector(4))), Is.EqualTo("Wed 4 Nov, not recorded"));
+            Assert.That(NameOf(cut.Find(Selector(18))), Is.EqualTo("Wed 18 Nov, today, not recorded"));
+            Assert.That(NameOf(cut.Find(Selector(19))), Is.EqualTo("Thu 19 Nov, future"));
+        });
+    }
+
+    [Test]
+    public void Render_Marks_TodayAndFutureKeepTheirClasses()
+    {
+        var cut = RenderMarks(Day(18, 1000));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find(Selector(18)).ClassList, Does.Contain("today").And.Contain("marked"));
+            Assert.That(cut.Find(Selector(19)).ClassList, Does.Contain("future"));
+        });
+    }
+
+    [Test]
+    public void Render_Marks_WithAHandler_OnlyRecordedDaysAreButtons()
+    {
+        var cut = Context.Render<MonthCalendar>(p => p
+            .Add(x => x.Month, new DateOnly(2026, 11, 20)).Add(x => x.Days, [Day(3, 1000), Day(18, 500)]).Add(x => x.Today, Today)
+            .Add(x => x.Style, CalendarStyle.Marks).Add(x => x.TestId, "cal").Add(x => x.OnSelect, EventCallback.Factory.Create<DateOnly>(this, selected.Add)));
+
+        cut.Find(Selector(3)).Click();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.FindAll("button.cell").Select(b => b.GetAttribute("data-testid")), Is.EqualTo(new[] { "cal-day-2026-11-03", "cal-day-2026-11-18" }));
+            Assert.That(cut.Find(Selector(4)).TagName, Is.EqualTo("DIV"));
+            Assert.That(cut.Find(Selector(19)).TagName, Is.EqualTo("DIV"));
+            Assert.That(selected, Is.EqualTo(new[] { new DateOnly(2026, 11, 3) }));
+        });
+    }
+
+    [Test]
+    public void Css_Marks_PressedStateShowsOnlyOnTheCircle()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Charts", "MonthCalendar.razor.css");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(css, Does.Not.Match(@"(?m)^button\.cell:active"));
+            Assert.That(css, Does.Match(@"\.marks button\.cell:not\(:disabled\):active\s*\{[^}]*background-image: none;"));
+            Assert.That(css, Does.Match(@"\.marks button\.cell:active \.num\s*\{[^}]*background-image: linear-gradient\(var\(--state-pressed\)"));
+        });
+    }
+
+    [Test]
+    public void Render_DefaultStyleIsStatus()
+    {
+        var cut = Render(Day(3, 1000));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find(".calendar").ClassList, Does.Not.Contain("marks"));
+            Assert.That(cut.Find(Selector(3)).ClassList, Does.Not.Contain("marked"));
+        });
+    }
 }

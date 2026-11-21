@@ -88,3 +88,18 @@
 .chart:has(.bar:hover, .bar:focus-visible) ::deep .value-label {
     display: none;
 }
+
+/* PastAndCurrent style: without pairs only the Current bar is the accent and the others are past; in a pair every bar's own column is the accent and every earlier column the past colour. */
+.bar.past .column,
+.column.earlier {
+    fill: var(--color-chart-past);
+}
+
+.bar.now .column:not(.earlier) {
+    fill: var(--color-accent);
+}
+
+.chart ::deep .axis-label.current {
+    fill: var(--color-text);
+    font-weight: var(--font-weight-bold);
+}

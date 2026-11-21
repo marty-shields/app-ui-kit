@@ -29,6 +29,11 @@
     text-overflow: ellipsis;
 }
 
+/* A row whose value draws as zero reads as plain text, so a longer one such as "Not trained" fits the value column. */
+.value.zero {
+    font-weight: var(--font-weight-regular);
+}
+
 .track {
     grid-column: 1 / -1;
     height: var(--bar-list-bar-height);

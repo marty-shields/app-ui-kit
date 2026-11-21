@@ -54,6 +54,10 @@
     padding-inline: 0;
 }
 
+.parts.compact .input {
+    font-size: var(--font-size-md);
+}
+
 .parts.compact .separator {
     font-size: var(--font-size-sm);
 }

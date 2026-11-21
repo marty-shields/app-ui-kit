@@ -267,6 +267,33 @@ public class TrendBarChartTests : ComponentTestBase
     }
 
     [Test]
+    public void Render_BarNotSelectable_IsPlainAndKeepsItsName()
+    {
+        var cut = Render([Bar(0, 1000), Bar(1, 2000) with { Selectable = false }]);
+
+        var plain = cut.Find("[data-testid=chart-bar-2026-11-10]");
+        Assert.Multiple(() =>
+        {
+            Assert.That(plain.GetAttribute("role"), Is.EqualTo("img"));
+            Assert.That(plain.HasAttribute("tabindex"), Is.False);
+            Assert.That(plain.ClassList, Does.Not.Contain("selectable"));
+            Assert.That(plain.GetAttribute("aria-label"), Does.StartWith("Tue 10 Nov, 2,000"));
+            Assert.That(cut.Find("[data-testid=chart-bar-2026-11-09]").GetAttribute("role"), Is.EqualTo("button"));
+        });
+    }
+
+    [Test]
+    public void ClickAndKey_OnBarNotSelectable_RaiseNothing()
+    {
+        var cut = Render([Bar(0, 1000) with { Selectable = false }]);
+
+        cut.Find("[data-testid=chart-bar-2026-11-09]").Click();
+        cut.Find("[data-testid=chart-bar-2026-11-09]").KeyDown(new KeyboardEventArgs { Key = "Enter" });
+
+        Assert.That(selected, Is.Empty);
+    }
+
+    [Test]
     public void Click_RaisesOnSelectWithTheBarsDate()
     {
         var cut = Render([Bar(0, 1000), Bar(1, 2000)]);

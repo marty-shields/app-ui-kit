@@ -63,6 +63,12 @@
         </Template>
     </Story>
 
+    <Story Name="Inline, zero row">
+        <Template>
+            <BarList Inline="true" LabelWidth="BarListLabelWidth.Narrow" Label="Sessions per day" Items="@([new BarListItem("Mon", 3, "3 sessions"), new BarListItem("Tue", 0, "Not trained"), new BarListItem("Wed", 2, "2 sessions")])" TestId="list" />
+        </Template>
+    </Story>
+
     <Story Name="Inline, dark">
         <Template>
             <div class="themed" data-theme="dark">

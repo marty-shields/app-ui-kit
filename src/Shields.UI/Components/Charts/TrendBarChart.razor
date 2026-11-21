@@ -29,7 +29,7 @@
     @for (var i = 0; i < Bars.Count; i++)
     {
         var bar = Bars[i];
-        var selectable = OnSelect.HasDelegate;
+        var selectable = OnSelect.HasDelegate && bar.Selectable;
         var slotX = Left + i * Slot;
         var centre = slotX + Slot / 2;
         @Text(bar.Current ? "axis-label current" : "axis-label", centre, Height - 8, "middle", Short(bar.Label), hidden: true)
@@ -109,7 +109,7 @@
     [Parameter]
     public double? Target { get; set; }
 
-    /// <summary>Raised with the bar's date when a bar is clicked, or has focus and gets Enter or Space. Without a handler the bars are not buttons and cannot be focused.</summary>
+    /// <summary>Raised with the bar's date when a bar is clicked, or has focus and gets Enter or Space. Without a handler the bars are not buttons and cannot be focused, nor are those whose <see cref="TrendBarPoint.Selectable"/> is false.</summary>
     [Parameter]
     public EventCallback<DateOnly> OnSelect { get; set; }
 
@@ -290,7 +290,13 @@
         _ => $"{(tick / 1e9).ToString("0.#", CultureInfo.InvariantCulture)}B",
     };
 
-    private async Task Select(TrendBarPoint bar) => await OnSelect.InvokeAsync(bar.Date);
+    private async Task Select(TrendBarPoint bar)
+    {
+        if (bar.Selectable)
+        {
+            await OnSelect.InvokeAsync(bar.Date);
+        }
+    }
 
     private async Task OnKey(KeyboardEventArgs e, TrendBarPoint bar)
     {

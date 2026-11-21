@@ -142,6 +142,19 @@ public class DurationFieldTests : ComponentTestBase
     }
 
     [Test]
+    public void Css_Compact_DropsPaddingAndGapAndShrinksTheDigits()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Inputs", "DurationField.razor.css");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(css, Does.Contain(".parts.compact .box {\n    padding-inline: 0;"));
+            Assert.That(css, Does.Contain(".parts.compact .input {\n    font-size: var(--font-size-md);"));
+            Assert.That(css, Does.Contain(".parts.compact {\n    gap: 0;"));
+        });
+    }
+
+    [Test]
     public void FocusMoveWait_IsTheTenMillisecondsTheFieldWaitsBeforeFillingIn()
     {
         Assert.That(DurationField.FocusMoveWait, Is.EqualTo(TimeSpan.FromMilliseconds(10)));

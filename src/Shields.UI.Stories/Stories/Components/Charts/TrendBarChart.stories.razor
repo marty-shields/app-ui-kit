@@ -12,6 +12,14 @@
         </Template>
     </Story>
 
+    <Story Name="Some bars not selectable">
+        <Template>
+            <div class="card">
+                <TrendBarChart Bars="WeekPartlySelectable" Target="2000" Unit="pts" OnSelect="_ => { }" TestId="chart" />
+            </div>
+        </Template>
+    </Story>
+
     <Story Name="Year by month">
         <Template>
             <div class="card">
@@ -132,6 +140,15 @@
 
 @code {
     private static readonly DateOnly Monday = new(2026, 11, 9);
+
+    private static readonly IReadOnlyList<TrendBarPoint> WeekPartlySelectable =
+    [
+        new(Monday, "Mon", 1800),
+        new(Monday.AddDays(1), "Tue", 2100),
+        new(Monday.AddDays(2), "Wed", 2000),
+        new(Monday.AddDays(3), "Thu", 900, Selectable: false),
+        new(Monday.AddDays(4), "Fri", 1500, Selectable: false),
+    ];
 
     private static readonly IReadOnlyList<LegendItem> Legend =
     [

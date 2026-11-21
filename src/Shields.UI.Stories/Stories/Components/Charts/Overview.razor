@@ -85,6 +85,7 @@
 </table>
 <ul>
     <li>Without a target (or with zero) a recorded day has no status, unless the day carries its own target.</li>
+    <li><code>Style</code> is <code>Status</code> by default. <code>Marks</code> draws each day's number in a circle: solid <code>--color-primary</code> when recorded, dashed when not, a <code>--color-text</code> ring on today, and no target or markers. The day's text alternative then ends "recorded", so the circle is never the only cue; the circle size is <code>--calendar-day-size</code>.</li>
     <li><code>FirstDayOfWeek</code> (Monday by default) sets the first column. <code>DayNames</code> is seven labels, Sunday first; without it each heading is the first letter of the current culture's shortest day name, and a list of any other length throws.</li>
     <li>With <code>OnSelect</code> the enabled days are buttons that raise it with the day's date; without it they are plain cells.</li>
     <li>Each day's text alternative is its date, "today" when it is, its value, <code>Unit</code> and status, or "not recorded" or "future". The grid is a group named by the month; the weekday letters are hidden from screen readers.</li>

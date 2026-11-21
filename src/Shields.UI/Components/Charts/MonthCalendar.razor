@@ -1,6 +1,6 @@
 @using System.Globalization
 @inject TimeProvider Time
-<div class="calendar" role="group" aria-label="@MonthName" data-testid="@TestId">
+<div class="calendar @(Style == CalendarStyle.Marks ? "marks" : null)" role="group" aria-label="@MonthName" data-testid="@TestId">
     <div class="weekdays" aria-hidden="true">
         @for (var i = 0; i < 7; i++)
         {
@@ -67,6 +67,10 @@
     [Parameter]
     public IReadOnlyList<string>? DayNames { get; set; }
 
+    /// <summary>How a recorded day is drawn. <see cref="CalendarStyle.Status"/> by default.</summary>
+    [Parameter]
+    public CalendarStyle Style { get; set; }
+
     /// <summary>Value of the data-testid attribute, and the prefix of <c>-day-{date}</c> and <c>-marker-{date}</c> (the date as yyyy-MM-dd). None are rendered without it.</summary>
     [Parameter]
     public string? TestId { get; set; }
@@ -102,7 +106,7 @@
 
     private RenderFragment Content(DateOnly date, CellInfo cell) => @<text>
         <span class="visually-hidden">@cell.Name</span>
-        <span aria-hidden="true">@date.Day</span>
+        <span class="num" aria-hidden="true">@date.Day</span>
         @if (cell.Status is TargetStatus.Over or TargetStatus.On)
         {
             <span class="marker" aria-hidden="true" data-testid="@Id($"marker-{Day(date)}")">@(cell.Status == TargetStatus.Over ? "▲" : "✓")</span>
@@ -126,9 +130,14 @@
             return new CellInfo("none" + today, $"{name}{todayName}, not recorded", false, TargetStatus.None);
         }
 
-        var status = TargetStatuses.Of(day!.Value!.Value, TargetStatuses.ValidTarget(day.Target) ?? Target);
+        var value = TargetStatuses.Number(day!.Value!.Value) + (Unit is null ? "" : $" {Unit}");
+        if (Style == CalendarStyle.Marks)
+        {
+            return new CellInfo("marked" + today, $"{name}{todayName}, {value}, recorded", false, TargetStatus.None);
+        }
+
+        var status = TargetStatuses.Of(day.Value!.Value, TargetStatuses.ValidTarget(day.Target) ?? Target);
         var word = TargetStatuses.Word(status);
-        var value = TargetStatuses.Number(day.Value.Value) + (Unit is null ? "" : $" {Unit}");
         var full = $"{name}{todayName}, {value}{(word.Length > 0 ? ", " + word : "")}";
         return new CellInfo(TargetStatuses.Class(status) + today, full, false, status);
     }

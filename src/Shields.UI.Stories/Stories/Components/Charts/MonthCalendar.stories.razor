@@ -50,6 +50,26 @@
         </Template>
     </Story>
 
+    <Story Name="Marks">
+        <Template>
+            <div class="card">
+                <MonthCalendar Month="new DateOnly(2026, 11, 1)" Days="Month(2026, 11, Today)" Today="Today" Unit="pts" Style="CalendarStyle.Marks" OnSelect="_ => { }" TestId="calendar" />
+                <ChartLegend Items="MarksLegend" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Marks, dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <div class="card">
+                    <MonthCalendar Month="new DateOnly(2026, 11, 1)" Days="Month(2026, 11, Today)" Today="Today" Style="CalendarStyle.Marks" />
+                    <ChartLegend Items="MarksLegend" />
+                </div>
+            </div>
+        </Template>
+    </Story>
+
     <Story Name="Light">
         <Template>
             <div class="themed" data-theme="light">
@@ -82,6 +102,12 @@
         new(LegendSwatch.Chip, "Under"),
         new(LegendSwatch.Accent, "On target", "✓"),
         new(LegendSwatch.Error, "Over", "▲"),
+        new(LegendSwatch.Outline, "Not recorded"),
+    ];
+
+    private static readonly IReadOnlyList<LegendItem> MarksLegend =
+    [
+        new(LegendSwatch.Accent, "Recorded"),
         new(LegendSwatch.Outline, "Not recorded"),
     ];
 

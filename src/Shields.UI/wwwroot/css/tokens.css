@@ -132,6 +132,9 @@
     --bar-list-bar-height: 0.75rem;
     --bar-list-value-max-width: 50%;
 
+    /* MonthCalendar marks style: the diameter of a day's circle. */
+    --calendar-day-size: 2.25rem;
+
     /* Sheet and SheetAction: the bottom sheet's enter time, widest and tallest size, grab-bar size, and the action tile's height and icon. */
     --sheet-enter-duration: 200ms;
     --sheet-max-width: 32rem;

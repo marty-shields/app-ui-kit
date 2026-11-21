@@ -9,7 +9,7 @@ public static class KitNames
         "AppButton", "AppErrorBoundary", "AppScreen", "BackHandler", "BarList", "BottomNav", "Card", "ChartLegend", "ConfirmDialog",
         "DateStrip", "EmptyState", "ErrorView", "FieldInput", "FilterChips", "HostBridges", "Icon", "IconButton", "ListRow", "LoadFailed",
         "NumberField", "PeriodStepper", "ProgressRing", "RadioGroup", "SectionHeader", "SegmentedControl", "SelectField", "Snackbar", "Spinner", "StartupGate",
-        "StartupView", "StatTile", "TextField",
+        "StartupView", "StatTile", "TextField", "TrendBarChart",
     };
 
     /// <summary>
@@ -22,7 +22,7 @@ public static class KitNames
         "ButtonVariant", "ChangeDirection", "DataSeries", "DataSeriesExtensions", "DayLabel", "IAppLifecycle", "IAppStart", "IBackButton", "IconButtonStyle",
         "IconName", "IconSize", "IconTone", "LegendItem", "LegendSwatch", "PeriodKind", "RadioOption",
         "ShieldsUiServiceCollectionExtensions", "SnackbarMessage", "SnackbarService", "StatChange",
-        "SystemBarInsetWriter", "ThemePreference", "ThemeService"
+        "SystemBarInsetWriter", "TargetStatus", "TargetStatuses", "ThemePreference", "ThemeService", "TrendBar"
     };
 
     /// <summary>Every custom property the kit declares in tokens.css and base.css.</summary>

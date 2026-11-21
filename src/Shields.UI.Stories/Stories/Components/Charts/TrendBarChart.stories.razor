@@ -1,0 +1,107 @@
+@using System.Globalization
+@attribute [Stories("Components/Charts/TrendBarChart")]
+
+<Stories TComponent="TrendBarChart" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Week against target">
+        <Template>
+            <div class="card">
+                <TrendBarChart Bars="Week" Target="2000" Unit="pts" OnSelect="_ => { }" TestId="chart" />
+                <ChartLegend Items="Legend" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Year by month">
+        <Template>
+            <div class="card">
+                <TrendBarChart Bars="Year" Target="2000" DateFormat="MMMM yyyy" Label="Average by month" OnSelect="_ => { }" TestId="chart" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="All over">
+        <Template>
+            <div class="card">
+                <TrendBarChart Bars="AllOver" Target="2000" OnSelect="_ => { }" TestId="chart" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Empty">
+        <Template>
+            <div class="card">
+                <TrendBarChart Bars="Empty" Target="2000" TestId="chart" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Long labels">
+        <Template>
+            <div class="card">
+                <TrendBarChart Bars="LongLabels" Target="2000" OnSelect="_ => { }" TestId="chart" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="No target">
+        <Template>
+            <div class="card">
+                <TrendBarChart Bars="Week" OnSelect="_ => { }" TestId="chart" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <div class="card">
+                    <TrendBarChart Bars="Week" Target="2000" />
+                    <ChartLegend Items="Legend" />
+                </div>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <div class="card">
+                    <TrendBarChart Bars="Week" Target="2000" />
+                    <ChartLegend Items="Legend" />
+                </div>
+            </div>
+        </Template>
+    </Story>
+
+</Stories>
+
+@code {
+    private static readonly DateOnly Monday = new(2026, 11, 9);
+
+    private static readonly IReadOnlyList<LegendItem> Legend =
+    [
+        new(LegendSwatch.Chip, "Under"),
+        new(LegendSwatch.Accent, "On target"),
+        new(LegendSwatch.Error, "Over", "▲"),
+        new(LegendSwatch.Line, "Target"),
+        new(LegendSwatch.Band, "Target range"),
+    ];
+
+    private static TrendBar Day(int day, double? value, string? label = null) =>
+        new(Monday.AddDays(day), label ?? Monday.AddDays(day).ToString("ddd", CultureInfo.InvariantCulture), value);
+
+    private static readonly IReadOnlyList<TrendBar> Week =
+        [Day(0, 1500), Day(1, 2000), Day(2, 2600), Day(3, null), Day(4, 1900), Day(5, 2150), Day(6, 900)];
+
+    private static readonly IReadOnlyList<TrendBar> AllOver =
+        [.. Enumerable.Range(0, 7).Select(i => Day(i, 2500 + i * 100))];
+
+    private static readonly IReadOnlyList<TrendBar> Empty = [.. Enumerable.Range(0, 7).Select(i => Day(i, null))];
+
+    private static readonly IReadOnlyList<TrendBar> LongLabels =
+        [.. Enumerable.Range(0, 7).Select(i => Day(i, 1800 + i * 50, "Monday afternoon"))];
+
+    private static readonly IReadOnlyList<TrendBar> Year =
+        [.. Enumerable.Range(1, 12).Select(m => new TrendBar(new DateOnly(2026, m, 1), new DateOnly(2026, m, 1).ToString("MMM", CultureInfo.InvariantCulture), m is 4 or 8 ? null : 1400 + m * 90))];
+}

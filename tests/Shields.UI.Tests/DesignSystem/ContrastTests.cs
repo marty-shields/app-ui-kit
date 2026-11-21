@@ -78,7 +78,7 @@ public class ContrastTests
     private static readonly (string Css, string Selector, string Property, string[] Backgrounds, double Minimum)[] ComponentColours =
     [
         .. new[] { ".text", ".label", ".muted", ".muted-small", ".strong", ".figure", ".error" }
-            .Select(selector => ("Layout/Text.razor.css", selector, "color", new[] { "--color-bg", "--color-surface" }, Text)),
+            .Select(selector => ("Layout/Typography.razor.css", selector, "color", new[] { "--color-bg", "--color-surface" }, Text)),
         ("Feedback/InlineAlert.razor.css", ".error", "color", ["--color-surface"], Text),
         ("Feedback/InlineAlert.razor.css", ".error", "border-color", ["--color-bg", "--color-surface"], LargeTextOrControl),
         ("Layout/Card.razor.css", ".card.error", "border-color", ["--color-bg", "--color-surface"], LargeTextOrControl),

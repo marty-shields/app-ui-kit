@@ -1,6 +1,6 @@
 namespace Shields.UI.Components.Layout;
 
-/// <summary>HTML element a <see cref="Text"/> renders as.</summary>
+/// <summary>HTML element a <see cref="Typography"/> renders as.</summary>
 public enum TextElement
 {
     /// <summary>Inline <c>span</c>.</summary>

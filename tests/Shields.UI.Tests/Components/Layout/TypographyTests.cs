@@ -2,12 +2,12 @@ using Shields.UI.Components.Layout;
 
 namespace Shields.UI.Tests.Components.Layout;
 
-public class TextTests : ComponentTestBase
+public class TypographyTests : ComponentTestBase
 {
     [Test]
     public void Render_ShowsTheContentInASpanWithTheBodyLook()
     {
-        var cut = Context.Render<Text>(p => p.AddChildContent("Hello"));
+        var cut = Context.Render<Typography>(p => p.AddChildContent("Hello"));
 
         Assert.Multiple(() =>
         {
@@ -25,7 +25,7 @@ public class TextTests : ComponentTestBase
     [TestCase(TextVariant.Error, "error")]
     public void Variant_PutsItsClassOnTheElement(TextVariant variant, string expected)
     {
-        var cut = Context.Render<Text>(p => p.Add(x => x.Variant, variant).AddChildContent("x"));
+        var cut = Context.Render<Typography>(p => p.Add(x => x.Variant, variant).AddChildContent("x"));
 
         Assert.That(cut.Find("span").ClassList, Does.Contain(expected).And.Contain("text"));
     }
@@ -40,7 +40,7 @@ public class TextTests : ComponentTestBase
     [TestCase(TextElement.H6, "H6")]
     public void As_RendersTheElementWithTheLookAndTheContent(TextElement element, string tag)
     {
-        var cut = Context.Render<Text>(p => p
+        var cut = Context.Render<Typography>(p => p
             .Add(x => x.As, element)
             .Add(x => x.Variant, TextVariant.Label)
             .AddChildContent("Section"));
@@ -57,7 +57,7 @@ public class TextTests : ComponentTestBase
     [Test]
     public void TestId_IsWrittenToTheElement()
     {
-        var cut = Context.Render<Text>(p => p.Add(x => x.TestId, "note").AddChildContent("x"));
+        var cut = Context.Render<Typography>(p => p.Add(x => x.TestId, "note").AddChildContent("x"));
 
         Assert.That(cut.Find("[data-testid=note]").TextContent, Is.EqualTo("x"));
     }
@@ -65,7 +65,7 @@ public class TextTests : ComponentTestBase
     [Test]
     public void Render_WithoutTestId_WritesNoTestId()
     {
-        var cut = Context.Render<Text>(p => p.AddChildContent("x"));
+        var cut = Context.Render<Typography>(p => p.AddChildContent("x"));
 
         Assert.That(cut.Find("span").HasAttribute("data-testid"), Is.False);
     }
@@ -73,7 +73,7 @@ public class TextTests : ComponentTestBase
     [Test]
     public void OtherAttributes_AreWrittenToTheElement_AndAClassIsAddedToTheOwn()
     {
-        var cut = Context.Render<Text>(p => p
+        var cut = Context.Render<Typography>(p => p
             .Add(x => x.Variant, TextVariant.Muted)
             .AddUnmatched("id", "intro")
             .AddUnmatched("class", "centred")
@@ -93,11 +93,11 @@ public class TextTests : ComponentTestBase
     [Test]
     public void Strong_NestedInMuted_KeepsTheNormalTextColour()
     {
-        var cut = Context.Render<Text>(p => p
+        var cut = Context.Render<Typography>(p => p
             .Add(x => x.Variant, TextVariant.Muted)
-            .AddChildContent<Text>(inner => inner.Add(x => x.Variant, TextVariant.Strong).AddChildContent("kcal")));
+            .AddChildContent<Typography>(inner => inner.Add(x => x.Variant, TextVariant.Strong).AddChildContent("kcal")));
 
-        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Layout", "Text.razor.css");
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Layout", "Typography.razor.css");
         Assert.Multiple(() =>
         {
             Assert.That(cut.Find("span.muted span.strong").TextContent, Is.EqualTo("kcal"));
@@ -108,7 +108,7 @@ public class TextTests : ComponentTestBase
     [Test]
     public void Css_ErrorLabelAndFigureHaveTheirLooks()
     {
-        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Layout", "Text.razor.css");
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Layout", "Typography.razor.css");
 
         Assert.Multiple(() =>
         {
@@ -120,6 +120,20 @@ public class TextTests : ComponentTestBase
                     .And.Member("text-transform: uppercase")
                     .And.Member("letter-spacing: var(--letter-spacing-label)"));
             Assert.That(TouchTargetCheck.Declarations(css, ".figure"), Has.Member("font-size: var(--font-size-xl)").And.Member("font-weight: var(--font-weight-bold)"));
+        });
+    }
+
+    [Test]
+    public void Render_AtTheStartOfARazorCodeBlock_IsTheComponentNotATextTag()
+    {
+        var cut = Context.Render<TypographyInCodeBlock>();
+
+        var element = cut.Find("[data-testid=inside]");
+        Assert.Multiple(() =>
+        {
+            Assert.That(element.TagName, Is.EqualTo("SPAN"));
+            Assert.That(element.ClassList, Is.EquivalentTo(new[] { "text", "strong" }));
+            Assert.That(element.TextContent, Is.EqualTo("Inside a block"));
         });
     }
 }

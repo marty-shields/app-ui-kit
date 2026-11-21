@@ -1,0 +1,11 @@
+@using Shields.UI.Components.Layout
+
+@if (Show)
+{
+    <Typography Variant="TextVariant.Strong" TestId="inside">Inside a block</Typography>
+}
+
+@code {
+    [Parameter]
+    public bool Show { get; set; } = true;
+}

@@ -9,7 +9,7 @@ public static class KitNames
         "AppButton", "AppErrorBoundary", "AppScreen", "BackHandler", "Banner", "BarList", "BottomNav", "Card", "ChartLegend", "ConfirmDialog",
         "DateStrip", "Divider", "DurationField", "EmptyState", "ErrorView", "FieldInput", "FilterChips", "HostBridges", "Icon", "IconButton", "InlineAlert", "ListRow", "LoadFailed",
         "MonthCalendar", "NumberField", "PeriodStepper", "ProgressRing", "RadioGroup", "RangeCalendar", "SearchField", "SectionHeader", "SegmentedControl", "SelectField", "Sheet", "SheetAction", "Snackbar", "Spinner", "StackedBar", "StartupGate",
-        "StartupView", "StatTile", "Text", "TextField", "TrendBarChart", "ValueField",
+        "StartupView", "StatTile", "TextField", "TrendBarChart", "Typography", "ValueField",
     };
 
     /// <summary>

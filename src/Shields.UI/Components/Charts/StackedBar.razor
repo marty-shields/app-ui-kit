@@ -88,6 +88,11 @@
 
     private string ValueText(StackedBarSegment segment)
     {
+        if (!string.IsNullOrWhiteSpace(segment.ValueText))
+        {
+            return segment.ValueText;
+        }
+
         var number = Counted(segment.Value).ToString("#,0.#", CultureInfo.InvariantCulture);
         return string.IsNullOrEmpty(Unit) ? number : $"{number} {Unit}";
     }

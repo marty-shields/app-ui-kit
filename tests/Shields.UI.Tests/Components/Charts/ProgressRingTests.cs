@@ -131,6 +131,128 @@ public class ProgressRingTests : ComponentTestBase
         });
     }
 
+    [TestCase(false, false)]
+    [TestCase(true, false)]
+    [TestCase(false, true)]
+    public void Render_FigureAndUnit_ShowInTheCentreWithTheKitClasses(bool compact, bool over)
+    {
+        var cut = Context.Render<ProgressRing>(p => p.Add(x => x.Value, over ? 2359 : 659).Add(x => x.Max, 2100).Add(x => x.Compact, compact)
+            .Add(x => x.Figure, "1,441").Add(x => x.FigureUnit, "kcal left").Add(x => x.TestId, "ring"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find(".centre > [data-testid=ring-value]").TextContent, Is.EqualTo("1,441"));
+            Assert.That(cut.Find("[data-testid=ring-value]").ClassList, Does.Contain("value"));
+            Assert.That(cut.Find(".centre > [data-testid=ring-caption]").TextContent, Is.EqualTo("kcal left"));
+            Assert.That(cut.Find("[data-testid=ring-caption]").ClassList, Does.Contain("caption"));
+            Assert.That(cut.Find("[data-testid=ring]").ClassList.Contains("compact"), Is.EqualTo(compact));
+            Assert.That(cut.Find("[data-testid=ring]").ClassList.Contains("over"), Is.EqualTo(over));
+        });
+    }
+
+    [Test]
+    public void Render_FigureAndUnit_ReplaceTheValueAndCaption()
+    {
+        var cut = Context.Render<ProgressRing>(p => p.Add(x => x.Value, 659).Add(x => x.Max, 2100).Add(x => x.Caption, "of 2,100")
+            .Add(x => x.Figure, "1,441").Add(x => x.FigureUnit, "kcal left").Add(x => x.TestId, "ring"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.FindAll("[data-testid=ring-value]"), Has.Count.EqualTo(1));
+            Assert.That(cut.Find("[data-testid=ring-value]").TextContent, Is.EqualTo("1,441"));
+            Assert.That(cut.FindAll("[data-testid=ring-caption]"), Has.Count.EqualTo(1));
+            Assert.That(cut.Find("[data-testid=ring-caption]").TextContent, Is.EqualTo("kcal left"));
+            Assert.That(cut.Find("[data-testid=ring]").GetAttribute("aria-label"), Is.EqualTo("659 of 2,100 of 2,100"));
+        });
+    }
+
+    [Test]
+    public void Render_FigureUnitWithoutFigure_ReplacesTheCaptionUnderTheValue()
+    {
+        var cut = Context.Render<ProgressRing>(p => p.Add(x => x.Value, 659).Add(x => x.Caption, "of 2,100").Add(x => x.FigureUnit, "kcal").Add(x => x.TestId, "ring"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find("[data-testid=ring-value]").TextContent, Is.EqualTo("659"));
+            Assert.That(cut.Find("[data-testid=ring-caption]").TextContent, Is.EqualTo("kcal"));
+        });
+    }
+
+    [Test]
+    public void Render_EmptyFigureAndUnit_FallBackToTheValueAndCaption()
+    {
+        var cut = Context.Render<ProgressRing>(p => p.Add(x => x.Value, 659).Add(x => x.Caption, "of 2,100").Add(x => x.Figure, "").Add(x => x.FigureUnit, "").Add(x => x.TestId, "ring"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find("[data-testid=ring-value]").TextContent, Is.EqualTo("659"));
+            Assert.That(cut.Find("[data-testid=ring-caption]").TextContent, Is.EqualTo("of 2,100"));
+        });
+    }
+
+    [Test]
+    public void Render_FigureWithoutUnit_KeepsTheCaption()
+    {
+        var cut = Context.Render<ProgressRing>(p => p.Add(x => x.Value, 659).Add(x => x.Caption, "left").Add(x => x.Figure, "1,441").Add(x => x.TestId, "ring"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find("[data-testid=ring-value]").TextContent, Is.EqualTo("1,441"));
+            Assert.That(cut.Find("[data-testid=ring-caption]").TextContent, Is.EqualTo("left"));
+        });
+    }
+
+    [Test]
+    public void Render_ChildContent_BeatsFigureAndFigureUnit()
+    {
+        var cut = Context.Render<ProgressRing>(p => p.Add(x => x.Value, 659).Add(x => x.Caption, "left").Add(x => x.Figure, "1,441").Add(x => x.FigureUnit, "kcal left")
+            .Add(x => x.TestId, "ring").Add(x => x.ChildContent, "<b data-testid=\"child\">9</b>"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find("[data-testid=child]").TextContent, Is.EqualTo("9"));
+            Assert.That(cut.FindAll("[data-testid=ring-value]"), Is.Empty);
+            Assert.That(cut.Find("[data-testid=ring-caption]").TextContent, Is.EqualTo("left"));
+            Assert.That(cut.Markup, Does.Not.Contain("1,441").And.Not.Contain("kcal left"));
+        });
+    }
+
+    [Test]
+    public void Render_FigureOnly_ForTheAccessibleName_KeepsTheDefaultUnlessAriaLabelIsSet()
+    {
+        var plain = Context.Render<ProgressRing>(p => p.Add(x => x.Value, 659).Add(x => x.Max, 2100).Add(x => x.Figure, "1,441").Add(x => x.FigureUnit, "left").Add(x => x.TestId, "ring"));
+        var named = Context.Render<ProgressRing>(p => p.Add(x => x.Value, 659).Add(x => x.Max, 2100).Add(x => x.Figure, "1,441").Add(x => x.AriaLabel, "1,441 left").Add(x => x.TestId, "ring"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(plain.Find("[data-testid=ring]").GetAttribute("aria-label"), Is.EqualTo("659 of 2,100"));
+            Assert.That(named.Find("[data-testid=ring]").GetAttribute("aria-label"), Is.EqualTo("1,441 left"));
+        });
+    }
+
+    [TestCase("999", "")]
+    [TestCase("12,345", "wider")]
+    [TestCase("123,456", "widest")]
+    [TestCase("-1,441", "wider")]
+    public void Render_StepsTheFigureDownByWidthLikeTheValue(string figure, string expected)
+    {
+        var cut = Context.Render<ProgressRing>(p => p.Add(x => x.Value, 1).Add(x => x.Figure, figure).Add(x => x.TestId, "ring"));
+        var classes = cut.Find("[data-testid=ring-value]").ClassList.Where(c => c != "value" && !c.StartsWith("b-", StringComparison.Ordinal));
+
+        Assert.That(string.Join(" ", classes), Is.EqualTo(expected));
+    }
+
+    [TestCase(".value.wider")]
+    [TestCase(".value.widest")]
+    [TestCase(".compact .value.wider")]
+    [TestCase(".compact .value.widest")]
+    public void Css_WidthStepsAreRulesOnTheValueClassTheFigureShares(string selector)
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Charts", "ProgressRing.razor.css");
+
+        Assert.That(Regex.IsMatch(css, Regex.Escape(selector) + @"\s*\{[^}]*font-size: var\(--font-size-"), Is.True);
+    }
+
     [TestCase(999, "")]
     [TestCase(1234, "")]
     [TestCase(12345, "wider")]

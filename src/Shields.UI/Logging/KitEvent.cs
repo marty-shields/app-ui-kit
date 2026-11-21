@@ -41,4 +41,7 @@ internal enum KitEvent
 
     /// <summary><see cref="Components.Layout.AppScreen"/>: setting up pull to refresh failed.</summary>
     PullRefreshFailed = 9701,
+
+    /// <summary><see cref="Components.Overlays.Sheet"/>: moving focus into the sheet or back to its opener failed.</summary>
+    SheetFocusFailed = 9801,
 }

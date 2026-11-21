@@ -1,0 +1,59 @@
+@attribute [Stories("Components/Overlays/Sheet")]
+
+<Stories TComponent="Sheet" Layout="typeof(PhoneLayout)">
+
+    <Story Name="Opened by a button">
+        <Template>
+            <div class="themed">
+                <button type="button" class="opener" data-testid="open" @onclick="() => opened = true">Open sheet</button>
+                <Sheet Open="opened" Title="Add item" OnClose="() => opened = false" TestId="opened">
+                    <div class="tiles">
+                        <SheetAction Icon="IconName.Search" Label="Search" OnClick="() => opened = false" TestId="opened-search" />
+                        <SheetAction Icon="IconName.Scan" Label="Scan" OnClick="() => opened = false" TestId="opened-scan" />
+                    </div>
+                </Sheet>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Text body">
+        <Template>
+            <div class="themed">
+                <Sheet Open Title="Details" TestId="text">
+                    <p class="body">A sheet holds any body: text, a form or a list.</p>
+                </Sheet>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <Sheet Open Title="Add item" TestId="light">
+                    <div class="tiles">
+                        <SheetAction Icon="IconName.Search" Label="Search" TestId="light-search" />
+                        <SheetAction Icon="IconName.Scan" Label="Scan" TestId="light-scan" />
+                    </div>
+                </Sheet>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <Sheet Open Title="Add item" TestId="dark">
+                    <div class="tiles">
+                        <SheetAction Icon="IconName.Search" Label="Search" TestId="dark-search" />
+                        <SheetAction Icon="IconName.Scan" Label="Scan" TestId="dark-scan" />
+                    </div>
+                </Sheet>
+            </div>
+        </Template>
+    </Story>
+
+</Stories>
+
+@code {
+    private bool opened;
+}

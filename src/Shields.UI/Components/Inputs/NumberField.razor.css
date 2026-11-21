@@ -12,17 +12,7 @@
     justify-content: center;
     gap: var(--space-1);
     min-width: 0;
-    min-height: var(--touch-target);
-    padding: 0 var(--space-3);
-    border: var(--border-width) solid var(--color-border-strong);
-    border-radius: var(--radius-md);
-    background-color: var(--color-surface);
     cursor: text;
-}
-
-.box:focus-within {
-    outline: var(--focus-width) solid var(--color-focus);
-    outline-offset: var(--focus-offset);
 }
 
 .input {

@@ -33,6 +33,8 @@ public class KitTokensTests
         // Sheet and SheetAction.
         "--sheet-enter-duration", "--sheet-max-width", "--sheet-max-height", "--sheet-handle-width",
         "--sheet-handle-height", "--sheet-tile-min-height", "--sheet-tile-icon-size",
+        // Input box.
+        "--input-box-padding-inline", "--input-box-padding-inline-compact",
     ];
 
     // Calorie Tracker's macro, target band and share bar tokens, and the app's own sheet names (the kit's are allowed above); Workout Log's bar-past, set, calendar and meter

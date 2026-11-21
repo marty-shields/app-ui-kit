@@ -56,6 +56,22 @@
         </Template>
     </Story>
 
+    <Story Name="Compact, three in a row">
+        <Template>
+            <div class="three">
+                <NumberField Label="Weight" Compact="true" @bind-Value="compactWeight" TestId="example-number-weight" />
+                <NumberField Label="Reps" Compact="true" AllowDecimal="false" @bind-Value="compactReps" TestId="example-number-reps" />
+                <NumberField Label="Distance" Compact="true" @bind-Value="compactDistance" TestId="example-number-distance" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Raw text">
+        <Template>
+            <NumberField Label="Amount" Unit="g" @bind-Value="rawValue" @bind-Text="rawText" InvalidMessage="Enter a number." TestId="example-number" />
+        </Template>
+    </Story>
+
 </Stories>
 
 @code {
@@ -68,4 +84,9 @@
     private decimal? atMin = 10;
     private decimal? invalid = 5;
     private decimal? disabled = 150;
+    private decimal? compactWeight = 62.5m;
+    private decimal? compactReps = 12;
+    private decimal? compactDistance = 105.25m;
+    private decimal? rawValue;
+    private string? rawText = "22,x5";
 }

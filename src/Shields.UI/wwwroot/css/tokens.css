@@ -140,6 +140,9 @@
     --sheet-handle-height: 0.375rem;
     --sheet-tile-min-height: 6.5rem;
     --sheet-tile-icon-size: 2rem;
+    /* Input box (the .input-box class in base.css): the padding either side of the input, and the smaller one of the compact box. */
+    --input-box-padding-inline: var(--space-3);
+    --input-box-padding-inline-compact: var(--space-1);
     /* StackedBar: the bar's height, and the transparent gap between segments (neighbouring data colours are under 3:1 against each other, so the gap tells them apart). */
     --stacked-bar-height: 0.75rem;
     --stacked-bar-gap: 0.25rem;

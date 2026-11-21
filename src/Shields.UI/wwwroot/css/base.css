@@ -61,3 +61,22 @@ label:has(input[type="radio"]:not(:disabled)):active {
     white-space: nowrap;
     border: 0;
 }
+
+/* Input box: the bordered box around a text input (NumberField, and other fields that draw their own box). Put the class on the box
+   and the input inside it; the box shows the focus outline while the input has focus. Add input-box-compact for less padding. */
+.input-box {
+    min-height: var(--touch-target);
+    padding: 0 var(--input-box-padding-inline);
+    border: var(--border-width) solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    background-color: var(--color-surface);
+}
+
+.input-box:focus-within {
+    outline: var(--focus-width) solid var(--color-focus);
+    outline-offset: var(--focus-offset);
+}
+
+.input-box-compact {
+    padding-inline: var(--input-box-padding-inline-compact);
+}

@@ -8,7 +8,7 @@ public static class KitNames
     {
         "AppButton", "AppErrorBoundary", "AppScreen", "BackHandler", "BottomNav", "Card", "ChartLegend", "ConfirmDialog",
         "DateStrip", "EmptyState", "ErrorView", "FieldInput", "FilterChips", "HostBridges", "Icon", "IconButton", "ListRow", "LoadFailed",
-        "NumberField", "PeriodStepper", "ProgressRing", "RadioGroup", "SegmentedControl", "SelectField", "Snackbar", "Spinner", "StartupGate",
+        "NumberField", "PeriodStepper", "ProgressRing", "RadioGroup", "SectionHeader", "SegmentedControl", "SelectField", "Snackbar", "Spinner", "StartupGate",
         "StartupView", "StatTile", "TextField",
     };
 

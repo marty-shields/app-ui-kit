@@ -1,0 +1,51 @@
+@attribute [Stories("Components/Lists/SectionHeader")]
+
+<Stories TComponent="SectionHeader" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Plain heading">
+        <Template>
+            <SectionHeader Title="Morning" Total="3 items" TestId="head" />
+        </Template>
+    </Story>
+
+    <Story Name="Badge">
+        <Template>
+            <SectionHeader Title="Morning" Badge="Now" Total="3 items" TestId="head" />
+        </Template>
+    </Story>
+
+    <Story Name="Collapsed">
+        <Template>
+            <SectionHeader Title="Morning" Total="3 items" Expanded="false" ExpandedChanged="_ => { }" ControlsId="panel" TestId="head" />
+        </Template>
+    </Story>
+
+    <Story Name="Expanded">
+        <Template>
+            <SectionHeader Title="Morning" Badge="Now" Total="3 items" Expanded="true" ExpandedChanged="_ => { }" ControlsId="panel" TestId="head" />
+        </Template>
+    </Story>
+
+    <Story Name="Long title">
+        <Template>
+            <SectionHeader Title="An especially long section title that has to wrap" Badge="Now" Total="1,234 items" Expanded="true" ExpandedChanged="_ => { }" TestId="head" />
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <SectionHeader Title="Morning" Badge="Now" Total="3 items" Expanded="true" ExpandedChanged="_ => { }" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <SectionHeader Title="Morning" Badge="Now" Total="3 items" Expanded="false" ExpandedChanged="_ => { }" />
+            </div>
+        </Template>
+    </Story>
+
+</Stories>

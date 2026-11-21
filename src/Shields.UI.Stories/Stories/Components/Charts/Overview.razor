@@ -29,4 +29,13 @@
     <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>{TestId}-value</code> and <code>{TestId}-caption</code>.</li>
 </ul>
 
-<p>Stories: <a href="./?path=/docs/components-charts-chartlegend--docs">ChartLegend</a>, <a href="./?path=/docs/components-charts-progressring--docs">ProgressRing</a></p>
+<h2><code>BarList</code></h2>
+<p>Labelled horizontal bars, one per <code>BarListItem</code>, each with its value text at the end of the row. Bars are sized against the largest value, or against <code>Max</code> when it is a positive number. Negative and non-finite values count as zero.</p>
+<ul>
+    <li><code>ValueText</code> replaces the value shown, by default the number with thousands separators and no decimals. A long label is cut with an ellipsis.</li>
+    <li>With no items <code>EmptyText</code> is shown instead of the list.</li>
+    <li>The list is named by <code>Label</code>; the bars are hidden from screen readers, so put what matters in the label and value text.</li>
+    <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>{TestId}-row-0</code>, <code>-label-0</code>, <code>-value-0</code> and <code>-bar-0</code> by position, or <code>{TestId}-empty</code> with no items. None are rendered without <code>TestId</code>.</li>
+</ul>
+
+<p>Stories: <a href="./?path=/docs/components-charts-chartlegend--docs">ChartLegend</a>, <a href="./?path=/docs/components-charts-progressring--docs">ProgressRing</a>, <a href="./?path=/docs/components-charts-barlist--docs">BarList</a></p>

@@ -28,6 +28,7 @@ public class KitTokensTests
         "--color-ring-track", "--font-size-xs", "--ring-size", "--ring-width", "--ring-size-compact", "--ring-width-compact",
         "--color-chart-band", "--snackbar-gap-bottom",
         "--opacity-thin", "--chart-dash", "--color-data-1", "--color-data-2", "--color-data-3", "--color-data-4", "--color-data-5",
+        "--bar-list-bar-height",
     ];
 
     // Calorie Tracker's macro, target band, share bar and sheet tokens; Workout Log's bar-past, set, calendar and meter

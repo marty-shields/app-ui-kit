@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
+using Shields.UI.Components.Actions;
 using Shields.UI.Components.Feedback;
 using Shields.UI.Logging;
 
@@ -31,6 +32,46 @@ public class LoadFailedTests : ComponentTestBase
         {
             Assert.That(classes, Does.Contain("primary"));
             Assert.That(classes, Does.Not.Contain("secondary"));
+        });
+    }
+
+    [TestCase(ButtonVariant.Secondary, "secondary")]
+    [TestCase(ButtonVariant.Danger, "danger")]
+    [TestCase(ButtonVariant.Primary, "primary")]
+    public void RetryVariant_SetsTheVariantOfTryAgain(ButtonVariant variant, string expected)
+    {
+        var cut = Context.Render<LoadFailed>(p => p
+            .Add(x => x.Message, "Couldn't load the Dashboard")
+            .Add(x => x.TestId, "dashboard")
+            .Add(x => x.RetryVariant, variant));
+
+        Assert.That(cut.Find("[data-testid=dashboard-retry]").ClassList, Does.Contain(expected));
+    }
+
+    [Test]
+    public void Plain_AddsThePlainClass_AndIsOffByDefault()
+    {
+        var plain = Context.Render<LoadFailed>(p => p
+            .Add(x => x.Message, "Couldn't load the Dashboard")
+            .Add(x => x.TestId, "dashboard")
+            .Add(x => x.Plain, true));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(plain.Find(".failed").ClassList, Does.Contain("plain"));
+            Assert.That(Render().Find(".failed").ClassList, Does.Not.Contain("plain"));
+        });
+    }
+
+    [Test]
+    public void Css_Plain_CentresTheMessageAndDropsTheBorderAndPadding()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Feedback", "LoadFailed.razor.css");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(css, Does.Contain(".plain {\n    text-align: center;"));
+            Assert.That(css, Does.Contain(".plain .error {\n    padding: 0;\n    border: 0;"));
         });
     }
 

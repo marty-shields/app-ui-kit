@@ -15,6 +15,36 @@ public class KitDataTests
     }
 
     [Test]
+    public void ThemeJs_EqualsTheKitsFile()
+    {
+        Assert.Multiple(() =>
+        {
+            Assert.That(KitAssets.ThemeJs, Is.Not.Empty);
+            Assert.That(KitAssets.ThemeJs, Is.EqualTo(RepoFiles.Read("src", "Shields.UI", "wwwroot", "theme.js")));
+        });
+    }
+
+    [Test]
+    public void Bundle_IsTheScopedCssTheKitBuildsWithItsComponentsRules()
+    {
+        var built = RepoFiles.Find("Shields.UI.bundle.scp.css", "src", "Shields.UI", "obj").Select(File.ReadAllText).ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(KitCss.Bundle, Does.Contain(".failed").And.Contain("[b-"));
+            Assert.That(built, Has.Some.EqualTo(KitCss.Bundle));
+        });
+    }
+
+    [Test]
+    public void EmbeddedFiles_AreInTheTestingAssemblyThatThePackageCarries()
+    {
+        var names = typeof(KitCss).Assembly.GetManifestResourceNames();
+
+        Assert.That(names, Is.SupersetOf(new[] { "tokens.css", "base.css", "theme.js", "bundle.scp.css" }));
+    }
+
+    [Test]
     public void Tokens_AreEveryCustomPropertyInTokensAndBaseCss()
     {
         var declared = RepoFiles.Find("*.css", "src", "Shields.UI", "wwwroot", "css")

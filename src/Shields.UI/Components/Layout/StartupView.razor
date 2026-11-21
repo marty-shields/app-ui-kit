@@ -6,14 +6,14 @@
             <h1 class="title">@Title</h1>
         </header>
     }
-    <div class="centre">
+    <div class="centre" data-testid="@(Failed ? "startup-failed" : null)">
         @if (!Failed)
         {
             <Spinner Label="@LoadingLabel" TestId="startup-loading" />
         }
         else if (OnRetry.HasDelegate)
         {
-            <LoadFailed Message="@FailedMessage" TestId="startup" OnRetry="OnRetry" />
+            <LoadFailed Message="@FailedMessage" TestId="startup" Plain OnRetry="OnRetry" />
         }
         else
         {
@@ -31,7 +31,7 @@
     [Parameter]
     public string LoadingLabel { get; set; } = "Loading…";
 
-    /// <summary>Shows <see cref="FailedMessage"/> instead of the spinner.</summary>
+    /// <summary>Shows <see cref="FailedMessage"/> instead of the spinner, and marks the view <c>startup-failed</c> with or without <see cref="OnRetry"/>.</summary>
     [Parameter]
     public bool Failed { get; set; }
 

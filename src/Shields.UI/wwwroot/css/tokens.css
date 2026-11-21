@@ -143,11 +143,25 @@
     /* Input box (the .input-box class in base.css): the padding either side of the input, and the smaller one of the compact box. */
     --input-box-padding-inline: var(--space-3);
     --input-box-padding-inline-compact: var(--space-1);
+    /* Rows of fields: the narrow index column before the fields and the narrow trailing column after them, so the fields line up row to row. */
+    --entry-grid-index-width: 2rem;
+    --entry-grid-aside-width: 3.5rem;
     /* StackedBar: the bar's height, and the transparent gap between segments (neighbouring data colours are under 3:1 against each other, so the gap tells them apart). */
     --stacked-bar-height: 0.75rem;
     --stacked-bar-gap: 0.25rem;
     /* StackedBar: the narrowest a drawn segment gets, so a tiny share stays visible. */
     --stacked-bar-segment-min-width: 0.25rem;
+    /* AppScreen: extra room under the content when the bottom navigation bar's raised button overlaps its foot. */
+    --app-screen-nav-clearance: 0.75rem;
+    /* StatTile compact: the tile's padding and value size, so a row of small tiles stays short. */
+    --stat-tile-compact-padding: var(--space-3) var(--space-2);
+    --stat-tile-compact-value-size: var(--font-size-md);
+    /* Card compact: no bottom padding, because the rows it holds carry their own, and a short gap under the title. */
+    --card-compact-padding: var(--space-4) var(--space-4) 0;
+    --card-compact-title-gap: var(--space-2);
+    /* RangeCalendar: the round that holds a day's number, and the dot that marks a day with items. */
+    --calendar-day-size: 2.25rem;
+    --calendar-dot-size: 0.25rem;
 }
 
 /* Forces a theme on an element and its children. */

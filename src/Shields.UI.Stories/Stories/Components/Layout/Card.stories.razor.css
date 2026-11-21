@@ -8,3 +8,7 @@
 .body {
     margin: 0;
 }
+
+.padded {
+    padding-bottom: var(--space-4);
+}

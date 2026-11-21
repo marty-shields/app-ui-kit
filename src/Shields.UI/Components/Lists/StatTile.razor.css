@@ -48,3 +48,19 @@
     font-size: var(--font-size-sm);
     overflow-wrap: anywhere;
 }
+
+.compact {
+    padding: var(--stat-tile-compact-padding);
+}
+
+.compact .value {
+    font-size: var(--stat-tile-compact-value-size);
+    overflow-wrap: normal;
+    white-space: nowrap;
+}
+
+.compact .change,
+.compact .up,
+.compact .down {
+    color: var(--color-text-muted);
+}

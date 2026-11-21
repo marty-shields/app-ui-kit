@@ -112,7 +112,7 @@
         }
     }
 
-    private static decimal? Parse(string text) =>
+    internal static decimal? Parse(string text) =>
         decimal.TryParse(text.Trim().Replace(',', '.'), NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var number) ? number : null;
 
     private async Task OnInput(ChangeEventArgs e)

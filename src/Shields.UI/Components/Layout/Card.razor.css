@@ -27,3 +27,11 @@
     color: var(--color-text-muted);
     font-size: var(--font-size-sm);
 }
+
+.compact {
+    padding: var(--card-compact-padding);
+}
+
+.compact .header {
+    margin-bottom: var(--card-compact-title-gap);
+}

@@ -128,7 +128,7 @@
 
 /* Content ends clear of the raised button, which overlaps its foot. */
 .with-nav .content {
-    padding-bottom: calc(var(--space-4) + var(--raised));
+    padding-bottom: calc(var(--space-4) + var(--raised) + var(--app-screen-nav-clearance));
 }
 
 .status-slot {
@@ -149,5 +149,5 @@
 }
 
 .with-nav:has(.status-slot > *) .content {
-    padding-bottom: calc(var(--space-4) + var(--raised) + 2 * var(--touch-target));
+    padding-bottom: calc(var(--space-4) + var(--raised) + var(--app-screen-nav-clearance) + 2 * var(--touch-target));
 }

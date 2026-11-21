@@ -337,11 +337,4 @@ public class MonthCalendarTests : ComponentTestBase
 
         Assert.That(cut.FindAll(".marker"), Is.Empty);
     }
-
-    private sealed class FixedClock(DateTimeOffset now) : TimeProvider
-    {
-        public override DateTimeOffset GetUtcNow() => now;
-
-        public override TimeZoneInfo LocalTimeZone => TimeZoneInfo.Utc;
-    }
 }

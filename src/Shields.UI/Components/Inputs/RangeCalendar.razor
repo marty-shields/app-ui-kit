@@ -1,0 +1,248 @@
+@using System.Globalization
+@inject TimeProvider Time
+<div class="calendar" data-testid="@Id()">
+    <div class="ends">
+        <button type="button" class="end" aria-pressed="@Pressed(End.From)" data-testid="@Id("from")" @onclick="() => Choose(End.From)">
+            <span class="end-label">From</span>
+            <span class="end-value" data-testid="@Id("from-value")">@Short(from)</span>
+        </button>
+        <button type="button" class="end" aria-pressed="@Pressed(End.To)" data-testid="@Id("to")" @onclick="() => Choose(End.To)">
+            <span class="end-label">To</span>
+            <span class="end-value" data-testid="@Id("to-value")">@(to is { } last ? Short(last) : "Pick a day")</span>
+        </button>
+    </div>
+
+    @if (pickingYear is { } year)
+    {
+        <div class="head">
+            <IconButton Icon="IconName.ChevronLeft" AriaLabel="Previous year" Disabled="year <= Min.Year" TestId="@Id("prev-year")" OnClick="() => pickingYear--" />
+            <span class="year" data-testid="@Id("year")">@year</span>
+            <IconButton Icon="IconName.Chevron" AriaLabel="Next year" Disabled="year >= Max.Year" TestId="@Id("next-year")" OnClick="() => pickingYear++" />
+        </div>
+        <div class="months">
+            @for (var m = 1; m <= 12; m++)
+            {
+                var month = new DateOnly(year, m, 1);
+                var outside = OutsideBounds(month);
+                var count = CountIn(year, m);
+                <button type="button"
+                        class="month"
+                        disabled="@outside"
+                        aria-current="@(month == shown ? "true" : null)"
+                        aria-label="@MonthLabel(month, count)"
+                        data-testid="@Id($"month-{year:D4}-{m:D2}")"
+                        @onclick="() => Show(month)">
+                    @month.ToString("MMM", CultureInfo.InvariantCulture)
+                    @if (DayCounts is not null)
+                    {
+                        <span class="month-count" data-testid="@Id($"month-count-{year:D4}-{m:D2}")">@(outside ? "–" : count)</span>
+                    }
+                </button>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="head">
+            <IconButton Icon="IconName.ChevronLeft" AriaLabel="Previous month" Disabled="shown <= FirstOfMonth(Min)" TestId="@Id("prev-month")" OnClick="() => shown = shown.AddMonths(-1)" />
+            <button type="button" class="title" aria-label="@($"Choose month, showing {MonthName}")" data-testid="@Id("month-name")" @onclick="() => pickingYear = shown.Year">
+                @MonthName
+                <Icon Name="IconName.Down" />
+            </button>
+            <IconButton Icon="IconName.Chevron" AriaLabel="Next month" Disabled="shown >= FirstOfMonth(Max)" TestId="@Id("next-month")" OnClick="() => shown = shown.AddMonths(1)" />
+        </div>
+        <div class="days" role="group" aria-label="@MonthName">
+            @foreach (var letter in WeekDays)
+            {
+                <span class="weekday" aria-hidden="true">@letter</span>
+            }
+            @for (var i = 0; i < ((int)shown.DayOfWeek + 6) % 7; i++)
+            {
+                <span aria-hidden="true"></span>
+            }
+            @for (var day = shown; day.Month == shown.Month; day = day.AddDays(1))
+            {
+                var date = day;
+                var marked = DayCounts is not null && DayCounts.TryGetValue(date, out var n) && n > 0;
+                <button type="button"
+                        class="day @DayClasses(date)"
+                        disabled="@(date > Max || date < Min)"
+                        aria-current="@(date == today ? "date" : null)"
+                        data-testid="@Id($"day-{date:yyyy-MM-dd}")"
+                        @onclick="() => Tap(date)">
+                    <span class="number" aria-hidden="true">@date.Day</span>
+                    <span class="visually-hidden">@DayName(date, marked)</span>
+                    @if (marked)
+                    {
+                        <span class="dot" aria-hidden="true"></span>
+                    }
+                </button>
+            }
+        </div>
+    }
+
+    <p class="hint" aria-live="polite" data-testid="@Id("hint")">@Hint</p>
+    <div class="actions">
+        <AppButton Variant="ButtonVariant.Secondary" TestId="@Id("cancel")" OnClick="OnCancel">Cancel</AppButton>
+        <AppButton TestId="@Id("apply")" OnClick="Apply">@ApplyLabel</AppButton>
+    </div>
+</div>
+
+@code {
+    private static readonly string[] WeekDays = ["M", "T", "W", "T", "F", "S", "S"];
+
+    private DateOnly from;
+    private DateOnly? to;
+    private End next;
+    private DateOnly shown;
+    private int? pickingYear;
+    private DateOnly today;
+
+    /// <summary>The first day that can be picked. Earlier days and months are disabled.</summary>
+    [Parameter, EditorRequired]
+    public DateOnly Min { get; set; }
+
+    /// <summary>The last day that can be picked. Later days and months are disabled.</summary>
+    [Parameter, EditorRequired]
+    public DateOnly Max { get; set; }
+
+    /// <summary>Range shown when the calendar opens, with the month of its later end in view, kept inside <see cref="Min"/> and <see cref="Max"/>. A range given backwards is turned round. Later changes to it are ignored.</summary>
+    [Parameter, EditorRequired]
+    public DateRange Dates { get; set; }
+
+    /// <summary>Opens on the month grid instead of the days.</summary>
+    [Parameter]
+    public bool OpenOnMonths { get; set; }
+
+    /// <summary>Items per day, such as entries logged. A day with more than none gets a dot, and a month in the month grid shows the sum of its days. Null shows neither.</summary>
+    [Parameter]
+    public IReadOnlyDictionary<DateOnly, int>? DayCounts { get; set; }
+
+    /// <summary>Words for a month's total in its accessible name, e.g. <c>n => $"{n} entries"</c>. Null says the bare number.</summary>
+    [Parameter]
+    public Func<int, string>? CountText { get; set; }
+
+    /// <summary>Read to screen readers after the date of a day that has a dot, e.g. <em>entry logged</em>.</summary>
+    [Parameter]
+    public string MarkedDayText { get; set; } = "marked";
+
+    /// <summary>The current day, ringed. Null means today by the clock.</summary>
+    [Parameter]
+    public DateOnly? Today { get; set; }
+
+    /// <summary>Text of the button that applies the range.</summary>
+    [Parameter]
+    public string ApplyLabel { get; set; } = "Apply";
+
+    /// <summary>Raised by the apply button with the range picked; a single day has both ends the same.</summary>
+    [Parameter]
+    public EventCallback<DateRange> OnApply { get; set; }
+
+    /// <summary>Raised by Cancel. The range picked is thrown away.</summary>
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    /// <summary>Prefix of the data-testid attributes, <c>range</c> by default: <c>{TestId}</c> on the calendar, then <c>-from</c> and <c>-to</c> (with <c>-value</c>), <c>-prev-month</c>, <c>-month-name</c>, <c>-next-month</c>, <c>-day-{yyyy-MM-dd}</c>, <c>-prev-year</c>, <c>-year</c>, <c>-next-year</c>, <c>-month-{yyyy-MM}</c> (and <c>-month-count-{yyyy-MM}</c>), <c>-hint</c>, <c>-cancel</c> and <c>-apply</c>.</summary>
+    [Parameter]
+    public string TestId { get; set; } = "range";
+
+    private enum End
+    {
+        From,
+        To,
+    }
+
+    protected override void OnInitialized()
+    {
+        (from, to) = Dates.From <= Dates.To ? (Dates.From, Dates.To) : (Dates.To, Dates.From);
+        var last = FirstOfMonth(to!.Value);
+        shown = last < FirstOfMonth(Min) ? FirstOfMonth(Min) : last > FirstOfMonth(Max) ? FirstOfMonth(Max) : last;
+        pickingYear = OpenOnMonths ? shown.Year : null;
+    }
+
+    protected override void OnParametersSet() =>
+        today = Today ?? DateOnly.FromDateTime(Time.GetLocalNow().DateTime);
+
+    private string Id(string? part = null) => part is null ? TestId : $"{TestId}-{part}";
+
+    private string MonthName => MonthText(shown);
+
+    private string Hint => pickingYear is not null ? "Choose a month"
+        : next == End.To ? "Tap the last day, or the same day again for one day"
+        : "Tap the first day";
+
+    private string Pressed(End end) => next == end ? "true" : "false";
+
+    private static string Short(DateOnly day) => day.ToString("ddd d MMM yy", CultureInfo.InvariantCulture);
+
+    private static string MonthText(DateOnly month) => month.ToString("MMMM yyyy", CultureInfo.InvariantCulture);
+
+    private string DayName(DateOnly date, bool marked)
+    {
+        var name = date.ToString("ddd d MMM", CultureInfo.InvariantCulture);
+        var last = to ?? from;
+        var role = date == from ? ", start" : date == last ? ", end" : "";
+        return name + role + (marked ? ", " + MarkedDayText : "");
+    }
+
+    private int CountIn(int year, int month) =>
+        DayCounts?.Where(d => d.Key.Year == year && d.Key.Month == month && d.Key >= Min && d.Key <= Max).Sum(d => d.Value) ?? 0;
+
+    private string MonthLabel(DateOnly month, int count) =>
+        DayCounts is null || OutsideBounds(month) ? MonthText(month) : $"{MonthText(month)}, {CountText?.Invoke(count) ?? count.ToString(CultureInfo.InvariantCulture)}";
+
+    private void Choose(End end)
+    {
+        next = end;
+        if (end == End.From)
+        {
+            shown = FirstOfMonth(from);
+        }
+        else if (to is { } last)
+        {
+            shown = FirstOfMonth(last);
+        }
+
+        pickingYear = null;
+    }
+
+    private void Show(DateOnly month)
+    {
+        shown = month;
+        pickingYear = null;
+    }
+
+    private void Tap(DateOnly day)
+    {
+        if (next == End.From)
+        {
+            (from, to, next) = (day, null, End.To);
+        }
+        else if (day < from)
+        {
+            (from, to, next) = (day, from, End.From);
+        }
+        else
+        {
+            (to, next) = (day, End.From);
+        }
+    }
+
+    private Task Apply() => OnApply.InvokeAsync(new DateRange(from, to ?? from));
+
+    private string DayClasses(DateOnly day)
+    {
+        var last = to ?? from;
+        return string.Join(' ', new[]
+        {
+            day >= from && day <= last ? "in" : null,
+            day == from ? "first" : null,
+            day == last ? "last" : null,
+            day == today ? "today" : null,
+        }.OfType<string>());
+    }
+
+    private bool OutsideBounds(DateOnly month) => month < FirstOfMonth(Min) || month > FirstOfMonth(Max);
+
+    private static DateOnly FirstOfMonth(DateOnly day) => new(day.Year, day.Month, 1);
+}

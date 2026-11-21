@@ -1,0 +1,153 @@
+@implements IDisposable
+@inject TimeProvider Time
+<FieldInput Label="@Label"
+            ShowLabel="ShowLabel"
+            Required="Required"
+            InputId="@InputId(0)"
+            Message="@InvalidMessage"
+            MessageId="@messageId"
+            MessageTestId="@($"{Id}-error")">
+    <div class="parts" role="group" aria-label="@Label" @onfocusin="() => focused = true" @onfocusout="OnFocusOut">
+        @for (var i = 0; i < Parts.Length; i++)
+        {
+            var index = i;
+            if (index > 0)
+            {
+                <span class="separator" aria-hidden="true">:</span>
+            }
+            <div class="box input-box input-box-compact @(IsInvalid ? "invalid" : null)" data-testid="@($"{Id}-{Parts[index].Placeholder}-box")" @onclick="() => FocusPart(index)">
+                <input @ref="boxes[index]"
+                       id="@InputId(index)"
+                       type="text"
+                       inputmode="numeric"
+                       autocomplete="off"
+                       maxlength="2"
+                       class="input"
+                       placeholder="@Parts[index].Placeholder"
+                       aria-label="@Parts[index].Name"
+                       aria-required="@(Required ? "true" : null)"
+                       aria-invalid="@(IsInvalid ? "true" : null)"
+                       aria-describedby="@(HasMessage ? messageId : null)"
+                       disabled="@Disabled"
+                       value="@PartValue(index)"
+                       data-testid="@($"{Id}-{Parts[index].Placeholder}")"
+                       @oninput="e => OnPartInput(index, e)" />
+            </div>
+        }
+    </div>
+</FieldInput>
+
+@code {
+    private static readonly Part[] Parts = [new("Hours", "h"), new("Minutes", "mm"), new("Seconds", "ss")];
+    private static readonly TimeSpan FocusMoveWait = TimeSpan.FromMilliseconds(10);
+
+    private readonly string baseId = $"duration-field-{Guid.NewGuid():N}";
+    private readonly string messageId = $"duration-field-message-{Guid.NewGuid():N}";
+    private readonly ElementReference[] boxes = new ElementReference[Parts.Length];
+    private readonly CancellationTokenSource disposed = new();
+    private bool focused;
+
+    /// <summary>What the duration measures, e.g. Time. Names the group for screen readers.</summary>
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = "";
+
+    /// <summary>Shows the label above the boxes. When false it is kept for screen readers only.</summary>
+    [Parameter]
+    public bool ShowLabel { get; set; } = true;
+
+    /// <summary>Marks the field as required: an asterisk on the label and <c>aria-required</c> on every box.</summary>
+    [Parameter]
+    public bool Required { get; set; }
+
+    /// <summary>Shows every box as failing validation, without a message. <see cref="InvalidMessage"/> does this too.</summary>
+    [Parameter]
+    public bool Invalid { get; set; }
+
+    /// <summary>Error shown under the boxes in the error tone and announced. Null or empty means no message.</summary>
+    [Parameter]
+    public string? InvalidMessage { get; set; }
+
+    /// <summary>Greys out the boxes and ignores input.</summary>
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    /// <summary>The text as h:mm:ss, kept as typed so a part-filled field such as <c>1::</c> survives. Null when every box is empty.</summary>
+    [Parameter]
+    public string? Value { get; set; }
+
+    /// <summary>Raised on each keystroke with the new text, or null when every box is empty. When focus leaves a field with any box filled, also raised to fill it out: an empty hour becomes 0, minutes and seconds two digits, e.g. 1:00:00.</summary>
+    [Parameter]
+    public EventCallback<string?> ValueChanged { get; set; }
+
+    /// <summary>Prefix of each box's data-testid, <c>duration</c> by default; the part is appended (<c>-h</c>, <c>-mm</c>, <c>-ss</c>), and <c>-error</c> on the message.</summary>
+    [Parameter]
+    public string? TestId { get; set; }
+
+    private string Id => TestId ?? "duration";
+
+    private bool HasMessage => !string.IsNullOrEmpty(InvalidMessage);
+
+    private bool IsInvalid => Invalid || HasMessage;
+
+    private string InputId(int index) => $"{baseId}-{index}";
+
+    /// <summary>Moves focus to the first box.</summary>
+    public ValueTask FocusAsync() => boxes[0].FocusAsync();
+
+    private ValueTask FocusPart(int index) => Disabled ? ValueTask.CompletedTask : boxes[index].FocusAsync();
+
+    private string[] SplitValue()
+    {
+        var values = (Value ?? "").Split(':');
+        return Enumerable.Range(0, Parts.Length).Select(i => i < values.Length ? values[i] : "").ToArray();
+    }
+
+    private string PartValue(int index) => SplitValue()[index];
+
+    private Task OnPartInput(int index, ChangeEventArgs e)
+    {
+        var values = SplitValue();
+        values[index] = new string((e.Value as string ?? "").Where(char.IsAsciiDigit).ToArray());
+        var joined = values.All(string.IsNullOrEmpty) ? null : string.Join(':', values);
+        return ValueChanged.InvokeAsync(joined);
+    }
+
+    // Moving between boxes raises focusout then focusin; only fill in once focus has left every box.
+    private async Task OnFocusOut()
+    {
+        focused = false;
+        try
+        {
+            await Task.Delay(FocusMoveWait, Time, disposed.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        if (focused)
+        {
+            return;
+        }
+
+        var values = SplitValue();
+        if (values.All(string.IsNullOrEmpty))
+        {
+            return;
+        }
+
+        var filled = values.Select((v, i) => i == 0 ? (v.Length == 0 ? "0" : v) : v.PadLeft(2, '0')).ToArray();
+        if (!filled.SequenceEqual(values))
+        {
+            await ValueChanged.InvokeAsync(string.Join(':', filled));
+        }
+    }
+
+    public void Dispose()
+    {
+        disposed.Cancel();
+        disposed.Dispose();
+    }
+
+    private sealed record Part(string Name, string Placeholder);
+}

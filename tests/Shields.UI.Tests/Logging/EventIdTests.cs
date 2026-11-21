@@ -14,6 +14,18 @@ public partial class EventIdTests
             .Select(f => new TestCaseData(f).SetArgDisplayNames(Path.GetRelativePath(RepoFiles.Root, f)));
 
     [Test]
+    public void KitEvent_IsPublic_AndEveryValueIsDocumented()
+    {
+        var docs = RepoFiles.Read("src", "Shields.UI", "Logging", "KitEvent.cs");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(typeof(KitEvent).IsVisible, Is.True);
+            Assert.That(Regex.Count(docs, "/// <summary>"), Is.EqualTo(Enum.GetValues<KitEvent>().Length + 1));
+        });
+    }
+
+    [Test]
     public void KitEvent_ValuesAreUnique() =>
         Assert.That(Enum.GetValues<KitEvent>().Select(e => (int)e), Is.Unique);
 

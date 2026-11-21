@@ -179,6 +179,18 @@ public class ProgressRingTests : ComponentTestBase
     }
 
     [Test]
+    public void Render_EmptyFigureAndUnit_FallBackToTheValueAndCaption()
+    {
+        var cut = Context.Render<ProgressRing>(p => p.Add(x => x.Value, 659).Add(x => x.Caption, "of 2,100").Add(x => x.Figure, "").Add(x => x.FigureUnit, "").Add(x => x.TestId, "ring"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find("[data-testid=ring-value]").TextContent, Is.EqualTo("659"));
+            Assert.That(cut.Find("[data-testid=ring-caption]").TextContent, Is.EqualTo("of 2,100"));
+        });
+    }
+
+    [Test]
     public void Render_FigureWithoutUnit_KeepsTheCaption()
     {
         var cut = Context.Render<ProgressRing>(p => p.Add(x => x.Value, 659).Add(x => x.Caption, "left").Add(x => x.Figure, "1,441").Add(x => x.TestId, "ring"));

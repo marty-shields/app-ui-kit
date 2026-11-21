@@ -55,14 +55,14 @@
                 {
                     <path class="column" d="@Column(left, width, top, height)" data-height="@N(height)" data-testid="@Id($"column-{Day(bar)}")" />
                 }
-                @if (status == TargetStatus.Over)
+                @if (status == TargetStatus.Over && ShowOverMarker)
                 {
                     <path class="marker" d="M @N(centre - 4) @N(top - 4) L @N(centre + 4) @N(top - 4) L @N(centre) @N(top - 11) Z" data-testid="@Id($"marker-{Day(bar)}")" />
                 }
                 @if (recorded && (Past ? bar.Labelled : bar == highest))
                 {
                     var labelTop = paired && TargetStatuses.IsRecorded(bar.Earlier) ? Math.Min(top, Y(bar.Earlier!.Value)) : top;
-                    @Text("value-label", left + width / 2, labelTop - (status == TargetStatus.Over ? 15 : 6), "middle", TargetStatuses.Number(value), Id(Past ? $"value-label-{Day(bar)}" : "value-label"))
+                    @Text("value-label", left + width / 2, labelTop - (status == TargetStatus.Over && ShowOverMarker ? 15 : 6), "middle", TargetStatuses.Number(value), Id(Past ? $"value-label-{Day(bar)}" : "value-label"))
                 }
                 @{ var tip = Tip(bar); }
                 @Text("tip", TipX(centre, tip), 12, "middle", tip, hidden: true)
@@ -139,6 +139,12 @@
     /// <summary>Value of the data-testid attribute, and the prefix of the parts: <c>-band</c> (with <c>-band-top</c> and <c>-band-bottom</c>), <c>-target</c>, <c>-baseline</c>, <c>-tick-{value}</c> and <c>-grid-{value}</c> (the value in invariant "0.##" form), <c>-bar-{date}</c>, <c>-column-{date}</c>, <c>-marker-{date}</c>, <c>-gap-{date}</c>, <c>-value-label</c> (<c>-value-label-{date}</c> with <see cref="TrendBarStyle.PastAndCurrent"/>), <c>-earlier-{date}</c>, <c>-empty</c>.</summary>
     [Parameter]
     public string? TestId { get; set; }
+
+    /// <summary>
+    /// Whether an Over bar gets a ▲. True by default. With false, Over is shown by colour alone on screen (the accessible name still says "over target"), so keep another cue, such as a <see cref="ChartLegend"/> entry or text. The value label above an Over bar then sits as close as above any other.
+    /// </summary>
+    [Parameter]
+    public bool ShowOverMarker { get; set; } = true;
 
     /// <summary>How the bars are coloured. <see cref="TrendBarStyle.Status"/> by default.</summary>
     [Parameter]

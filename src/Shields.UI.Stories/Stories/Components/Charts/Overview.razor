@@ -11,11 +11,13 @@
         <tr><td>Chip</td><td>A filled dot in <code>--color-chip</code>.</td></tr>
         <tr><td>Error</td><td>A filled dot in <code>--color-error</code>.</td></tr>
         <tr><td>Outline</td><td>A dashed ring in <code>--color-border-strong</code>, for something absent.</td></tr>
-        <tr><td>Line</td><td>A short dashed line in <code>--color-text-muted</code>, for a reference line.</td></tr>
+        <tr><td>Line</td><td>A short dashed line in <code>--color-text-muted</code> with the dash and gap of <code>--chart-dash</code>, as the target line of <code>TrendBarChart</code> has, for a reference line.</td></tr>
         <tr><td>Band</td><td>An unfilled box, twice as wide as tall, edged in <code>--color-chart-band</code>, for a target band. Apps stroke the band's top and bottom edges in this colour with no fill.</td></tr>
         <tr><td>Past</td><td>A filled dot in <code>--color-chart-past</code>, for the bars of earlier periods beside the current one. Tuned to sit beside the accent bar, not beside <code>--color-primary</code>.</td></tr>
         <tr><td>Primary</td><td>A filled dot in <code>--color-primary</code>.</td></tr>
         <tr><td>Today</td><td>A solid ring in <code>--color-text</code>, the stroke of the <code>MonthCalendar</code> today ring.</td></tr>
+        <tr><td>Check</td><td>A small <code>--color-accent</code> box with a ✓ in <code>--color-on-primary</code>, the on-target cell of <code>MonthCalendar</code> in miniature.</td></tr>
+        <tr><td>Triangle</td><td>A small <code>--color-error</code> box with a ▲ in <code>--color-on-danger</code>, the over cell of <code>MonthCalendar</code> in miniature.</td></tr>
     </tbody>
 </table>
 <ul>
@@ -72,6 +74,7 @@
     <li>With <code>OnSelect</code> the bars are buttons: click, or Enter on focus, raises it with the bar's date. Without it they are images.</li>
     <li><code>Style</code> is <code>Status</code> by default. <code>PastAndCurrent</code> drops the target, band and markers: the bar whose <code>Current</code> is true is <code>--color-accent</code> and the others <code>--color-chart-past</code>, unless the chart is paired (see <code>Earlier</code>), when every bar's own column is accent and every earlier column past; <code>Current</code> then only bolds the axis label and adds "current" to the text alternative. There, <code>Labelled</code> prints a bar's value above it, and <code>Earlier</code> draws the period before as a second bar to the left of each, named in the text alternative with <code>EarlierLabel</code> ("last week"); add a <code>ChartLegend</code> to say which is which. <code>Current</code> also bolds the axis label in <code>Status</code>; the other two do nothing there.</li>
     <li>Each bar's text alternative is its date, value, <code>Unit</code>, status and <code>Note</code>; a bar with a <code>Note</code> is drawn faded. The chart is a group named by <code>Label</code>; with no values it shows <code>EmptyText</code>.</li>
+    <li><code>ShowOverMarker</code> is true by default. False draws no ▲ above Over bars and drops the value label's lift for it, so Over is shown by colour alone on screen (the text alternative still says "over target"); keep another cue, such as a <code>ChartLegend</code> entry.</li>
     <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>-band</code> (<code>-band-top</code>, <code>-band-bottom</code>), <code>-target</code>, <code>-baseline</code>, <code>-tick-{value}</code>, <code>-bar-{date}</code>, <code>-column-{date}</code>, <code>-marker-{date}</code>, <code>-gap-{date}</code>, <code>-value-label</code> (<code>-value-label-{date}</code> in <code>PastAndCurrent</code>), <code>-earlier-{date}</code>, <code>-empty</code>.</li>
 </ul>
 
@@ -94,6 +97,7 @@
     <li><code>FirstDayOfWeek</code> (Monday by default) sets the first column. <code>DayNames</code> is seven labels, Sunday first; without it each heading is the first letter of the current culture's shortest day name, and a list of any other length throws.</li>
     <li>With <code>OnSelect</code> the enabled days are buttons that raise it with the day's date; without it they are plain cells.</li>
     <li>Each day's text alternative is its date, "today" when it is, its value, <code>Unit</code> and status, or "not recorded" or "future". The grid is a group named by the month; the weekday letters are hidden from screen readers.</li>
+    <li><code>ShowOverMarker</code> is true by default. False draws no ▲ in Over cells; the ✓ on on-target days stays. Over is then shown by colour alone on screen (the text alternative still says "over target"); keep another cue, such as a <code>ChartLegend</code> entry.</li>
     <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>-day-{date}</code> and <code>-marker-{date}</code>, the date as yyyy-MM-dd.</li>
 </ul>
 

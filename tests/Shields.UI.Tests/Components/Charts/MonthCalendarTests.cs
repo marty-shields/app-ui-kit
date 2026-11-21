@@ -131,6 +131,20 @@ public class MonthCalendarTests : ComponentTestBase
     }
 
     [Test]
+    public void Render_WithShowOverMarkerFalse_OverDaysHaveNoMarkerButStillSayOverAndOnDaysKeepTheTick()
+    {
+        var cut = Context.Render<MonthCalendar>(p => p.Add(x => x.Month, new DateOnly(2026, 11, 1)).Add(x => x.Days, [Day(3, 2500), Day(4, 2000)])
+            .Add(x => x.Target, 2000).Add(x => x.Today, new DateOnly(2026, 11, 18)).Add(x => x.TestId, "cal").Add(x => x.ShowOverMarker, false));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.FindAll("[data-testid=cal-marker-2026-11-03]"), Is.Empty);
+            Assert.That(cut.Find("[data-testid=cal-marker-2026-11-04]").TextContent, Is.EqualTo("✓"));
+            Assert.That(cut.Find("[data-testid=cal-day-2026-11-03]").TextContent, Does.Contain("over target"));
+        });
+    }
+
+    [Test]
     public void Render_OnAndOverDaysHaveADistinctHiddenMarkerAndUnderDoesNot()
     {
         var cut = Render(Day(3, 2500), Day(4, 2000), Day(5, 1000));

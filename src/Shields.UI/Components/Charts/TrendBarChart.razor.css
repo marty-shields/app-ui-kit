@@ -24,17 +24,19 @@
 }
 
 /* The band is an outline: its top and bottom edges only, never a fill, so every bar sits on the plain card. The edges are as wide
-   as the legend's band swatch, whatever the chart's scale. */
+   as the legend's band swatch, whatever the chart's scale, and snapped to the pixel grid so a fractional y does not blur the colour. */
 .band-edge {
     stroke: var(--color-chart-band);
     stroke-width: var(--border-width);
     vector-effect: non-scaling-stroke;
+    shape-rendering: crispEdges;
 }
 
 .target {
     stroke: var(--color-text-muted);
     stroke-width: var(--border-width-error);
     stroke-dasharray: var(--chart-dash);
+    vector-effect: non-scaling-stroke;
 }
 
 .gap {

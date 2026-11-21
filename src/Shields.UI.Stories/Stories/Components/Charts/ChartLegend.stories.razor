@@ -26,6 +26,12 @@
         </Template>
     </Story>
 
+    <Story Name="Calendar marks">
+        <Template>
+            <ChartLegend Items="CalendarMarks" TestId="legend" />
+        </Template>
+    </Story>
+
     <Story Name="Long labels">
         <Template>
             <ChartLegend Items="Long" TestId="legend" />
@@ -74,6 +80,14 @@
     [
         new(LegendSwatch.Primary, "Selected week"),
         new(LegendSwatch.Chip, "Other weeks"),
+    ];
+
+    private static readonly IReadOnlyList<LegendItem> CalendarMarks =
+    [
+        new(LegendSwatch.Check, "On target"),
+        new(LegendSwatch.Triangle, "Over"),
+        new(LegendSwatch.Chip, "Under"),
+        new(LegendSwatch.Line, "Target"),
     ];
 
     private static readonly IReadOnlyList<LegendItem> Long =

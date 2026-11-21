@@ -1,12 +1,18 @@
 <div class="screen">
     @if (Title is not null)
     {
-        <h1 class="title">@Title</h1>
+        <header class="top-bar" data-testid="error-top-bar">
+            <h1 class="title">@Title</h1>
+        </header>
     }
     <div class="centre">
         <p class="message" role="alert" data-testid="error-message">Something went wrong</p>
     </div>
-    <AppButton FullWidth TestId="error-restart" OnClick="OnRestart">Restart</AppButton>
+    <footer class="bottom">
+        <div class="bottom-bar" data-testid="error-bottom-bar">
+            <AppButton FullWidth TestId="error-restart" OnClick="OnRestart">Restart</AppButton>
+        </div>
+    </footer>
 </div>
 
 @code {

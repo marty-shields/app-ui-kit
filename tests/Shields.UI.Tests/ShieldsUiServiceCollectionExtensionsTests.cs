@@ -140,4 +140,31 @@ public class ShieldsUiServiceCollectionExtensionsTests
 
         Assert.That(provider.GetRequiredService<TimeProvider>(), Is.SameAs(clock));
     }
+
+    [Test]
+    public void AddShieldsUi_Twice_RegistersEachServiceOnce()
+    {
+        var services = new ServiceCollection().AddShieldsUi().AddShieldsUi();
+
+        Assert.Multiple(() =>
+        {
+            foreach (var type in new[] { typeof(ThemeService), typeof(SystemBarInsetWriter), typeof(SnackbarService), typeof(IBackButton), typeof(AppLifecycle), typeof(IAppStart), typeof(IAppLifecycle), typeof(BackButtonBridge), typeof(AppLifecycleBridge), typeof(TimeProvider) })
+            {
+                Assert.That(services.Count(d => d.ServiceType == type), Is.EqualTo(1), type.Name);
+            }
+        });
+    }
+
+    [Test]
+    public void AddShieldsUi_RegistersTheBridgesAsSingletons()
+    {
+        using var provider = new ServiceCollection().AddShieldsUi().BuildServiceProvider(validateScopes: true);
+        using var scope = provider.CreateScope();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(provider.GetRequiredService<BackButtonBridge>(), Is.SameAs(scope.ServiceProvider.GetRequiredService<BackButtonBridge>()));
+            Assert.That(provider.GetRequiredService<AppLifecycleBridge>(), Is.SameAs(scope.ServiceProvider.GetRequiredService<AppLifecycleBridge>()));
+        });
+    }
 }

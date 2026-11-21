@@ -49,3 +49,50 @@
 <p>"Something went wrong" with a Restart button that raises <code>OnRestart</code>. <code>data-testid</code>: <code>error-message</code> and <code>error-restart</code>.</p>
 
 <p>Stories: <a href="./?path=/docs/components-layout-startupgate--docs">StartupGate</a>, <a href="./?path=/docs/components-layout-startupview--docs">StartupView</a>, <a href="./?path=/docs/components-layout-apperrorboundary--docs">AppErrorBoundary</a>, <a href="./?path=/docs/components-layout-errorview--docs">ErrorView</a></p>
+
+<h2><code>HostBridges</code></h2>
+<p>Renders nothing. The back button and app lifecycle are scoped to the BlazorWebView, but Android's activity events happen outside that scope. <code>AddShieldsUi()</code> registers two singletons, <code>BackButtonBridge</code> and <code>AppLifecycleBridge</code>, for the activity to call; <code>HostBridges</code> connects the scoped <code>IBackButton</code> and <code>IAppLifecycle</code> to them when it initialises and disconnects them when it is disposed. Put <code>&lt;HostBridges /&gt;</code> first in the root component (<code>Routes</code>), so it connects before any page registers.</p>
+<p>The kit has no MAUI dependency, so the app's <code>MainActivity</code> makes the calls. <code>BackButtonBridge.Enabled</code> is true while an activity is current and a page has a back handler; <code>EnabledChanged</code> can be raised on any thread.</p>
+<pre><code>protected override void OnCreate(Bundle? savedInstanceState)
+{
+    base.OnCreate(savedInstanceState);
+    var services = IPlatformApplication.Current!.Services;
+    backBridge = services.GetRequiredService&lt;BackButtonBridge&gt;();
+    lifecycleBridge = services.GetRequiredService&lt;AppLifecycleBridge&gt;();
+    backBridge.Attach(this);
+    lifecycleBridge.Attach(this);
+
+    backCallback = new BackCallback(this, backBridge);
+    OnBackPressedDispatcher.AddCallback(this, backCallback);
+    backBridge.EnabledChanged += SyncBackCallback;
+    SyncBackCallback();
+}
+
+protected override void OnStart()
+{
+    base.OnStart();
+    _ = lifecycleBridge.StartedAsync();
+}
+
+protected override void OnDestroy()
+{
+    backBridge.EnabledChanged -= SyncBackCallback;
+    backBridge.Detach(this);
+    lifecycleBridge.Detach(this);
+    base.OnDestroy();
+}
+
+private void SyncBackCallback() => RunOnUiThread(() => backCallback.Enabled = backBridge.Enabled);
+
+// HandleAsync is null when no page handles back: switch the callback off and let Android handle it.
+private sealed class BackCallback(Activity activity, BackButtonBridge bridge) : OnBackPressedCallback(false)
+{
+    public override void HandleOnBackPressed()
+    {
+        if (bridge.HandleAsync() is null)
+        {
+            Enabled = false;
+            activity.OnBackPressedDispatcher.OnBackPressed();
+        }
+    }
+}</code></pre>

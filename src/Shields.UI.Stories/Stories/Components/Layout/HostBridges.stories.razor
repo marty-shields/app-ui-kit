@@ -1,0 +1,23 @@
+@attribute [Stories("Components/Layout/HostBridges")]
+@using Shields.UI.Navigation
+@inject BackButtonBridge Bridge
+
+<Stories TComponent="HostBridges" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Connected">
+        <Template>
+            <HostBridges />
+            <BackHandler OnBack="() => pressed++" />
+            <p data-testid="bridge-enabled">Back @(Bridge.Enabled ? "enabled" : "disabled") (no activity attached in the browser)</p>
+            <AppButton TestId="press-back" OnClick="PressBackAsync">Press back</AppButton>
+            <p data-testid="bridge-count">Handled @pressed time(s)</p>
+        </Template>
+    </Story>
+
+</Stories>
+
+@code {
+    private int pressed;
+
+    private Task PressBackAsync() => Bridge.HandleAsync() ?? Task.CompletedTask;
+}

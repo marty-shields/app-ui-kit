@@ -1,0 +1,22 @@
+@implements IDisposable
+@using Shields.UI.Lifecycle
+@using Shields.UI.Navigation
+@inject IBackButton BackButton
+@inject IAppLifecycle AppLifecycle
+@inject BackButtonBridge BackBridge
+@inject AppLifecycleBridge LifecycleBridge
+
+@code {
+    // Connects before any page registers, so the host puts this first in its root component.
+    protected override void OnInitialized()
+    {
+        BackBridge.Connect(BackButton);
+        LifecycleBridge.Connect(AppLifecycle);
+    }
+
+    public void Dispose()
+    {
+        BackBridge.Disconnect(BackButton);
+        LifecycleBridge.Disconnect(AppLifecycle);
+    }
+}

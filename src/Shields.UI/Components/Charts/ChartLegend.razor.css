@@ -36,8 +36,21 @@
     background-color: var(--color-error);
 }
 
+.swatch.past {
+    background-color: var(--color-chart-past);
+}
+
+.swatch.primary {
+    background-color: var(--color-primary);
+}
+
+.swatch.today {
+    border: var(--border-width-error) solid var(--color-text);
+}
+
 .swatch.outline {
-    border: var(--border-width-error) dashed var(--color-border-strong);
+    box-sizing: border-box;
+    border: calc(var(--border-width-error) * 1.5) dashed var(--color-border-strong);
 }
 
 .swatch.line {

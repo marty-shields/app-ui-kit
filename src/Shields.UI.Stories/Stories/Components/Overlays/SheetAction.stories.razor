@@ -18,8 +18,8 @@
         <Template>
             @foreach (var theme in Themes)
             {
-                <div class="themed" data-theme="@theme">
-                    <SheetAction Icon="IconName.Calendar" Label="Choose another day to look at" TestId="@($"long-{theme}")" />
+                <div class="themed single" data-theme="@theme">
+                    <SheetAction Icon="IconName.Calendar" Label="Choose another day to see" TestId="@($"long-{theme}")" />
                 </div>
             }
         </Template>

@@ -19,6 +19,12 @@ public partial class SnackbarCssTests
     }
 
     [Test]
+    public void Snackbar_BottomMarginIsTheGapToken()
+    {
+        Assert.That(Rule(".snackbar"), Does.Contain("margin: 0 var(--space-4) var(--snackbar-gap-bottom);"));
+    }
+
+    [Test]
     public void Snackbar_RisesInOverTheEnterDuration()
     {
         Assert.Multiple(() =>

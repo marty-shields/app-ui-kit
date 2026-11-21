@@ -20,12 +20,13 @@ public class KitTokensTests
         "--snackbar-enter-duration", "--radio-size", "--radio-dot-size", "--nav-indicator-width", "--nav-indicator-height",
     ];
 
-    // Tokens only one app has that a kit component needs, and the decided names for the raised button and legend.
+    // Tokens only one app has that a kit component needs, and the decided names for the raised button, legend, chart band and snackbar gap.
     private static readonly string[] KitComponents =
     [
         "--color-chip", "--color-on-chip", "--color-chip-soft", "--color-on-chip-soft", "--letter-spacing-label",
         "--dialog-max-width", "--add-button-size", "--add-button-lift", "--legend-swatch-size",
         "--color-ring-track", "--font-size-xs", "--ring-size", "--ring-width", "--ring-size-compact", "--ring-width-compact",
+        "--color-chart-band", "--snackbar-gap-bottom",
     ];
 
     // Calorie Tracker's macro, target band, share bar and sheet tokens; Workout Log's bar-past, set, calendar and meter
@@ -52,6 +53,8 @@ public class KitTokensTests
             Assert.That(DesignTokens.Value("--add-button-size"), Is.EqualTo("3.5rem"));
             Assert.That(DesignTokens.Value("--add-button-lift"), Is.EqualTo("1.5rem"));
             Assert.That(DesignTokens.Value("--legend-swatch-size"), Is.EqualTo("0.75rem"));
+            Assert.That(DesignTokens.Value("--color-chart-band"), Is.EqualTo("light-dark(#3f7fa6, #7fb8de)"));
+            Assert.That(DesignTokens.Value("--snackbar-gap-bottom"), Is.EqualTo("var(--space-2)"));
         });
     }
 

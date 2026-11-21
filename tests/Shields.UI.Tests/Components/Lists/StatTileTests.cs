@@ -104,6 +104,19 @@ public class StatTileTests : ComponentTestBase
     }
 
     [Test]
+    public void Render_NotEnoughDataNote_ReplacesTheDefaultText()
+    {
+        var cut = Context.Render<StatTile>(p => p
+            .Add(x => x.Label, "Average")
+            .Add(x => x.Value, "1")
+            .Add(x => x.NotEnoughData, true)
+            .Add(x => x.NotEnoughDataNote, "Log 3 more days")
+            .Add(x => x.TestId, "tile"));
+
+        Assert.That(cut.Find("[data-testid=tile-note]").TextContent, Is.EqualTo("Log 3 more days"));
+    }
+
+    [Test]
     public void Render_WithoutTestId_RendersNoTestIds()
     {
         var cut = Context.Render<StatTile>(p => p

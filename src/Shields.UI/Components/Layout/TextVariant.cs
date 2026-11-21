@@ -1,6 +1,6 @@
 namespace Shields.UI.Components.Layout;
 
-/// <summary>Look of a <see cref="Text"/>.</summary>
+/// <summary>Look of a <see cref="Typography"/>.</summary>
 public enum TextVariant
 {
     /// <summary>Normal text in the normal text colour at the surrounding size.</summary>

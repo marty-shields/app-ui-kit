@@ -1,0 +1,53 @@
+@attribute [Stories("Components/Layout/Typography")]
+
+<Stories TComponent="Typography" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Variants">
+        <Template>
+            <div class="sheet">
+                <Typography Variant="TextVariant.Body" As="TextElement.P">Body: normal text.</Typography>
+                <Typography Variant="TextVariant.Label" As="TextElement.H2">Section label</Typography>
+                <Typography Variant="TextVariant.Muted" As="TextElement.P">Muted: a note or detail.</Typography>
+                <Typography Variant="TextVariant.MutedSmall" As="TextElement.P">Muted small: a caption.</Typography>
+                <Typography Variant="TextVariant.Strong" As="TextElement.P">Strong: bold.</Typography>
+                <Typography Variant="TextVariant.Figure" As="TextElement.P">521</Typography>
+                <Typography Variant="TextVariant.Error" As="TextElement.P">Error: couldn't save.</Typography>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Strong inside Muted">
+        <Template>
+            <Typography Variant="TextVariant.Muted" As="TextElement.P">You have <Typography Variant="TextVariant.Strong">3 items</Typography> left today.</Typography>
+        </Template>
+    </Story>
+
+    <Story Name="Label as a heading">
+        <Template>
+            <Typography Variant="TextVariant.Label" As="TextElement.H3" TestId="heading">Recent</Typography>
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed sheet" data-theme="light">
+                <Typography Variant="TextVariant.Label" As="TextElement.H2">Section label</Typography>
+                <Typography Variant="TextVariant.Muted" As="TextElement.P">Muted with <Typography Variant="TextVariant.Strong">strong</Typography> text.</Typography>
+                <Typography Variant="TextVariant.Figure" As="TextElement.P">521</Typography>
+                <Typography Variant="TextVariant.Error" As="TextElement.P">Couldn't save.</Typography>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed sheet" data-theme="dark">
+                <Typography Variant="TextVariant.Label" As="TextElement.H2">Section label</Typography>
+                <Typography Variant="TextVariant.Muted" As="TextElement.P">Muted with <Typography Variant="TextVariant.Strong">strong</Typography> text.</Typography>
+                <Typography Variant="TextVariant.Figure" As="TextElement.P">521</Typography>
+                <Typography Variant="TextVariant.Error" As="TextElement.P">Couldn't save.</Typography>
+            </div>
+        </Template>
+    </Story>
+
+</Stories>

@@ -455,7 +455,16 @@ public class AppScreenTests : ComponentTestBase
 
         await Context.DisposeComponentsAsync();
         runtime.Import.SetResult(module);
-        await Task.Yield();
+        try
+        {
+            await module.DisposeSignal.Task.WaitAsync(TimeSpan.FromSeconds(10));
+        }
+        catch (TimeoutException)
+        {
+            Assert.Fail("The module that loaded after dispose was never disposed");
+        }
+        // The signal fires inside DisposeAsync; the renderer runs the continuation as one work item, so this one queues behind its remainder.
+        await cut.InvokeAsync(() => { });
 
         Assert.Multiple(() =>
         {
@@ -509,6 +518,8 @@ public class AppScreenTests : ComponentTestBase
 
         public bool Disposed { get; private set; }
 
+        public TaskCompletionSource DisposeSignal { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
         public ValueTask<TValue> InvokeAsync<TValue>(string identifier, object?[]? args)
         {
             Calls.Add(identifier);
@@ -521,6 +532,7 @@ public class AppScreenTests : ComponentTestBase
         public ValueTask DisposeAsync()
         {
             Disposed = true;
+            DisposeSignal.SetResult();
             return ValueTask.CompletedTask;
         }
     }

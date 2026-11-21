@@ -44,6 +44,7 @@
 <ul>
     <li>A segment at zero, negative or not finite draws nothing but keeps its label, with 0 as its value. With every segment at zero the track is empty and the text alternative ends with <code>EmptyText</code>.</li>
     <li>The bar is one image named by its text alternative, which starts with <code>Label</code> and lists each segment's label, value (followed by <code>Unit</code>) and percentage; percentages are rounded so they add up to 100. <code>ShowLabels</code> hides the visible labels, not the text alternative.</li>
+    <li>A segment's <code>ValueText</code> replaces its formatted value and <code>Unit</code> in the visible label and the text alternative, so a bar sized in one unit (such as energy) can be labelled in another (such as grams). <code>Value</code> still sizes the segment and sets its percentage.</li>
     <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>{TestId}-segment-0</code> (only above zero) and <code>-label-0</code> by position. None are rendered without <code>TestId</code>.</li>
 </ul>
 

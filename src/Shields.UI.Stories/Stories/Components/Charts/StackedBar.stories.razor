@@ -20,6 +20,12 @@
         </Template>
     </Story>
 
+    <Story Name="Sized by one unit, labelled in another">
+        <Template>
+            <div class="themed"><StackedBar Label="Macros by energy" Segments="@([new StackedBarSegment("Protein", 128, DataSeries.One, "32 g"), new StackedBarSegment("Carbs", 400, DataSeries.Two, "100 g"), new StackedBarSegment("Fat", 270, DataSeries.Three, "30 g")])" TestId="bar" /></div>
+        </Template>
+    </Story>
+
     <Story Name="Single segment">
         <Template>
             <div class="themed"><StackedBar Label="Sales by region" Unit="units" Segments="@([new StackedBarSegment("North", 420, DataSeries.One)])" TestId="bar" /></div>

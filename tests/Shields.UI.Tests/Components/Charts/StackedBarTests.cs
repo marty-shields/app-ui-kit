@@ -35,6 +35,30 @@ public class StackedBarTests : ComponentTestBase
     }
 
     [Test]
+    public void Render_WithValueText_ShowsItInTheLabelAndTextAlternativeAndStillSizesByValue()
+    {
+        var cut = Render([new("A", 10, DataSeries.One, "5 kg"), new("B", 10, DataSeries.Two), new("C", 20, DataSeries.Three, "7 lb")]);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find("[data-testid=bar-label-0]").TextContent, Is.EqualTo("A 5 kg"));
+            Assert.That(cut.Find("[data-testid=bar-label-1]").TextContent, Is.EqualTo("B 10 g"));
+            Assert.That(cut.Find("[data-testid=bar-label-2]").TextContent, Is.EqualTo("C 7 lb"));
+            Assert.That(Text(cut), Is.EqualTo("Sales by region: A 5 kg, 25%; B 10 g, 25%; C 7 lb, 50%."));
+            Assert.That(cut.Find("[data-testid=bar-segment-0]").GetAttribute("style"), Does.Contain("flex-grow: 25"));
+            Assert.That(cut.Find("[data-testid=bar-segment-2]").GetAttribute("style"), Does.Contain("flex-grow: 50"));
+        });
+    }
+
+    [Test]
+    public void Render_WithValueTextAndAllZero_UsesItInTheTextAlternative()
+    {
+        var cut = Render([new("A", 0, DataSeries.One, "none")]);
+
+        Assert.That(Text(cut), Is.EqualTo("Sales by region: A none. Nothing yet."));
+    }
+
+    [Test]
     public void Render_SizesSegmentsByShare()
     {
         var cut = Render([new("A", 10, DataSeries.One), new("B", 10, DataSeries.Two), new("C", 20, DataSeries.Three)]);

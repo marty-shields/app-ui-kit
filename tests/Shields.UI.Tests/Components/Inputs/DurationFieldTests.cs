@@ -135,7 +135,7 @@ public class DurationFieldTests : ComponentTestBase
         var cut = Render(p => p.Add(x => x.Value, value).Add(x => x.ValueChanged, (string? v) => raised = v));
 
         var leaving = cut.Find("[role=group]").FocusOutAsync(new FocusEventArgs());
-        clock.Advance(TimeSpan.FromMilliseconds(10));
+        clock.Advance(DurationField.FocusMoveWait);
         await leaving;
 
         Assert.That(raised, Is.EqualTo(expected));
@@ -155,6 +155,7 @@ public class DurationFieldTests : ComponentTestBase
 
         var leaving = cut.Find("[role=group]").FocusOutAsync(new FocusEventArgs());
         clock.Advance(DurationField.FocusMoveWait - TimeSpan.FromMilliseconds(1));
+        await cut.InvokeAsync(() => { });
         Assert.That(raised, Is.Null);
         clock.Advance(TimeSpan.FromMilliseconds(1));
         await leaving;
@@ -170,7 +171,7 @@ public class DurationFieldTests : ComponentTestBase
         var cut = Render(p => p.Add(x => x.Value, value).Add(x => x.ValueChanged, (string? _) => raised = true));
 
         var leaving = cut.Find("[role=group]").FocusOutAsync(new FocusEventArgs());
-        clock.Advance(TimeSpan.FromMilliseconds(10));
+        clock.Advance(DurationField.FocusMoveWait);
         await leaving;
 
         Assert.That(raised, Is.False);
@@ -184,7 +185,7 @@ public class DurationFieldTests : ComponentTestBase
 
         var leaving = cut.Find("[role=group]").FocusOutAsync(new FocusEventArgs());
         await cut.Find("[role=group]").FocusInAsync(new FocusEventArgs());
-        clock.Advance(TimeSpan.FromMilliseconds(10));
+        clock.Advance(DurationField.FocusMoveWait);
         await leaving;
 
         Assert.That(raised, Is.Null);
@@ -226,7 +227,7 @@ public class DurationFieldTests : ComponentTestBase
 
         var leaving = cut.Find("[role=group]").FocusOutAsync(new FocusEventArgs());
         await Context.DisposeComponentsAsync();
-        clock.Advance(TimeSpan.FromMilliseconds(10));
+        clock.Advance(DurationField.FocusMoveWait);
         await leaving;
 
         Assert.That(raised, Is.Null);

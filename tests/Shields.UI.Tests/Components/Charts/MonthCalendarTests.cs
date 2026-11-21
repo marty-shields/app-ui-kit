@@ -400,6 +400,16 @@ public class MonthCalendarTests : ComponentTestBase
     }
 
     [Test]
+    public void Render_Marks_WithEmptyUnit_LeavesTheValueOut()
+    {
+        var cut = Context.Render<MonthCalendar>(p => p
+            .Add(x => x.Month, new DateOnly(2026, 11, 20)).Add(x => x.Days, [Day(3, 1000)]).Add(x => x.Today, Today).Add(x => x.Unit, "")
+            .Add(x => x.Style, CalendarStyle.Marks).Add(x => x.TestId, "cal"));
+
+        Assert.That(NameOf(cut.Find(Selector(3))), Is.EqualTo("Tue 3 Nov, recorded"));
+    }
+
+    [Test]
     public void Render_Marks_TodayAndFutureKeepTheirClasses()
     {
         var cut = RenderMarks(Day(18, 1000));

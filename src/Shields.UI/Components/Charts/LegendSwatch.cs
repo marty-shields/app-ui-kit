@@ -18,8 +18,8 @@ public enum LegendSwatch
     Line,
 
     /// <summary>
-    /// A see-through filled rectangle in <c>--color-chart-band</c> with a thin accent edge, for a target band. Apps draw their band with the same
-    /// token so the legend matches the chart.
+    /// An unfilled outlined box wider than tall, for a target band. Apps draw the band's top and bottom edges as strokes in
+    /// <c>--color-chart-band</c> with no fill, so the legend matches the chart.
     /// </summary>
     Band,
 }

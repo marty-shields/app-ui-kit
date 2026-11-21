@@ -48,8 +48,7 @@
 
 .swatch.band {
     width: calc(var(--legend-swatch-size) * 2);
-    background-color: var(--color-chart-band);
-    box-shadow: inset 0 0 0 var(--border-width) var(--color-accent);
+    box-shadow: inset 0 0 0 var(--border-width) var(--color-chart-band);
     border-radius: var(--radius-sm);
 }
 

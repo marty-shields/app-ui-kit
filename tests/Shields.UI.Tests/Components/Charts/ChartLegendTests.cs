@@ -28,7 +28,7 @@ public class ChartLegendTests : ComponentTestBase
     }
 
     [Test]
-    public void Band_IsFilledWithTheBandTokenAndEdgedInAccent()
+    public void Band_IsAnOutlineInTheBandTokenWithNoFill()
     {
         var css = RepoFiles.Read("src", "Shields.UI", "Components", "Charts", "ChartLegend.razor.css");
         var rule = Regex.Match(css, @"\.swatch\.band\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
@@ -36,8 +36,8 @@ public class ChartLegendTests : ComponentTestBase
         Assert.Multiple(() =>
         {
             Assert.That(rule, Does.Contain("width: calc(var(--legend-swatch-size) * 2);"));
-            Assert.That(rule, Does.Contain("background-color: var(--color-chart-band);"));
-            Assert.That(rule, Does.Contain("box-shadow: inset 0 0 0 var(--border-width) var(--color-accent);"));
+            Assert.That(rule, Does.Not.Contain("background"));
+            Assert.That(rule, Does.Contain("box-shadow: inset 0 0 0 var(--border-width) var(--color-chart-band);"));
         });
     }
 

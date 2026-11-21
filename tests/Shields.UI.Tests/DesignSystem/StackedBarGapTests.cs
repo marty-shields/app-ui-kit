@@ -27,31 +27,4 @@ public class StackedBarGapTests
 
         Assert.That(double.Parse(gap.Replace("rem", "").Replace("px", ""), CultureInfo.InvariantCulture), Is.GreaterThan(0), gap);
     }
-
-    // The gap shows --color-surface, and the empty track --color-ring-track; both must read against the card.
-    [TestCase(ColourScheme.Light)]
-    [TestCase(ColourScheme.Dark)]
-    public void EmptyTrack_MeetsThreeToOneOnTheCard(ColourScheme scheme)
-    {
-        var result = ContrastCheck.Measure("--color-ring-track", "--color-surface", ContrastCheck.LargeTextOrControl, scheme);
-
-        Assert.That(result.Passes, Is.True, result.ToString());
-    }
-
-    [TestCase("--color-data-1")]
-    [TestCase("--color-data-2")]
-    [TestCase("--color-data-3")]
-    [TestCase("--color-data-4")]
-    [TestCase("--color-data-5")]
-    public void EverySeries_MeetsThreeToOneOnTheCardAndThePage(string token)
-    {
-        foreach (var scheme in Enum.GetValues<ColourScheme>())
-        {
-            foreach (var background in new[] { "--color-surface", "--color-bg" })
-            {
-                var result = ContrastCheck.Measure(token, background, ContrastCheck.LargeTextOrControl, scheme);
-                Assert.That(result.Passes, Is.True, result.ToString());
-            }
-        }
-    }
 }

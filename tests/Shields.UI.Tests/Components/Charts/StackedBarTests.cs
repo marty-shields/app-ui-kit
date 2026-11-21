@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Shields.UI.Components.Charts;
 
 namespace Shields.UI.Tests.Components.Charts;
@@ -92,14 +93,19 @@ public class StackedBarTests : ComponentTestBase
     [Test]
     public void Render_NegativeAndNonFiniteValues_DrawNoSegmentAndShowZero()
     {
-        var cut = Render([new("A", -5, DataSeries.One), new("B", double.NaN, DataSeries.Two), new("C", 10, DataSeries.Three)]);
+        var cut = Render([new("A", -5, DataSeries.One), new("B", double.NaN, DataSeries.Two), new("C", 10, DataSeries.Three),
+            new("D", double.PositiveInfinity, DataSeries.Four), new("E", double.NegativeInfinity, DataSeries.Five)]);
 
         Assert.Multiple(() =>
         {
             Assert.That(cut.FindAll("[data-testid=bar-segment-0]"), Is.Empty);
             Assert.That(cut.FindAll("[data-testid=bar-segment-1]"), Is.Empty);
             Assert.That(cut.Find("[data-testid=bar-label-0]").TextContent, Is.EqualTo("A 0 g"));
+            Assert.That(cut.FindAll("[data-testid=bar-segment-3]"), Is.Empty);
+            Assert.That(cut.FindAll("[data-testid=bar-segment-4]"), Is.Empty);
             Assert.That(cut.Find("[data-testid=bar-label-1]").TextContent, Is.EqualTo("B 0 g"));
+            Assert.That(cut.Find("[data-testid=bar-label-3]").TextContent, Is.EqualTo("D 0 g"));
+            Assert.That(cut.Find("[data-testid=bar-label-4]").TextContent, Is.EqualTo("E 0 g"));
             Assert.That(Text(cut), Does.Contain("A 0 g, 0%").And.Contain("C 10 g, 100%"));
         });
     }
@@ -113,6 +119,40 @@ public class StackedBarTests : ComponentTestBase
         {
             Assert.That(cut.Find("[data-testid=bar-label-0]").TextContent, Is.EqualTo("A 12.5 g"));
             Assert.That(Text(cut), Does.Contain("A 12.5 g"));
+        });
+    }
+
+    [Test]
+    public void Render_LargeValues_GroupThousands()
+    {
+        var cut = Render([new("A", 12500, DataSeries.One), new("B", 1234.5, DataSeries.Two)]);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find("[data-testid=bar-label-0]").TextContent, Is.EqualTo("A 12,500 g"));
+            Assert.That(cut.Find("[data-testid=bar-label-1]").TextContent, Is.EqualTo("B 1,234.5 g"));
+        });
+    }
+
+    [Test]
+    public void Render_TinyShare_StillGetsAPositiveGrow()
+    {
+        var cut = Render([new("A", 1e9, DataSeries.One), new("B", 1, DataSeries.Two)]);
+
+        Assert.That(cut.Find("[data-testid=bar-segment-1]").GetAttribute("style"), Does.Contain("flex-grow: 0.001"));
+    }
+
+    [Test]
+    public void Css_TrackUsesTheGapAndSurface_AndSegmentsKeepAMinimumWidth()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Charts", "StackedBar.razor.css");
+        string Rule(string selector) => Regex.Match(css, Regex.Escape(selector) + @"\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(Rule(".track"), Does.Contain("gap: var(--stacked-bar-gap);").And.Contain("background-color: var(--color-surface);"));
+            Assert.That(Rule(".track.none"), Does.Contain("background-color: var(--color-ring-track);"));
+            Assert.That(Rule(".segment"), Does.Contain("min-width: var(--stacked-bar-segment-min-width);"));
         });
     }
 

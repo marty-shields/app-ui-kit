@@ -20,7 +20,8 @@
 
 .segment {
     flex-basis: 0;
-    min-width: 0;
+    /* Keeps a tiny share visible. */
+    min-width: var(--stacked-bar-segment-min-width);
 }
 
 .labels {
@@ -33,6 +34,10 @@
 }
 
 .label {
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
 }
 

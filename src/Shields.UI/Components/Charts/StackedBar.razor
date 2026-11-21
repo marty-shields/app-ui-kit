@@ -49,7 +49,9 @@
 
     private static double Counted(double value) => double.IsFinite(value) ? Math.Max(value, 0) : 0;
 
-    private double Total => Segments.Sum(s => Counted(s.Value));
+    private double Total { get; set; }
+
+    protected override void OnParametersSet() => Total = Segments.Sum(s => Counted(s.Value));
 
     /// <summary>Whole percentages of the total, largest-remainder rounded so they add up to 100. Ties go to the earlier segment.</summary>
     private int[] Percents()
@@ -81,11 +83,12 @@
         }
     }
 
-    private string Grow(StackedBarSegment segment) => (Counted(segment.Value) / Total * 100).ToString("0.###", CultureInfo.InvariantCulture);
+    // Never rounds a drawn segment to 0, which would collapse it.
+    private string Grow(StackedBarSegment segment) => Math.Max(Counted(segment.Value) / Total * 100, 0.001).ToString("0.###", CultureInfo.InvariantCulture);
 
     private string ValueText(StackedBarSegment segment)
     {
-        var number = Counted(segment.Value).ToString("0.#", CultureInfo.InvariantCulture);
+        var number = Counted(segment.Value).ToString("#,0.#", CultureInfo.InvariantCulture);
         return string.IsNullOrEmpty(Unit) ? number : $"{number} {Unit}";
     }
 

@@ -135,6 +135,8 @@
     /* StackedBar: the bar's height, and the surface-coloured gap between segments (neighbouring data colours are under 3:1 against each other, so the gap tells them apart). */
     --stacked-bar-height: 0.75rem;
     --stacked-bar-gap: 0.25rem;
+    /* StackedBar: the narrowest a drawn segment gets, so a tiny share stays visible. */
+    --stacked-bar-segment-min-width: 0.25rem;
 }
 
 /* Forces a theme on an element and its children. */

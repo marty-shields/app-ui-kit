@@ -32,6 +32,12 @@
         </Template>
     </Story>
 
+    <Story Name="Long labels">
+        <Template>
+            <div class="themed narrow"><StackedBar Label="Sales by region" Unit="units" Segments="@([new StackedBarSegment("A very long region name that cannot fit", 420, DataSeries.One), new StackedBarSegment("Another similarly long region name", 640, DataSeries.Two)])" TestId="bar" /></div>
+        </Template>
+    </Story>
+
     <Story Name="All zero">
         <Template>
             <div class="themed"><StackedBar Label="Sales by region" Unit="units" EmptyText="Nothing recorded yet" Segments="@([new StackedBarSegment("North", 0, DataSeries.One), new StackedBarSegment("South", 0, DataSeries.Two)])" TestId="bar" /></div>

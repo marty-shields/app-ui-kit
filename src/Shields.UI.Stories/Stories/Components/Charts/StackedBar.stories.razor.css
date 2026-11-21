@@ -4,3 +4,7 @@
     background-color: var(--color-surface);
     color: var(--color-text);
 }
+
+.narrow {
+    max-width: var(--stories-narrow-card-width);
+}

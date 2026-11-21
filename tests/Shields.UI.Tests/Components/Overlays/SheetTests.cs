@@ -218,7 +218,7 @@ public class SheetTests : ComponentTestBase
         cut.Render(p => p.Add(x => x.Open, false));
 
         runtime.Import.SetResult(module);
-        await Task.Yield();
+        await cut.InvokeAsync(() => { });
         await Context.DisposeComponentsAsync();
 
         Assert.Multiple(() =>
@@ -234,11 +234,11 @@ public class SheetTests : ComponentTestBase
         var runtime = new DelayedImportRuntime();
         Context.Services.AddSingleton<IJSRuntime>(runtime);
         var module = new FakeModule();
-        Render(open: true);
+        var cut = Render(open: true);
 
         await Context.DisposeComponentsAsync();
         runtime.Import.SetResult(module);
-        await Task.Yield();
+        await cut.InvokeAsync(() => { });
 
         Assert.That(module.Calls, Is.Empty);
     }

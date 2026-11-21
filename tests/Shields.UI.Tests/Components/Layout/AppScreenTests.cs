@@ -455,7 +455,16 @@ public class AppScreenTests : ComponentTestBase
 
         await Context.DisposeComponentsAsync();
         runtime.Import.SetResult(module);
-        await module.DisposeSignal.Task.WaitAsync(TimeSpan.FromSeconds(30));
+        try
+        {
+            await module.DisposeSignal.Task.WaitAsync(TimeSpan.FromSeconds(10));
+        }
+        catch (TimeoutException)
+        {
+            Assert.Fail("The module that loaded after dispose was never disposed");
+        }
+        // The signal fires inside DisposeAsync; the renderer runs the continuation as one work item, so this one queues behind its remainder.
+        await cut.InvokeAsync(() => { });
 
         Assert.Multiple(() =>
         {

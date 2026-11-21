@@ -30,6 +30,7 @@ public class ContrastTests
         ("--color-border-strong", "--color-bg", LargeTextOrControl),
         ("--color-border-strong", "--color-surface", LargeTextOrControl),
         ("--color-accent", "--color-bg", LargeTextOrControl),
+        ("--color-accent", "--color-selected", LargeTextOrControl),
         ("--color-on-chip", "--color-chip", Text),
         ("--color-on-chip-soft", "--color-chip-soft", Text),
         ("--color-chip", "--color-bg", LargeTextOrControl),

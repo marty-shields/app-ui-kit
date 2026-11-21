@@ -48,11 +48,71 @@ public class SectionHeaderTests : ComponentTestBase
     }
 
     [Test]
+    public void Render_ShowsTheHintWithTestIdBeforeTheTotal()
+    {
+        var cut = Context.Render<SectionHeader>(p => p
+            .Add(x => x.Title, "Lunch")
+            .Add(x => x.Hint, "from 11:00")
+            .Add(x => x.Total, "521 kcal")
+            .Add(x => x.TestId, "head"));
+
+        var hint = cut.Find("[data-testid=head-hint]");
+        Assert.Multiple(() =>
+        {
+            Assert.That(hint.TextContent, Is.EqualTo("from 11:00"));
+            Assert.That(hint.ClassList, Does.Contain("hint"));
+            Assert.That(hint.NextElementSibling!.GetAttribute("data-testid"), Is.EqualTo("head-total"));
+        });
+    }
+
+    [TestCase(null)]
+    [TestCase("")]
+    [TestCase("   ")]
+    public void Render_WithNullOrBlankHint_RendersNoHint(string? hint)
+    {
+        var cut = Context.Render<SectionHeader>(p => p
+            .Add(x => x.Title, "Lunch")
+            .Add(x => x.Hint, hint)
+            .Add(x => x.TestId, "head"));
+
+        Assert.That(cut.FindAll(".hint,[data-testid=head-hint]"), Is.Empty);
+    }
+
+    [Test]
+    public void Render_PlainHeader_ShowsTheHintInsideTheHeading()
+    {
+        var cut = Context.Render<SectionHeader>(p => p
+            .Add(x => x.Title, "Lunch")
+            .Add(x => x.Hint, "from 11:00")
+            .Add(x => x.TestId, "head"));
+
+        Assert.That(cut.Find("h2 span.toggle [data-testid=head-hint]").TextContent, Is.EqualTo("from 11:00"));
+    }
+
+    [Test]
+    public void Render_CollapsibleHeader_PutsTheHintInTheButtonSoItIsInTheAccessibleName()
+    {
+        var cut = Context.Render<SectionHeader>(p => p
+            .Add(x => x.Title, "Lunch")
+            .Add(x => x.Hint, "from 11:00")
+            .Add(x => x.ExpandedChanged, _ => { })
+            .Add(x => x.TestId, "head"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find("button [data-testid=head-hint]").TextContent, Is.EqualTo("from 11:00"));
+            Assert.That(cut.Find("button").TextContent, Does.Contain("from 11:00"));
+            Assert.That(cut.Find("button").HasAttribute("aria-describedby"), Is.False);
+        });
+    }
+
+    [Test]
     public void Render_WithoutTestId_RendersNoTestIds()
     {
         var cut = Context.Render<SectionHeader>(p => p
             .Add(x => x.Title, "Morning")
             .Add(x => x.Badge, "Now")
+            .Add(x => x.Hint, "from 11:00")
             .Add(x => x.Total, "3"));
 
         Assert.That(cut.FindAll("[data-testid]"), Is.Empty);

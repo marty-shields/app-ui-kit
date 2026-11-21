@@ -53,6 +53,11 @@
     flex: 1;
 }
 
+.hint {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+}
+
 .total {
     font-variant-numeric: tabular-nums;
     font-weight: var(--font-weight-bold);

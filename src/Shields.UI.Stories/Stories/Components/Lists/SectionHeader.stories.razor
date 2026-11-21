@@ -26,6 +26,24 @@
         </Template>
     </Story>
 
+    <Story Name="Hint">
+        <Template>
+            <SectionHeader Title="Lunch" Hint="from 11:00" Total="521 kcal" TestId="head" />
+        </Template>
+    </Story>
+
+    <Story Name="Collapsible with hint">
+        <Template>
+            <SectionHeader Title="Lunch" Badge="Now" Hint="from 11:00" Total="521 kcal" Expanded="true" ExpandedChanged="_ => { }" ControlsId="panel" TestId="head" />
+        </Template>
+    </Story>
+
+    <Story Name="Long title with hint">
+        <Template>
+            <SectionHeader Title="An especially long section title that has to wrap" Badge="Now" Hint="from 11:00" Total="1,234 kcal" Expanded="true" ExpandedChanged="_ => { }" TestId="head" />
+        </Template>
+    </Story>
+
     <Story Name="Long title">
         <Template>
             <SectionHeader Title="An especially long section title that has to wrap" Badge="Now" Total="1,234 items" Expanded="true" ExpandedChanged="_ => { }" TestId="head" />

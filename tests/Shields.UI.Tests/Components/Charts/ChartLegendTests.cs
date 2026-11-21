@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Shields.UI.Components.Charts;
 
 namespace Shields.UI.Tests.Components.Charts;
@@ -27,12 +28,17 @@ public class ChartLegendTests : ComponentTestBase
     }
 
     [Test]
-    public void Band_IsFilledWithTheBandToken()
+    public void Band_IsFilledWithTheBandTokenAndEdgedInAccent()
     {
         var css = RepoFiles.Read("src", "Shields.UI", "Components", "Charts", "ChartLegend.razor.css");
-        var rule = System.Text.RegularExpressions.Regex.Match(css, @"\.swatch\.band\s*\{([^}]*)\}").Groups[1].Value;
+        var rule = Regex.Match(css, @"\.swatch\.band\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
 
-        Assert.That(rule, Does.Contain("background-color: var(--color-chart-band);"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(rule, Does.Contain("width: calc(var(--legend-swatch-size) * 2);"));
+            Assert.That(rule, Does.Contain("background-color: var(--color-chart-band);"));
+            Assert.That(rule, Does.Contain("box-shadow: inset 0 0 0 var(--border-width) var(--color-accent);"));
+        });
     }
 
     [Test]

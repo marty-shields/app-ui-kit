@@ -53,6 +53,7 @@ public class KitTokensTests
             Assert.That(DesignTokens.Value("--add-button-size"), Is.EqualTo("3.5rem"));
             Assert.That(DesignTokens.Value("--add-button-lift"), Is.EqualTo("1.5rem"));
             Assert.That(DesignTokens.Value("--legend-swatch-size"), Is.EqualTo("0.75rem"));
+            Assert.That(DesignTokens.Value("--color-chart-band"), Is.EqualTo("color-mix(in srgb, var(--color-accent) 20%, transparent)"));
             Assert.That(DesignTokens.Value("--snackbar-gap-bottom"), Is.EqualTo("var(--space-2)"));
         });
     }

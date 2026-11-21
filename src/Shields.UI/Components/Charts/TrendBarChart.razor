@@ -116,6 +116,13 @@
     [Parameter]
     public string? Unit { get; set; }
 
+    /// <summary>
+    /// The value at the top of the y scale, so charts of different periods share one scale. Ticks keep the 1, 2, 5 steps up to it and a bar above it is drawn at the top.
+    /// Null, zero, negative or non-finite means a scale that fits the tallest bar and the band.
+    /// </summary>
+    [Parameter]
+    public double? Max { get; set; }
+
     /// <summary>The text shown in the chart when no bar has a value.</summary>
     [Parameter]
     public string EmptyText { get; set; } = "Nothing recorded yet";
@@ -181,13 +188,18 @@
         }
     }
 
-    private int Intervals => Math.Max(1, (int)Math.Ceiling(MaxValue / TickStep - 1e-9));
+    private double? FixedMax => Max is > 0 && double.IsFinite(Max.Value) ? Math.Min(Max.Value, MaxScale) : null;
 
-    /// <summary>The top of the y scale: the first tick at or above the tallest bar and the band. The space above it holds the tooltip, the value and the over marker.</summary>
-    private double Scale => Intervals * TickStep;
+    /// <summary>The number of intervals up to the top tick: the one at or above the tallest bar, or with <see cref="Max"/> the last one at or below it.</summary>
+    private int Intervals => FixedMax is null
+        ? Math.Max(1, (int)Math.Ceiling(MaxValue / TickStep - 1e-9))
+        : (int)Math.Floor(MaxValue / TickStep + 1e-9);
+
+    /// <summary>The top of the y scale: <see cref="Max"/> when set, else the first tick at or above the tallest bar and the band. The space above it holds the tooltip, the value and the over marker.</summary>
+    private double Scale => FixedMax ?? Intervals * TickStep;
 
     /// <summary>The tallest bar, the band's top and the per-bar targets, which the scale has to hold.</summary>
-    private double MaxValue => Math.Min(
+    private double MaxValue => FixedMax ?? Math.Min(
         MaxScale,
         Bars.Where(Drawn)
             .SelectMany(b => new[]

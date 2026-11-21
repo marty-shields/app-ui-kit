@@ -26,6 +26,44 @@
         </Template>
     </Story>
 
+    <Story Name="Header actions">
+        <Template>
+            <Card Title="Bench press" TestId="card">
+                <HeaderActions>
+                    <IconButton Icon="IconName.Check" AriaLabel="Mark Bench press done" />
+                    <IconButton Icon="IconName.Edit" AriaLabel="Edit Bench press" Muted />
+                    <IconButton Icon="IconName.Delete" AriaLabel="Delete Bench press" Muted />
+                </HeaderActions>
+                <ChildContent><p class="body" data-wrap-ok>Content goes here.</p></ChildContent>
+            </Card>
+        </Template>
+    </Story>
+
+    <Story Name="Error">
+        <Template>
+            <Card Title="Bench press" Error TestId="card">
+                <HeaderActions>
+                    <IconButton Icon="IconName.Check" AriaLabel="Mark Bench press done" />
+                </HeaderActions>
+                <ChildContent>
+                    <InlineAlert Tone="AlertTone.Error" Message="Enter the weight for set 2." />
+                </ChildContent>
+            </Card>
+        </Template>
+    </Story>
+
+    <Story Name="Error, dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <Card Title="Bench press" Error>
+                    <ChildContent>
+                        <InlineAlert Tone="AlertTone.Error" Message="Enter the weight for set 2." />
+                    </ChildContent>
+                </Card>
+            </div>
+        </Template>
+    </Story>
+
     <Story Name="Light">
         <Template>
             <div class="themed" data-theme="light">

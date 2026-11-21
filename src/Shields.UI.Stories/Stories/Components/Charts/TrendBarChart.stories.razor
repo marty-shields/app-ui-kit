@@ -63,6 +63,22 @@
         </Template>
     </Story>
 
+    <Story Name="Fixed max">
+        <Template>
+            <div class="card">
+                <TrendBarChart Bars="Week" Target="2000" Max="3000" Unit="pts" Label="Points per day, scale to 3,000" TestId="chart" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Fixed max, past and current">
+        <Template>
+            <div class="card">
+                <TrendBarChart Bars="PastWeek" Style="TrendBarStyle.PastAndCurrent" Max="120" Unit="min" Label="Minutes per day, scale to 120" TestId="chart" />
+            </div>
+        </Template>
+    </Story>
+
     <Story Name="Past and current">
         <Template>
             <div class="card">

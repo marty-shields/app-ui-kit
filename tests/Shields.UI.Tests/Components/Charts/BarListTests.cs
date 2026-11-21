@@ -234,4 +234,112 @@ public class BarListTests : ComponentTestBase
             Assert.That(css, Does.Contain("--value-width: var(--bar-list-value-width-narrow);"));
         });
     }
+
+    private IRenderedComponent<BarList> RenderBy(IReadOnlyList<BarListItem> items, BarListTestIdBy by, bool tappable = false) =>
+        Context.Render<BarList>(p =>
+        {
+            p.Add(x => x.Items, items).Add(x => x.TestIdBy, by).Add(x => x.TestId, "list");
+            if (tappable)
+            {
+                p.Add(x => x.OnSelect, EventCallback.Factory.Create<int>(this, _ => { }));
+            }
+        });
+
+    private static IEnumerable<string?> Ids(IRenderedComponent<BarList> cut, string part) =>
+        cut.FindAll($"[data-testid^=list-{part}-]").Select(e => e.GetAttribute("data-testid"));
+
+    [Test]
+    public void TestIdBy_Slug_NamesEveryRowPartByLabelSlug()
+    {
+        var cut = RenderBy([new("Upper Body", 3), new("  Legs & Core! ", 2)], BarListTestIdBy.Slug, tappable: true);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(Ids(cut, "row"), Is.EqualTo(new[] { "list-row-upper-body", "list-row-legs-core" }));
+            Assert.That(Ids(cut, "select"), Is.EqualTo(new[] { "list-select-upper-body", "list-select-legs-core" }));
+            Assert.That(Ids(cut, "label"), Is.EqualTo(new[] { "list-label-upper-body", "list-label-legs-core" }));
+            Assert.That(Ids(cut, "value"), Is.EqualTo(new[] { "list-value-upper-body", "list-value-legs-core" }));
+            Assert.That(Ids(cut, "bar"), Is.EqualTo(new[] { "list-bar-upper-body", "list-bar-legs-core" }));
+        });
+    }
+
+    [Test]
+    public void TestIdBy_Slug_NumbersRepeatedSlugsFromTwo()
+    {
+        var cut = RenderBy([new("Core", 1), new("core", 2), new("CORE!", 3), new("Core 2", 4)], BarListTestIdBy.Slug);
+
+        Assert.That(Ids(cut, "row"), Is.EqualTo(new[] { "list-row-core", "list-row-core-2", "list-row-core-3", "list-row-core-2-2" }));
+    }
+
+    [Test]
+    public void TestIdBy_Slug_GivesALabelWithNoLettersOrDigitsAnId()
+    {
+        var cut = RenderBy([new("!!!", 1), new("???", 2)], BarListTestIdBy.Slug);
+
+        Assert.That(Ids(cut, "row"), Is.EqualTo(new[] { "list-row-item", "list-row-item-2" }));
+    }
+
+    [Test]
+    public void TestIdBy_Default_KeepsThePositionIds()
+    {
+        var cut = RenderBy([new("Core", 1), new("Core", 2)], BarListTestIdBy.Position);
+
+        Assert.That(Ids(cut, "row"), Is.EqualTo(new[] { "list-row-0", "list-row-1" }));
+    }
+
+    [Test]
+    public void TestIdBy_Slug_FollowsTheItemsWhenTheyChange()
+    {
+        var cut = RenderBy([new("A", 1)], BarListTestIdBy.Slug);
+
+        cut.Render(p => p.Add(x => x.Items, [new BarListItem("B", 1), new BarListItem("A", 1)]));
+
+        Assert.That(Ids(cut, "row"), Is.EqualTo(new[] { "list-row-b", "list-row-a" }));
+    }
+
+    [Test]
+    public void AllZeroText_ReplacesTheBarsWhenEveryValueIsZero()
+    {
+        var cut = Context.Render<BarList>(p => p.Add(x => x.Items, [new BarListItem("A", 0), new BarListItem("B", 0)]).Add(x => x.AllZeroText, "Nothing logged").Add(x => x.TestId, "list"));
+
+        Assert.Multiple(() =>
+        {
+            var text = cut.Find("[data-testid=list-all-zero]");
+            Assert.That(text.TextContent, Is.EqualTo("Nothing logged"));
+            Assert.That(text.ClassList, Is.EquivalentTo(Context.Render<BarList>(p => p.Add(x => x.TestId, "e")).Find("[data-testid=e-empty]").ClassList));
+            Assert.That(cut.FindAll("li, .fill"), Is.Empty);
+        });
+    }
+
+    [Test]
+    public void AllZeroText_WithOneNonZeroValue_ShowsTheBars()
+    {
+        var cut = Context.Render<BarList>(p => p.Add(x => x.Items, [new BarListItem("A", 0), new BarListItem("B", 1)]).Add(x => x.AllZeroText, "Nothing logged").Add(x => x.TestId, "list"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.FindAll("li"), Has.Count.EqualTo(2));
+            Assert.That(cut.FindAll("[data-testid=list-all-zero]"), Is.Empty);
+        });
+    }
+
+    [Test]
+    public void AllZeroText_WithNoRows_ShowsTheEmptyTextInstead()
+    {
+        var cut = Context.Render<BarList>(p => p.Add(x => x.AllZeroText, "Nothing logged").Add(x => x.EmptyText, "No items").Add(x => x.TestId, "list"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find("[data-testid=list-empty]").TextContent, Is.EqualTo("No items"));
+            Assert.That(cut.FindAll("[data-testid=list-all-zero]"), Is.Empty);
+        });
+    }
+
+    [Test]
+    public void WithoutAllZeroText_AnAllZeroListShowsItsRows()
+    {
+        var cut = Render([new("A", 0), new("B", 0)]);
+
+        Assert.That(cut.FindAll("li"), Has.Count.EqualTo(2));
+    }
 }

@@ -14,6 +14,7 @@
 }
 
 .name {
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -23,13 +24,16 @@
     color: var(--color-text-muted);
     font-weight: var(--font-weight-bold);
     white-space: nowrap;
+    max-width: var(--bar-list-value-max-width);
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .track {
     grid-column: 1 / -1;
     height: var(--bar-list-bar-height);
     border-radius: var(--radius-sm);
-    background-color: var(--color-border);
+    background-color: var(--color-ring-track);
     overflow: hidden;
 }
 

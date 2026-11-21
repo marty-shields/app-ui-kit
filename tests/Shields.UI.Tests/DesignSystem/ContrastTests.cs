@@ -49,7 +49,6 @@ public class ContrastTests
         ("--color-data-4", "--color-surface", LargeTextOrControl),
         ("--color-data-5", "--color-bg", LargeTextOrControl),
         ("--color-data-5", "--color-surface", LargeTextOrControl),
-        ("--color-accent", "--color-border", LargeTextOrControl),
     ];
 
     private static IEnumerable<TestCaseData> Cases() =>

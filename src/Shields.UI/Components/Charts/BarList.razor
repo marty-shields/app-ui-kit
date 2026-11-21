@@ -1,10 +1,11 @@
 @using System.Globalization
 @if (Items.Count == 0)
 {
-    <p class="none" data-testid="@Id("empty")">@EmptyText</p>
+    <p class="none" data-wrap-ok data-testid="@Id("empty")">@EmptyText</p>
 }
 else
 {
+    var full = FullBar();
     <ul class="list" aria-label="@Label" data-testid="@TestId">
         @for (var i = 0; i < Items.Count; i++)
         {
@@ -12,14 +13,14 @@ else
             <li class="row" data-testid="@Id($"row-{i}")">
                 <span class="name" data-testid="@Id($"label-{i}")">@item.Label</span>
                 <span class="value" data-testid="@Id($"value-{i}")">@(item.ValueText ?? Number(item.Value))</span>
-                <span class="track" aria-hidden="true"><span class="fill" style="--fill: @Share(item)" data-testid="@Id($"bar-{i}")"></span></span>
+                <span class="track" aria-hidden="true"><span class="fill" style="--fill: @Share(item, full)" data-testid="@Id($"bar-{i}")"></span></span>
             </li>
         }
     </ul>
 }
 
 @code {
-    /// <summary>The rows, in the order shown.</summary>
+    /// <summary>The rows, in the order shown. The list is meant to sit on a card (<c>--color-surface</c>): the bar track keeps 3:1 against that surface, not against the page.</summary>
     [Parameter]
     public IReadOnlyList<BarListItem> Items { get; set; } = [];
 
@@ -41,14 +42,15 @@ else
 
     private static double Counted(double value) => double.IsFinite(value) ? Math.Max(value, 0) : 0;
 
+    private double FullBar() => Max is > 0 && double.IsFinite(Max.Value) ? Max.Value : Items.Max(i => Counted(i.Value));
+
     /// <summary>Share of the track the bar fills, 0 to 1.</summary>
-    private string Share(BarListItem item)
+    private static string Share(BarListItem item, double full)
     {
-        var full = Max is > 0 && double.IsFinite(Max.Value) ? Max.Value : Items.Max(i => Counted(i.Value));
         return (full > 0 ? Math.Clamp(Counted(item.Value) / full, 0, 1) : 0).ToString("0.####", CultureInfo.InvariantCulture);
     }
 
     private string? Id(string part) => TestId is null ? null : $"{TestId}-{part}";
 
-    private static string Number(double value) => Math.Round(Counted(value), MidpointRounding.AwayFromZero).ToString("N0", CultureInfo.InvariantCulture);
+    private static string Number(double value) => (Math.Round(double.IsFinite(value) ? value : 0, MidpointRounding.AwayFromZero) + 0.0).ToString("N0", CultureInfo.InvariantCulture);
 }

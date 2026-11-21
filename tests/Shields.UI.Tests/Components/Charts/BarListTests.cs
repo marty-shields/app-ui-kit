@@ -74,7 +74,7 @@ public class BarListTests : ComponentTestBase
     }
 
     [Test]
-    public void Render_NegativeAndNonFiniteValues_CountAsZero()
+    public void Render_NegativeAndNonFiniteValues_FillNoBar()
     {
         var cut = Render([new("A", -5), new("B", double.NaN), new("C", double.PositiveInfinity), new("D", 10)]);
 
@@ -82,7 +82,7 @@ public class BarListTests : ComponentTestBase
         {
             Assert.That(cut.FindAll(".fill").Take(3).Select(f => f.GetAttribute("style")), Has.All.EqualTo("--fill: 0"));
             Assert.That(Style(cut, 3), Is.EqualTo("--fill: 1"));
-            Assert.That(cut.Find("[data-testid=list-value-0]").TextContent, Is.EqualTo("0"));
+            Assert.That(cut.Find("[data-testid=list-value-0]").TextContent, Is.EqualTo("-5"));
             Assert.That(cut.Find("[data-testid=list-value-1]").TextContent, Is.EqualTo("0"));
             Assert.That(cut.Find("[data-testid=list-value-2]").TextContent, Is.EqualTo("0"));
         });

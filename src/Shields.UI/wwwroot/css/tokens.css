@@ -122,6 +122,7 @@
 
     /* BarList: the bar and its track; the accent fill keeps 3:1 against the track and the card surface. */
     --bar-list-bar-height: 0.75rem;
+    --bar-list-value-max-width: 50%;
 }
 
 /* Forces a theme on an element and its children. */

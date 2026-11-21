@@ -1,4 +1,5 @@
 @using Microsoft.AspNetCore.Components.Web
+@using Microsoft.JSInterop
 @using Shields.UI.Components.Actions
 @using Shields.UI.Components.Layout
 
@@ -12,6 +13,8 @@
            autocomplete="off"
            enterkeyhint="search"
            data-testid="@TestId"
+           @key="generation"
+           @ref="input"
            @oninput="OnInput"
            @onkeydown="OnKeyDown" />
     @if (Trailing is not null)
@@ -22,6 +25,19 @@
 </div>
 
 @code {
+    private int generation;
+    private bool inputSettled;
+    private const int MaxStaleChecks = 10;
+    private bool restoreFocus;
+    private int staleChecks;
+    private string? staleInputId;
+    private string? previousValue;
+    private string typed = "";
+    private ElementReference input;
+
+    // Seam for tests: the browser hands out the new reference late, which bUnit does not do.
+    internal virtual ElementReference CurrentInput => input;
+
     /// <summary>The text.</summary>
     [Parameter]
     public string? Value { get; set; }
@@ -30,7 +46,7 @@
     [Parameter]
     public EventCallback<string> ValueChanged { get; set; }
 
-    /// <summary>Raised when Enter is pressed in the field, the search key of a phone's keyboard.</summary>
+    /// <summary>Raised when Enter is pressed in the field, the search key of a phone's keyboard. The key press is not cancelled, so inside a form Enter also submits the form.</summary>
     [Parameter]
     public EventCallback OnEnter { get; set; }
 
@@ -50,7 +66,68 @@
     [Parameter]
     public string? TestId { get; set; }
 
-    private Task OnInput(ChangeEventArgs e) => ValueChanged.InvokeAsync(e.Value?.ToString() ?? "");
+    private async Task OnInput(ChangeEventArgs e)
+    {
+        typed = e.Value?.ToString() ?? "";
+        previousValue = Value;
+        try
+        {
+            await ValueChanged.InvokeAsync(typed);
+        }
+        finally
+        {
+            inputSettled = true;
+        }
+    }
+
+    /// <summary>Redraws the input when the parent put the text back to what it was before the keystroke, so the browser drops the typed text, and puts focus back on it.</summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (restoreFocus)
+        {
+            // The reference only points at the new input once the browser has drawn it.
+            var current = CurrentInput;
+            if (current.Id != staleInputId)
+            {
+                restoreFocus = false;
+                try
+                {
+                    await current.FocusAsync();
+                }
+                catch (JSDisconnectedException)
+                {
+                    // The page is gone, and the input with it.
+                }
+            }
+            else if (++staleChecks <= MaxStaleChecks)
+            {
+                // Nothing else may render, so ask for another render to look again, a few times at most.
+                await Task.Yield();
+                StateHasChanged();
+            }
+            else
+            {
+                restoreFocus = false;
+            }
+
+            return;
+        }
+
+        if (!inputSettled)
+        {
+            return;
+        }
+
+        inputSettled = false;
+        if (Value == previousValue && typed != (Value ?? ""))
+        {
+            staleInputId = CurrentInput.Id;
+            generation++;
+            restoreFocus = true;
+            staleChecks = 0;
+            StateHasChanged();
+        }
+    }
 
     private Task OnKeyDown(KeyboardEventArgs e) => e.Key == "Enter" ? OnEnter.InvokeAsync() : Task.CompletedTask;
 }

@@ -53,7 +53,7 @@
 <p>Text in one of the kit's looks, so a screen sets only layout. <code>Variant</code> (<code>TextVariant</code>): <code>Body</code> (default), <code>Label</code> (muted, small, bold, upper case, <code>--letter-spacing-label</code>), <code>Muted</code>, <code>MutedSmall</code>, <code>Strong</code> (bold, normal text colour, also inside muted text), <code>Figure</code> (<code>--font-size-xl</code>, bold) and <code>Error</code> (<code>--color-error</code>). Every variant reads at 4.5:1 on the page and on cards in both themes.</p>
 <ul>
     <li><code>As</code> (<code>TextElement</code>): the element, <code>Span</code> by default; <code>P</code>, <code>Div</code> and <code>H2</code> to <code>H6</code> let a label be a heading of the right level.</li>
-    <li>Other attributes (an <code>id</code>, a <code>class</code> for layout) go on the element; a <code>class</code> is added to the component's own.</li>
+    <li>Other attributes (an <code>id</code>, a <code>class</code>) go on the element; a <code>class</code> is added to the component's own. A class from the caller's scoped CSS does not match the element, so use <code>::deep</code> or a global class.</li>
     <li><code>data-testid</code>: <code>TestId</code>.</li>
 </ul>
 

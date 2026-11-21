@@ -1,5 +1,4 @@
 .divider {
-    flex-shrink: 0;
     background-color: var(--color-border);
 }
 
@@ -9,6 +8,7 @@
 }
 
 .vertical {
+    flex-shrink: 0;
     align-self: stretch;
     width: var(--border-width);
 }

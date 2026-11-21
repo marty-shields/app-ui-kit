@@ -104,4 +104,22 @@ public class TextTests : ComponentTestBase
             Assert.That(TouchTargetCheck.Declarations(css, ".strong"), Has.Member("color: var(--color-text)").And.Member("font-weight: var(--font-weight-bold)"));
         });
     }
+
+    [Test]
+    public void Css_ErrorLabelAndFigureHaveTheirLooks()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Layout", "Text.razor.css");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(TouchTargetCheck.Declarations(css, ".error"), Has.Member("color: var(--color-error)"));
+            Assert.That(
+                TouchTargetCheck.Declarations(css, ".label"),
+                Has.Member("font-size: var(--font-size-sm)")
+                    .And.Member("font-weight: var(--font-weight-bold)")
+                    .And.Member("text-transform: uppercase")
+                    .And.Member("letter-spacing: var(--letter-spacing-label)"));
+            Assert.That(TouchTargetCheck.Declarations(css, ".figure"), Has.Member("font-size: var(--font-size-xl)").And.Member("font-weight: var(--font-weight-bold)"));
+        });
+    }
 }

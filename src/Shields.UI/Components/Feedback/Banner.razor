@@ -13,5 +13,9 @@
     [Parameter]
     public string? TestId { get; set; }
 
-    private string ToneClass => Tone.ToString().ToLowerInvariant();
+    private string ToneClass => Tone switch
+    {
+        BannerTone.Selected => "selected",
+        _ => "selected",
+    };
 }

@@ -61,7 +61,8 @@ public class DividerTests : ComponentTestBase
 
         Assert.Multiple(() =>
         {
-            Assert.That(TouchTargetCheck.Declarations(css, ".vertical"), Has.Member("align-self: stretch"));
+            Assert.That(TouchTargetCheck.Declarations(css, ".vertical"), Has.Member("align-self: stretch").And.Member("flex-shrink: 0"));
+            Assert.That(TouchTargetCheck.Declarations(css, ".horizontal"), Has.No.Member("flex-shrink: 0"));
             Assert.That(TouchTargetCheck.Declarations(css, ".divider"), Has.Member("background-color: var(--color-border)"));
         });
     }

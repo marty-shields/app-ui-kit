@@ -103,4 +103,62 @@ public class SearchFieldTests : ComponentTestBase
 
         Assert.That(cut.FindAll(".divider-slot,.trailing"), Is.Empty);
     }
+
+    [Test]
+    public void Input_SitsInsideTheInputBoxSoItsFocusOutlineShows()
+    {
+        var cut = Context.Render<SearchField>(p => p.Add(x => x.AriaLabel, "Search"));
+
+        Assert.That(cut.Find("input").ParentElement!.ClassList, Does.Contain("input-box"));
+    }
+
+    [Test]
+    public void TypingTheParentPutsBack_RedrawsSoTheTypedTextGoes()
+    {
+        var cut = Context.Render<SearchField>(p => p
+            .Add(x => x.AriaLabel, "Search")
+            .Add(x => x.Value, "abc")
+            .Add(x => x.ValueChanged, (string _) => { }));
+        var renders = cut.RenderCount;
+
+        cut.Find("input").Input("abcd");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.RenderCount - renders, Is.EqualTo(2));
+            Assert.That(cut.Find("input").GetAttribute("value"), Is.EqualTo("abc"));
+        });
+    }
+
+    [Test]
+    public async Task TypingTheParentPutsBack_FocusesTheInputOnce()
+    {
+        Context.JSInterop.Mode = JSRuntimeMode.Loose;
+        var cut = Context.Render<SearchField>(p => p
+            .Add(x => x.AriaLabel, "Search")
+            .Add(x => x.Value, "abc")
+            .Add(x => x.ValueChanged, (string _) => { }));
+
+        await cut.Find("input").InputAsync("abcd");
+        cut.WaitForState(() => FocusCalls() == 1);
+        await WaitForRendererAsync();
+
+        Assert.That(FocusCalls(), Is.EqualTo(1));
+    }
+
+    [Test]
+    public void TypingTheParentTakes_KeepsTheTypedText()
+    {
+        IRenderedComponent<SearchField> cut = null!;
+        cut = Context.Render<SearchField>(p => p
+            .Add(x => x.AriaLabel, "Search")
+            .Add(x => x.Value, "abc")
+            .Add(x => x.ValueChanged, v => cut.Render(q => q.Add(x => x.Value, v))));
+
+        cut.Find("input").Input("abcd");
+
+        Assert.That(cut.Find("input").GetAttribute("value"), Is.EqualTo("abcd"));
+    }
+
+    private int FocusCalls() => Context.JSInterop.Invocations.Count(i => i.Identifier == "Blazor._internal.domWrapper.focus");
 }

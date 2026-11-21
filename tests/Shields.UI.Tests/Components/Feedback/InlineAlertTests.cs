@@ -45,7 +45,7 @@ public class InlineAlertTests : ComponentTestBase
     [Test]
     public void Tone_Error_IsTheDefaultAndPutsItsClassOnTheBox()
     {
-        var cut = Context.Render<InlineAlert>(p => p.Add(x => x.Tone, AlertTone.Error));
+        var cut = Context.Render<InlineAlert>(p => p.Add(x => x.Message, "x"));
 
         Assert.That(cut.Find("[role=alert]").ClassList, Does.Contain("error"));
     }
@@ -64,5 +64,25 @@ public class InlineAlertTests : ComponentTestBase
         var cut = Context.Render<InlineAlert>(p => p.Add(x => x.Message, "<img src=x onerror=alert(1)>"));
 
         Assert.That(cut.FindAll("img"), Is.Empty);
+    }
+
+    [Test]
+    public void Render_WithNoMessageAndNoContent_RendersNothing()
+    {
+        var cut = Context.Render<InlineAlert>();
+
+        Assert.That(cut.FindAll("[role=alert]"), Is.Empty);
+    }
+
+    [Test]
+    public void Css_HasTheSurfaceBackgroundAndTheErrorBorderAndText()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Feedback", "InlineAlert.razor.css");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(TouchTargetCheck.Declarations(css, ".alert"), Has.Member("background-color: var(--color-surface)"));
+            Assert.That(TouchTargetCheck.Declarations(css, ".error"), Has.Member("border-color: var(--color-error)").And.Member("color: var(--color-error)"));
+        });
     }
 }

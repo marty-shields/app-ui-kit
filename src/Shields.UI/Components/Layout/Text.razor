@@ -43,7 +43,7 @@
     [Parameter]
     public string? TestId { get; set; }
 
-    /// <summary>Other attributes, written to the element. A <c>class</c> is added to the component's own; <c>data-testid</c> is set by <see cref="TestId"/>.</summary>
+    /// <summary>Other attributes, written to the element. A <c>class</c> is added to the component's own; <c>data-testid</c> is set by <see cref="TestId"/>. A class from the caller's scoped CSS does not match, as the element is the component's: use <c>::deep</c> or a global class.</summary>
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object>? AdditionalAttributes { get; set; }
 

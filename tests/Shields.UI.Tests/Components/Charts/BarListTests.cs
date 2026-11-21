@@ -312,6 +312,14 @@ public class BarListTests : ComponentTestBase
     }
 
     [Test]
+    public void AllZeroText_ShowsWhenEveryValueCountsAsZero()
+    {
+        var cut = Context.Render<BarList>(p => p.Add(x => x.Items, [new BarListItem("A", 0), new BarListItem("B", double.NaN), new BarListItem("C", -3)]).Add(x => x.AllZeroText, "Nothing logged").Add(x => x.TestId, "list"));
+
+        Assert.That(cut.Find("[data-testid=list-all-zero]").TextContent, Is.EqualTo("Nothing logged"));
+    }
+
+    [Test]
     public void AllZeroText_WithOneNonZeroValue_ShowsTheBars()
     {
         var cut = Context.Render<BarList>(p => p.Add(x => x.Items, [new BarListItem("A", 0), new BarListItem("B", 1)]).Add(x => x.AllZeroText, "Nothing logged").Add(x => x.TestId, "list"));

@@ -4,26 +4,27 @@
 {
     <p class="none" data-wrap-ok data-testid="@Id("empty")">@EmptyText</p>
 }
-else if (AllZeroText is not null && Items.All(i => i.Value == 0))
+else if (AllZeroText is not null && Items.All(i => Counted(i.Value) == 0))
 {
     <p class="none" data-wrap-ok data-testid="@Id("all-zero")">@AllZeroText</p>
 }
 else
 {
     var full = FullBar();
+    var slugs = TestIdBy == BarListTestIdBy.Slug ? Slugs(Items) : null;
     <ul class="list @(Inline ? "inline" : null) @(OnSelect.HasDelegate ? "selectable" : null) @LabelClass @ValueClass" aria-label="@Label" data-testid="@TestId">
         @for (var i = 0; i < Items.Count; i++)
         {
             var item = Items[i];
             var index = i;
-            <li class="item" data-testid="@Id($"row-{Key(i)}")">
+            <li class="item" data-testid="@Id($"row-{Key(i, slugs)}")">
                 @if (OnSelect.HasDelegate && item.Selectable)
                 {
-                    <button type="button" class="tap row" data-testid="@Id($"select-{Key(i)}")" @onclick="() => OnSelect.InvokeAsync(index)">@Cells(item, index, full)</button>
+                    <button type="button" class="tap row" data-testid="@Id($"select-{Key(i, slugs)}")" @onclick="() => OnSelect.InvokeAsync(index)">@Cells(item, index, full, slugs)</button>
                 }
                 else
                 {
-                    <div class="row">@Cells(item, index, full)</div>
+                    <div class="row">@Cells(item, index, full, slugs)</div>
                 }
             </li>
         }
@@ -47,7 +48,7 @@ else
     [Parameter]
     public string EmptyText { get; set; } = "Nothing yet";
 
-    /// <summary>Shown instead of the bars when there are rows and every value is zero. Null shows the rows with empty bars. Looks like <see cref="EmptyText"/>.</summary>
+    /// <summary>Shown instead of the bars when there are rows and every value counts as zero (zero, negative or non-finite). Null shows the rows with empty bars. Looks like <see cref="EmptyText"/>.</summary>
     [Parameter]
     public string? AllZeroText { get; set; }
 
@@ -71,7 +72,7 @@ else
     [Parameter]
     public EventCallback<int> OnSelect { get; set; }
 
-    /// <summary>What the per-row test ids carry: the row's position (the default) or its label slug, which stays the same when rows are added or reordered.</summary>
+    /// <summary>What the per-row test ids carry: the row's position (the default) or its label slug, which stays the same when rows are added or reordered if the labels are unique. Repeated labels are numbered -2, -3 in list order.</summary>
     [Parameter]
     public BarListTestIdBy TestIdBy { get; set; }
 
@@ -82,11 +83,7 @@ else
     [Parameter]
     public string? TestId { get; set; }
 
-    private string[] slugs = [];
-
-    protected override void OnParametersSet() => slugs = TestIdBy == BarListTestIdBy.Slug ? Slugs(Items) : [];
-
-    private string Key(int index) => TestIdBy == BarListTestIdBy.Slug ? slugs[index] : index.ToString(CultureInfo.InvariantCulture);
+    private string Key(int index, string[]? slugs) => slugs is null ? index.ToString(CultureInfo.InvariantCulture) : slugs[index];
 
     private static string[] Slugs(IReadOnlyList<BarListItem> items)
     {
@@ -126,11 +123,11 @@ else
         return slug.ToString().TrimEnd('-') is { Length: > 0 } text ? text : "item";
     }
 
-    private RenderFragment Cells(BarListItem item, int index, double full) =>
+    private RenderFragment Cells(BarListItem item, int index, double full, string[]? slugs) =>
         @<text>
-            <span class="name" data-testid="@Id($"label-{Key(index)}")">@item.Label</span>
-            <span class="value" data-testid="@Id($"value-{Key(index)}")">@(item.ValueText ?? Number(item.Value))@if (Unit is not null) {<span class="visually-hidden">@($" {Unit}")</span>}</span>
-            <span class="track" aria-hidden="true"><span class="fill" style="--fill: @Share(item, full)" data-testid="@Id($"bar-{Key(index)}")"></span></span>
+            <span class="name" data-testid="@Id($"label-{Key(index, slugs)}")">@item.Label</span>
+            <span class="value" data-testid="@Id($"value-{Key(index, slugs)}")">@(item.ValueText ?? Number(item.Value))@if (Unit is not null) {<span class="visually-hidden">@($" {Unit}")</span>}</span>
+            <span class="track" aria-hidden="true"><span class="fill" style="--fill: @Share(item, full)" data-testid="@Id($"bar-{Key(index, slugs)}")"></span></span>
         </text>;
 
     private string? LabelClass => LabelWidth switch { BarListLabelWidth.Wide => "label-wide", BarListLabelWidth.Narrow => "label-narrow", _ => null };

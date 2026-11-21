@@ -159,9 +159,32 @@ public class CardTests : ComponentTestBase
 
         Assert.Multiple(() =>
         {
-            Assert.That(cut.Find(".card").TagName, Is.EqualTo("SECTION"));
+            Assert.That(cut.Find(".card").TagName, Is.EqualTo("DIV"));
             Assert.That(cut.FindAll("h2"), Is.Empty);
             Assert.That(cut.Find(".header [data-testid=card-actions] button").TextContent, Is.EqualTo("Edit"));
+        });
+    }
+
+    [Test]
+    public void HeaderActions_WithoutATitle_AreAPlainCardNotASection()
+    {
+        var cut = Context.Render<Card>(p => p.Add(x => x.HeaderActions, "<button>Edit</button>"));
+
+        Assert.That(cut.FindAll("section"), Is.Empty);
+    }
+
+    [Test]
+    public void Aside_WithoutATitle_IsNotShown()
+    {
+        var cut = Context.Render<Card>(p => p
+            .Add(x => x.HeaderActions, "<button>Edit</button>")
+            .Add(x => x.Aside, "ignored")
+            .Add(x => x.TestId, "card"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.FindAll("[data-testid=card-aside]"), Is.Empty);
+            Assert.That(cut.FindAll(".aside"), Is.Empty);
         });
     }
 

@@ -858,4 +858,48 @@ public class TrendBarChartTests : ComponentTestBase
 
         Assert.That(TickValues(cut), Is.EqualTo(new[] { 0d, 500, 1000, 1500, 2000 }));
     }
+
+    private IRenderedComponent<TrendBarChart> RenderMaxTarget(double target, double max, TrendBarStyle style) =>
+        Context.Render<TrendBarChart>(p => p.Add(x => x.Bars, [Bar(0, 1000)]).Add(x => x.Target, target).Add(x => x.Max, max).Add(x => x.Style, style).Add(x => x.TestId, "chart"));
+
+    [TestCase(TrendBarStyle.Status)]
+    [TestCase(TrendBarStyle.PastAndCurrent)]
+    public void Max_BelowTheTarget_DrawsNoTargetLineAndNoBandEdge(TrendBarStyle style)
+    {
+        var cut = RenderMaxTarget(2000, 1500, style);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.FindAll("[data-testid=chart-target]"), Is.Empty);
+            Assert.That(cut.FindAll("[data-testid=chart-band-top]"), Is.Empty);
+            Assert.That(cut.FindAll("[data-testid=chart-band-bottom]"), Is.Empty);
+        });
+    }
+
+    [Test]
+    public void Max_BelowTheBandTop_KeepsTheTargetLineAndLowerEdgeOnly()
+    {
+        var cut = RenderMaxTarget(1400, 1500, TrendBarStyle.Status);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.FindAll("[data-testid=chart-target]"), Has.Count.EqualTo(1));
+            Assert.That(cut.FindAll("[data-testid=chart-band-bottom]"), Has.Count.EqualTo(1));
+            Assert.That(cut.FindAll("[data-testid=chart-band-top]"), Is.Empty);
+        });
+    }
+
+    [TestCase(TrendBarStyle.Status)]
+    [TestCase(TrendBarStyle.PastAndCurrent)]
+    public void Max_HugeButFinite_KeepsTicksAndHeightsFinite(TrendBarStyle style)
+    {
+        var cut = RenderMax([Bar(0, 1000)], 1e300, style);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(TickValues(cut), Is.All.Matches<double>(double.IsFinite));
+            Assert.That(TickValues(cut).Max(), Is.LessThanOrEqualTo(2e16));
+            Assert.That(Height(cut, 0), Is.Not.NaN.And.GreaterThanOrEqualTo(0));
+        });
+    }
 }

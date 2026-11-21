@@ -19,7 +19,7 @@ public static class KitNames
     public static IReadOnlySet<string> Types { get; } = new HashSet<string>
     {
         "AppLifecycle", "AppLifecycleBridge", "BackButton", "BackButtonBridge", "BottomNavItem",
-        "ButtonVariant", "ChangeDirection", "DayLabel", "IAppLifecycle", "IAppStart", "IBackButton", "IconButtonStyle",
+        "ButtonVariant", "ChangeDirection", "DataSeries", "DataSeriesExtensions", "DayLabel", "IAppLifecycle", "IAppStart", "IBackButton", "IconButtonStyle",
         "IconName", "IconSize", "IconTone", "LegendItem", "LegendSwatch", "PeriodKind", "RadioOption",
         "ShieldsUiServiceCollectionExtensions", "SnackbarMessage", "SnackbarService", "StatChange",
         "SystemBarInsetWriter", "ThemePreference", "ThemeService"

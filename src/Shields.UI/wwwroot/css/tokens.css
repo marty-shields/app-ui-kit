@@ -77,6 +77,8 @@
     --focus-width: 2px;
     --focus-offset: 2px;
     --opacity-disabled: 0.5;
+    /* Thin: a mark that stays visible but steps back, such as a secondary line or an earlier period's bar. */
+    --opacity-thin: 0.55;
     --spinner-size: 40px;
     --spinner-width: 4px;
     --spinner-size-small: 1.125rem;
@@ -103,6 +105,19 @@
     --ring-size-compact: 6rem;
     --ring-width-compact: 0.625rem;
     --snackbar-gap-bottom: var(--space-2);
+
+    /* Chart dash: the dash and gap of a dashed chart line (stroke-dasharray), 6px then 4px. */
+    --chart-dash: calc(var(--space-1) * 1.5) var(--space-1);
+
+    /* Data palette: categorical series colours for charts and stacked bars. Use them in order, 1 to n, so a chart reads the same
+       everywhere. Teal, amber, violet, rose and olive step around the hue wheel at matched lightness, so neighbouring series differ
+       by hue rather than by shade; none is the red of --color-error or the green of --color-success, so a series never reads as a
+       status. Each is at least 3:1 on the page and cards in both themes, and neighbours are at least 0.12 apart in OKLab. */
+    --color-data-1: light-dark(#2f7f86, #7fc4cc);
+    --color-data-2: light-dark(#a35c00, #e0a860);
+    --color-data-3: light-dark(#7a5aa6, #b4a2f2);
+    --color-data-4: light-dark(#a8346f, #f28cb8);
+    --color-data-5: light-dark(#5b7a14, #b5d06a);
 }
 
 /* Forces a theme on an element and its children. */

@@ -27,6 +27,7 @@ public class KitTokensTests
         "--dialog-max-width", "--add-button-size", "--add-button-lift", "--legend-swatch-size",
         "--color-ring-track", "--font-size-xs", "--ring-size", "--ring-width", "--ring-size-compact", "--ring-width-compact",
         "--color-chart-band", "--snackbar-gap-bottom",
+        "--opacity-thin", "--chart-dash", "--color-data-1", "--color-data-2", "--color-data-3", "--color-data-4", "--color-data-5",
     ];
 
     // Calorie Tracker's macro, target band, share bar and sheet tokens; Workout Log's bar-past, set, calendar and meter
@@ -55,6 +56,8 @@ public class KitTokensTests
             Assert.That(DesignTokens.Value("--legend-swatch-size"), Is.EqualTo("0.75rem"));
             Assert.That(DesignTokens.Value("--color-chart-band"), Is.EqualTo("light-dark(#3f7fa6, #7fb8de)"));
             Assert.That(DesignTokens.Value("--snackbar-gap-bottom"), Is.EqualTo("var(--space-2)"));
+            Assert.That(DesignTokens.Value("--opacity-thin"), Is.EqualTo("0.55"));
+            Assert.That(DesignTokens.Value("--chart-dash"), Is.EqualTo("calc(var(--space-1) * 1.5) var(--space-1)"));
         });
     }
 

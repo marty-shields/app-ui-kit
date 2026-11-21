@@ -150,6 +150,12 @@
     --stacked-bar-segment-min-width: 0.25rem;
     /* AppScreen: extra room under the content when the bottom navigation bar's raised button overlaps its foot. */
     --app-screen-nav-clearance: 0.75rem;
+    /* StatTile compact: the tile's padding and value size, so a row of small tiles stays short. */
+    --stat-tile-compact-padding: var(--space-3) var(--space-2);
+    --stat-tile-compact-value-size: var(--font-size-md);
+    /* Card compact: no bottom padding, because the rows it holds carry their own, and a short gap under the title. */
+    --card-compact-padding: var(--space-4) var(--space-4) 0;
+    --card-compact-title-gap: var(--space-2);
 }
 
 /* Forces a theme on an element and its children. */

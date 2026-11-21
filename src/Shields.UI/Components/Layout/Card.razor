@@ -1,6 +1,6 @@
 @if (Title is not null)
 {
-    <section class="card" data-testid="@TestId">
+    <section class="card @(Compact ? "compact" : null)" data-testid="@TestId">
         <div class="header">
             <h2 class="title" data-wrap-ok>@Title</h2>
             @if (Aside is not null)
@@ -13,7 +13,7 @@
 }
 else
 {
-    <div class="card" data-testid="@TestId">
+    <div class="card @(Compact ? "compact" : null)" data-testid="@TestId">
         @ChildContent
     </div>
 }
@@ -30,6 +30,10 @@ else
     /// <summary>What the card holds.</summary>
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>Tightens the card: no padding under the content (the rows it holds supply their own) and a smaller gap under the title.</summary>
+    [Parameter]
+    public bool Compact { get; set; }
 
     /// <summary>Value of the data-testid attribute, and <c>{TestId}-aside</c> on the aside.</summary>
     [Parameter]

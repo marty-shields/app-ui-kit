@@ -1,4 +1,4 @@
-<div class="tile" data-testid="@TestId">
+<div class="tile @(Compact ? "compact" : null)" data-testid="@TestId">
     <span class="label" data-wrap-ok data-testid="@Id("label")">@Label</span>
     <span class="value" data-wrap-ok data-testid="@Id("value")">@(NotEnoughData ? "–" : Value)</span>
     @if (Change is not null && !NotEnoughData)
@@ -51,6 +51,10 @@
     /// <summary>The text shown under the dash when <see cref="NotEnoughData"/> is set.</summary>
     [Parameter]
     public string NotEnoughDataNote { get; set; } = "Not enough data yet";
+
+    /// <summary>Shrinks the tile for a row of small tiles: less padding, a smaller value that stays on one line, and a muted change line.</summary>
+    [Parameter]
+    public bool Compact { get; set; }
 
     /// <summary>Value of the data-testid attribute, and the prefix of <c>-label</c>, <c>-value</c>, <c>-change</c>, <c>-caption</c> and <c>-note</c>. None are rendered when unset.</summary>
     [Parameter]

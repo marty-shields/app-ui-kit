@@ -22,6 +22,34 @@ public class CardTests : ComponentTestBase
         });
     }
 
+    [TestCase("Records", "section")]
+    [TestCase(null, "div")]
+    public void Compact_AddsTheCompactClass_WithAndWithoutATitle(string? title, string tag)
+    {
+        var compact = Context.Render<Card>(p => p.Add(x => x.Title, title).Add(x => x.Compact, true));
+        var normal = Context.Render<Card>(p => p.Add(x => x.Title, title));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(compact.Find(tag + ".card").ClassList, Does.Contain("compact"));
+            Assert.That(normal.Find(tag + ".card").ClassList, Does.Not.Contain("compact"));
+        });
+    }
+
+    [Test]
+    public void Css_Compact_UsesTheCompactTokens()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Layout", "Card.razor.css");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(css, Does.Contain("padding: var(--card-compact-padding);"));
+            Assert.That(css, Does.Contain("margin-bottom: var(--card-compact-title-gap);"));
+            Assert.That(KitCss.Tokens, Does.Contain("--card-compact-padding: var(--space-4) var(--space-4) 0;"));
+            Assert.That(KitCss.Tokens, Does.Contain("--card-compact-title-gap: var(--space-2);"));
+        });
+    }
+
     [Test]
     public void WithoutAnAside_ShowsNone()
     {

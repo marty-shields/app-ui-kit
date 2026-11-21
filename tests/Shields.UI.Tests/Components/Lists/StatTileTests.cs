@@ -22,6 +22,34 @@ public class StatTileTests : ComponentTestBase
     }
 
     [Test]
+    public void Compact_AddsTheCompactClass_AndIsOffByDefault()
+    {
+        var compact = Context.Render<StatTile>(p => p.Add(x => x.Label, "Time").Add(x => x.Value, "3").Add(x => x.Compact, true));
+        var normal = Context.Render<StatTile>(p => p.Add(x => x.Label, "Time").Add(x => x.Value, "3"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(compact.Find(".tile").ClassList, Does.Contain("compact"));
+            Assert.That(normal.Find(".tile").ClassList, Does.Not.Contain("compact"));
+        });
+    }
+
+    [Test]
+    public void Css_Compact_UsesTheCompactTokensAndKeepsTheValueOnOneLine()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Lists", "StatTile.razor.css");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(css, Does.Contain("padding: var(--stat-tile-compact-padding);"));
+            Assert.That(css, Does.Contain("font-size: var(--stat-tile-compact-value-size);"));
+            Assert.That(css, Does.Contain("white-space: nowrap;"));
+            Assert.That(css, Does.Contain(".compact .up,"));
+            Assert.That(KitCss.Tokens, Does.Contain("--stat-tile-compact-value-size: var(--font-size-md);"));
+        });
+    }
+
+    [Test]
     public void Render_ChangeUp_ShowsAnUpArrowAndTheAmount()
     {
         var cut = RenderWithChange(new StatChange(ChangeDirection.Up, "35m"));

@@ -8,6 +8,12 @@
         </Template>
     </Story>
 
+    <Story Name="Compact">
+        <Template>
+            <StatTile Compact Label="Time" Value="3h 20m" Change="@(new StatChange(ChangeDirection.Up, "35m"))" TestId="compact" />
+        </Template>
+    </Story>
+
     <Story Name="Change up">
         <Template>
             <StatTile Label="Time" Value="3h 20m" Change="@(new StatChange(ChangeDirection.Up, "35m"))" TestId="tile" />

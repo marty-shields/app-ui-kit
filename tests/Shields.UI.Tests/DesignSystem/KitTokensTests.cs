@@ -25,14 +25,15 @@ public class KitTokensTests
     [
         "--color-chip", "--color-on-chip", "--color-chip-soft", "--color-on-chip-soft", "--letter-spacing-label",
         "--dialog-max-width", "--add-button-size", "--add-button-lift", "--legend-swatch-size",
+        "--color-ring-track", "--font-size-xs", "--ring-size", "--ring-width", "--ring-size-compact", "--ring-width-compact",
     ];
 
-    // Calorie Tracker's ring, macro, target band, share bar and sheet tokens; Workout Log's bar-past, set, calendar and meter
-    // tokens; and the old name of the raised button.
+    // Calorie Tracker's macro, target band, share bar and sheet tokens; Workout Log's bar-past, set, calendar and meter
+    // tokens; the old name of the raised button; and the ring names, of which only the kit's own are allowed.
     private static readonly string[] AppOnlyPrefixes =
     [
-        "--ring-", "--color-ring-", "--color-protein", "--color-carbs", "--color-fat", "--color-target-band",
-        "--share-bar-", "--sheet-", "--color-bar-past", "--set-", "--calendar-", "--meter-", "--nav-new-",
+        "--color-protein", "--color-carbs", "--color-fat", "--color-target-band",
+        "--share-bar-", "--sheet-", "--color-bar-past", "--set-", "--calendar-", "--meter-", "--nav-new-", "--ring-", "--color-ring-",
     ];
 
     [Test]
@@ -57,7 +58,7 @@ public class KitTokensTests
     [Test]
     public void Has_no_app_only_token()
     {
-        var forbidden = DesignTokens.Names.Where(n => AppOnlyPrefixes.Any(n.StartsWith));
+        var forbidden = DesignTokens.Names.Where(n => AppOnlyPrefixes.Any(n.StartsWith) && !KitComponents.Contains(n));
 
         Assert.That(forbidden, Is.Empty);
     }

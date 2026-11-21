@@ -34,6 +34,9 @@ public class ContrastTests
         ("--color-chip", "--color-surface", LargeTextOrControl),
         ("--color-focus", "--color-bg", LargeTextOrControl),
         ("--color-focus", "--color-surface", LargeTextOrControl),
+        ("--color-ring-track", "--color-surface", LargeTextOrControl),
+        ("--color-accent", "--color-ring-track", LargeTextOrControl),
+        ("--color-error", "--color-ring-track", LargeTextOrControl),
     ];
 
     private static IEnumerable<TestCaseData> Cases() =>

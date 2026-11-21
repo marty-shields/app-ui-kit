@@ -1,5 +1,5 @@
 /* Design tokens shared by every app. Most colours are light-dark() pairs and follow the phone's theme.
-   A token only one app uses stays in that app's own file. */
+   The kit ships every token; apps keep none of their own. */
 :root {
     color-scheme: light dark;
 
@@ -77,6 +77,8 @@
     --focus-width: 2px;
     --focus-offset: 2px;
     --opacity-disabled: 0.5;
+    /* Thin: a mark that stays visible but steps back, such as a secondary line or an earlier period's bar. */
+    --opacity-thin: 0.55;
     --spinner-size: 40px;
     --spinner-width: 4px;
     --spinner-size-small: 1.125rem;
@@ -103,6 +105,20 @@
     --ring-size-compact: 6rem;
     --ring-width-compact: 0.625rem;
     --snackbar-gap-bottom: var(--space-2);
+
+    /* Chart dash: the dash and gap of a dashed chart line (stroke-dasharray), 6px then 4px. */
+    --chart-dash: calc(var(--space-1) * 1.5) var(--space-1);
+
+    /* Data palette: categorical series colours for charts and stacked bars. Use them in order, 1 to n, so a chart reads the same
+       everywhere. Indigo, clay, rose, gold and violet are spread around the hue wheel, so series differ by hue rather than by
+       shade. None is close to the red of --color-error, the green of --color-success, the blue of --color-chart-band or the
+       teal of --color-accent, so a series never reads as a status or a band. Each is at least 3:1 on the page and cards in both
+       themes, and every pair is at least 0.12 apart in OKLab, so a legend showing all five stays readable. */
+    --color-data-1: light-dark(#6561cb, #908ffd);
+    --color-data-2: light-dark(#964e2c, #ce9379);
+    --color-data-3: light-dark(#a36094, #da74c5);
+    --color-data-4: light-dark(#96812a, #f0d776);
+    --color-data-5: light-dark(#673692, #d4b4f7);
 }
 
 /* Forces a theme on an element and its children. */

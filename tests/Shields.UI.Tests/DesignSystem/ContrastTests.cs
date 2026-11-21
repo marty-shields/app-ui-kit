@@ -39,6 +39,16 @@ public class ContrastTests
         ("--color-error", "--color-ring-track", LargeTextOrControl),
         ("--color-chart-band", "--color-bg", LargeTextOrControl),
         ("--color-chart-band", "--color-surface", LargeTextOrControl),
+        ("--color-data-1", "--color-bg", LargeTextOrControl),
+        ("--color-data-1", "--color-surface", LargeTextOrControl),
+        ("--color-data-2", "--color-bg", LargeTextOrControl),
+        ("--color-data-2", "--color-surface", LargeTextOrControl),
+        ("--color-data-3", "--color-bg", LargeTextOrControl),
+        ("--color-data-3", "--color-surface", LargeTextOrControl),
+        ("--color-data-4", "--color-bg", LargeTextOrControl),
+        ("--color-data-4", "--color-surface", LargeTextOrControl),
+        ("--color-data-5", "--color-bg", LargeTextOrControl),
+        ("--color-data-5", "--color-surface", LargeTextOrControl),
     ];
 
     private static IEnumerable<TestCaseData> Cases() =>

@@ -19,7 +19,7 @@ Releases and beta packages: [docs/release.md](docs/release.md).
 ## How the code fits
 - Projects: `Shields.UI` (components, tokens, base styles), `Shields.UI.Stories` (the stories shell), `Shields.UI.Stories.Host` (the site), `Shields.UI.Testing` (package of design checks and the kit's tokens for the apps' tests; no test-framework dependency) and `tests/Shields.UI.Tests`.
 - Styling: tokens only, no literal colours or sizes.
-- A component or token that only one app needs does not belong here. It stays in that app's repo.
+- The apps keep no tokens or general components (owner decision 2026-11-21): a general component or token an app needs belongs here. Only screens and app-specific logic stay in the app.
 
 ## Rules
 - Ask about any ambiguity.

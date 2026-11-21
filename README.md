@@ -10,7 +10,7 @@ It will hold what the two apps should always have in common, so a change is made
 - **Design-system tests:** tokens-only CSS, contrast and touch-target checks that the apps reuse.
 - **One stories site** showing the kit and both apps' screens.
 
-Screens and app-only components stay in each app's repo. The apps install the kit as NuGet packages: `Shields.UI`, `Shields.UI.Stories` and `Shields.UI.Testing`.
+Screens stay in each app's repo; the apps keep no tokens or general components of their own. The apps install the kit as NuGet packages: `Shields.UI`, `Shields.UI.Stories` and `Shields.UI.Testing`.
 
 A stories host (its `index.html` and `iframe.html`) must link `_content/Shields.UI.Stories/css/tokens.css` after the kit's `_content/Shields.UI/css/tokens.css`; `index.html` needs it for `blazor-ui.css`, and the phone frame and sheets take their sizes from it. Without it they lose their size.
 

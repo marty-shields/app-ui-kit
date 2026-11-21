@@ -1,0 +1,91 @@
+@attribute [Stories("Components/Charts/MonthCalendar")]
+
+<Stories TComponent="MonthCalendar" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Month in progress">
+        <Template>
+            <div class="card">
+                <MonthCalendar Month="new DateOnly(2026, 11, 1)" Days="Month(2026, 11, Today)" Target="2000" Today="Today" Unit="pts" OnSelect="_ => { }" TestId="calendar" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Finished month starting on Monday">
+        <Template>
+            <div class="card">
+                <MonthCalendar Month="new DateOnly(2026, 6, 1)" Days="Month(2026, 6, new DateOnly(2026, 6, 30))" Target="2000" Today="Today" Unit="pts" OnSelect="_ => { }" TestId="calendar" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="All over">
+        <Template>
+            <div class="card">
+                <MonthCalendar Month="new DateOnly(2026, 11, 1)" Days="AllOver" Target="2000" Today="Today" OnSelect="_ => { }" TestId="calendar" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Nothing recorded">
+        <Template>
+            <div class="card">
+                <MonthCalendar Month="new DateOnly(2026, 11, 1)" Target="2000" Today="Today" OnSelect="_ => { }" TestId="calendar" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Not selectable">
+        <Template>
+            <div class="card">
+                <MonthCalendar Month="new DateOnly(2026, 11, 1)" Days="Month(2026, 11, Today)" Target="2000" Today="Today" TestId="calendar" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <div class="card">
+                    <MonthCalendar Month="new DateOnly(2026, 11, 1)" Days="Month(2026, 11, Today)" Target="2000" Today="Today" />
+                    <ChartLegend Items="Legend" />
+                </div>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <div class="card">
+                    <MonthCalendar Month="new DateOnly(2026, 11, 1)" Days="Month(2026, 11, Today)" Target="2000" Today="Today" />
+                    <ChartLegend Items="Legend" />
+                </div>
+            </div>
+        </Template>
+    </Story>
+
+</Stories>
+
+@code {
+    private static readonly DateOnly Today = new(2026, 11, 18);
+
+    private static readonly IReadOnlyList<LegendItem> Legend =
+    [
+        new(LegendSwatch.Chip, "Under"),
+        new(LegendSwatch.Accent, "On target"),
+        new(LegendSwatch.Error, "Over", "▲"),
+        new(LegendSwatch.Outline, "Not recorded"),
+    ];
+
+    private static readonly double[] Values = [1500, 2000, 2600, 1900, 2150, 900, 2050];
+
+    /// <summary>Every day up to <paramref name="last"/> gets a value, except each fifth day, which is left out.</summary>
+    private static IReadOnlyList<CalendarDay> Month(int year, int month, DateOnly last) =>
+        [.. Enumerable.Range(1, DateTime.DaysInMonth(year, month))
+            .Select(d => new DateOnly(year, month, d))
+            .Where(d => d <= last && d.Day % 5 != 0)
+            .Select(d => new CalendarDay(d, Values[d.Day % Values.Length]))];
+
+    private static readonly IReadOnlyList<CalendarDay> AllOver =
+        [.. Enumerable.Range(1, 18).Select(d => new CalendarDay(new DateOnly(2026, 11, d), 2500 + d * 20))];
+}

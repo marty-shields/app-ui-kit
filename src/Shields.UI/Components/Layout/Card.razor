@@ -1,6 +1,6 @@
 @if (Title is not null)
 {
-    <section class="card @(Compact ? "compact" : null) @(Error ? "error" : null) @(ChildContent is null ? "no-body" : null) @(ChildContent is null && HeaderActions is not null ? "has-actions" : null)" data-testid="@TestId">
+    <section class="@CardClass"" data-testid="@TestId">
         <div class="header @(HeaderActions is not null ? "with-actions" : null)">
             <h2 class="title" data-wrap-ok>@Title</h2>
             @if (Aside is not null)
@@ -17,7 +17,7 @@
 }
 else
 {
-    <div class="card @(Compact ? "compact" : null) @(Error ? "error" : null) @(ChildContent is null ? "no-body" : null) @(ChildContent is null && HeaderActions is not null ? "has-actions" : null)" data-testid="@TestId">
+    <div class="@CardClass"" data-testid="@TestId">
         @if (HeaderActions is not null)
         {
             <div class="header with-actions">
@@ -29,6 +29,15 @@ else
 }
 
 @code {
+    private string CardClass => string.Join(' ', new[]
+    {
+        "card",
+        Compact ? "compact" : null,
+        Error ? "error" : null,
+        ChildContent is null ? "no-body" : null,
+        ChildContent is null && HeaderActions is not null ? "header-only-actions" : null,
+    }.Where(c => c is not null));
+
     /// <summary>Heading of the card. Null shows a plain card with no heading, and no aside.</summary>
     [Parameter]
     public string? Title { get; set; }
@@ -48,7 +57,7 @@ else
     [Parameter]
     public bool Error { get; set; }
 
-    /// <summary>What the card holds. Null (a card with only a header) drops the gap under the header, and with <see cref="HeaderActions"/> trims the card's vertical padding, so a collapsed card is as tall as its action row.</summary>
+    /// <summary>What the card holds. Null (a card with only a header) drops the gap under the header, and with <see cref="HeaderActions"/> trims the card's vertical padding, so a collapsed card is as tall as its action row. Content written between the tags is always a non-null fragment, even when it renders nothing, so a collapsible card passes <c>ChildContent="@(open ? body : null)"</c> (with <c>body</c> a <c>RenderFragment</c>) instead of an <c>@if</c> inside the tags.</summary>
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 

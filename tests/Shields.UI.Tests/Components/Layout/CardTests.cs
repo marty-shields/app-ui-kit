@@ -72,22 +72,23 @@ public class CardTests : ComponentTestBase
         Assert.Multiple(() =>
         {
             Assert.That(card.ClassList, Does.Contain("no-body"));
-            Assert.That(card.ClassList.Contains("has-actions"), Is.EqualTo(trimmed));
+            Assert.That(card.ClassList.Contains("header-only-actions"), Is.EqualTo(trimmed));
         });
     }
 
-    [Test]
-    public void WithContent_HasNoNoBodyClass()
+    [TestCase("Open")]
+    [TestCase(null)]
+    public void WithContent_HasNoNoBodyClass(string? title)
     {
         var cut = Context.Render<Card>(p => p
-            .Add(x => x.Title, "Open")
+            .Add(x => x.Title, title)
             .Add(x => x.HeaderActions, "<button>Edit</button>")
             .Add(x => x.ChildContent, "<p>Body</p>"));
 
         Assert.Multiple(() =>
         {
             Assert.That(cut.Find(".card").ClassList, Does.Not.Contain("no-body"));
-            Assert.That(cut.Find(".card").ClassList, Does.Not.Contain("has-actions"));
+            Assert.That(cut.Find(".card").ClassList, Does.Not.Contain("header-only-actions"));
         });
     }
 
@@ -99,7 +100,7 @@ public class CardTests : ComponentTestBase
         Assert.Multiple(() =>
         {
             Assert.That(css, Does.Contain(".no-body .header {\n    margin: 0;\n}"));
-            Assert.That(css, Does.Contain(".card.has-actions {\n    padding-block: var(--space-1);\n}"));
+            Assert.That(css, Does.Contain(".card.header-only-actions {\n    padding-block: var(--space-1);\n}"));
             Assert.That(css, Does.Contain("margin-top: calc(-1 * var(--space-2));"));
         });
     }

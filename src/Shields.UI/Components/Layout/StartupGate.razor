@@ -8,7 +8,7 @@
 else
 {
     <StartupView Title="@Title" LoadingLabel="@LoadingLabel" FailedMessage="@FailedMessage" Failed="state == State.Failed"
-                 OnRetry="Retry" />
+                 RetryVariant="RetryVariant" OnRetry="Retry" />
 }
 
 @code {
@@ -39,6 +39,10 @@ else
     /// <summary>Offers Try again after a failure, which runs <see cref="Initialize"/> again. False shows the message only.</summary>
     [Parameter]
     public bool Retryable { get; set; } = true;
+
+    /// <summary>Visual weight of Try again. Used only when <see cref="Retryable"/> is true.</summary>
+    [Parameter]
+    public ButtonVariant RetryVariant { get; set; } = ButtonVariant.Primary;
 
     private EventCallback Retry => Retryable ? EventCallback.Factory.Create(this, InitializeAgainAsync) : default;
 

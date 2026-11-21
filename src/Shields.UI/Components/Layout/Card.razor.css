@@ -56,7 +56,7 @@
 }
 
 /* The action row's touch targets already clear the edges, so a header-only card with actions needs little padding. */
-.card.has-actions {
+.card.header-only-actions {
     padding-block: var(--space-1);
 }
 

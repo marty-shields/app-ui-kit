@@ -44,7 +44,7 @@ public class ChartLegendTests : ComponentTestBase
     }
 
     [Test]
-    public void Outline_IsADashedRingThatIsNotThinAndKeepsItsBorderInsideTheBox()
+    public void Outline_IsADashedRingWithTheCalendarCellStrokeAndKeepsItsBorderInsideTheBox()
     {
         var css = RepoFiles.Read("src", "Shields.UI", "Components", "Charts", "ChartLegend.razor.css");
         var rule = Regex.Match(css, @"\.swatch\.outline\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
@@ -53,7 +53,7 @@ public class ChartLegendTests : ComponentTestBase
         Assert.Multiple(() =>
         {
             Assert.That(baseRule, Does.Contain("box-sizing: border-box;"));
-            Assert.That(rule, Does.Contain("border: calc(var(--border-width-error) * 1.5) dashed var(--color-border-strong);"));
+            Assert.That(rule, Does.Contain("border: var(--border-width) dashed var(--color-border-strong);"));
         });
     }
 

@@ -29,9 +29,12 @@ public class TargetStatusesTests
         });
     }
 
-    [TestCase(1234.5, "1,235")]
-    [TestCase(999.4, "999")]
-    public void Number_RoundsAndGroupsTheSameInEveryCulture(double value, string expected) =>
+    [TestCase(1234.5, "1,234.5")]
+    [TestCase(7.5, "7.5")]
+    [TestCase(999.4, "999.4")]
+    [TestCase(1234.567, "1,234.57")]
+    [TestCase(2000.0, "2,000")]
+    public void Number_GroupsAndKeepsUpToTwoDecimalsTheSameInEveryCulture(double value, string expected) =>
         Assert.That(TargetStatuses.Number(value), Is.EqualTo(expected));
 
     [TestCase(null, false)]

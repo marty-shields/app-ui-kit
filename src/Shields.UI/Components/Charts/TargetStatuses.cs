@@ -2,6 +2,7 @@ using System.Globalization;
 
 namespace Shields.UI.Components.Charts;
 
+/// <summary>Compares a value with its target, and the words, CSS classes and number format that go with the result.</summary>
 public static class TargetStatuses
 {
     /// <summary>A value is on target within this share either side of its target.</summary>
@@ -45,6 +46,6 @@ public static class TargetStatuses
         _ => "plain",
     };
 
-    /// <summary>The value rounded to a whole number with thousands separators, the same in every culture.</summary>
-    public static string Number(double value) => Math.Round(value, MidpointRounding.AwayFromZero).ToString("N0", CultureInfo.InvariantCulture);
+    /// <summary>The value with thousands separators and up to two decimals (7.5 stays 7.5), the same in every culture.</summary>
+    public static string Number(double value) => value.ToString("#,##0.##", CultureInfo.InvariantCulture);
 }

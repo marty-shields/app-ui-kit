@@ -21,8 +21,8 @@ public static class KitNames
         "AppLifecycle", "AppLifecycleBridge", "BackButton", "BackButtonBridge", "BarListItem", "BottomNavItem",
         "ButtonVariant", "ChangeDirection", "DataSeries", "DataSeriesExtensions", "DayLabel", "IAppLifecycle", "IAppStart", "IBackButton", "IconButtonStyle",
         "IconName", "IconSize", "IconTone", "LegendItem", "LegendSwatch", "PeriodKind", "RadioOption",
-        "ShieldsUiServiceCollectionExtensions", "SnackbarMessage", "SnackbarService", "StatChange", "TargetStatus", "TargetStatuses", "TrendBar",
-        "SystemBarInsetWriter", "ThemePreference", "ThemeService"
+        "ShieldsUiServiceCollectionExtensions", "SnackbarMessage", "SnackbarService", "StatChange",
+        "SystemBarInsetWriter", "TargetStatus", "TargetStatuses", "ThemePreference", "ThemeService", "TrendBar"
     };
 
     /// <summary>Every custom property the kit declares in tokens.css and base.css.</summary>

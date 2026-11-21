@@ -2,8 +2,8 @@
 <svg class="chart" viewBox="0 0 @N(Width) @N(Height)" role="group" aria-label="@Label" data-testid="@TestId">
     @foreach (var tick in Ticks)
     {
-        <line class="grid" x1="@N(Left)" x2="@N(Right)" y1="@N(Y(tick))" y2="@N(Y(tick))" data-testid="@Id($"grid-{tick}")" />
-        @Text("tick", Left - 6, Y(tick) + 4, "end", TickText(tick), Id($"tick-{tick}"))
+        <line class="grid" x1="@N(Left)" x2="@N(Right)" y1="@N(Y(tick))" y2="@N(Y(tick))" data-testid="@Id($"grid-{N(tick)}")" />
+        @Text("tick", Left - 6, Y(tick) + 4, "end", TickText(tick), Id($"tick-{N(tick)}"))
     }
     @if (TargetStatuses.ValidTarget(Target) is { } goal)
     {
@@ -71,13 +71,15 @@
     /// <summary>The scale never has more intervals than this.</summary>
     private const int MaxIntervals = 4;
 
-    /// <summary>The step search stops here, so a huge value ends it too.</summary>
-    private const double MaxMagnitude = 1e15;
+    /// <summary>The step search runs from 10^-6 up to this power of ten.</summary>
+    private const int MaxExponent = 15;
 
-    /// <summary>The tallest value the scale draws; larger ones are drawn at this height.</summary>
-    private const double MaxScale = 1e18;
+    private const int MinExponent = -6;
 
-    private static readonly double[] TickSteps = [1000, 2000, 5000];
+    /// <summary>The tallest value the scale draws; larger ones are drawn at this height. Four intervals of the largest step.</summary>
+    private const double MaxScale = 2e16;
+
+    private static readonly double[] TickSteps = [1, 2, 5];
 
     /// <summary>The bars, left to right.</summary>
     [Parameter]
@@ -87,7 +89,7 @@
     [Parameter]
     public double? Target { get; set; }
 
-    /// <summary>Raised with the bar's date when a bar is clicked, or has focus and gets Enter. Without a handler the bars are not buttons and cannot be focused.</summary>
+    /// <summary>Raised with the bar's date when a bar is clicked, or has focus and gets Enter or Space. Without a handler the bars are not buttons and cannot be focused.</summary>
     [Parameter]
     public EventCallback<DateOnly> OnSelect { get; set; }
 
@@ -107,7 +109,7 @@
     [Parameter]
     public string EmptyText { get; set; } = "Nothing recorded yet";
 
-    /// <summary>Value of the data-testid attribute, and the prefix of the parts: <c>-band</c> (with <c>-band-top</c> and <c>-band-bottom</c>), <c>-target</c>, <c>-baseline</c>, <c>-tick-{value}</c>, <c>-bar-{date}</c>, <c>-column-{date}</c>, <c>-marker-{date}</c>, <c>-gap-{date}</c>, <c>-value-label</c>, <c>-empty</c>.</summary>
+    /// <summary>Value of the data-testid attribute, and the prefix of the parts: <c>-band</c> (with <c>-band-top</c> and <c>-band-bottom</c>), <c>-target</c>, <c>-baseline</c>, <c>-tick-{value}</c> and <c>-grid-{value}</c> (the value in invariant "0.##" form), <c>-bar-{date}</c>, <c>-column-{date}</c>, <c>-marker-{date}</c>, <c>-gap-{date}</c>, <c>-value-label</c>, <c>-empty</c>.</summary>
     [Parameter]
     public string? TestId { get; set; }
 
@@ -117,38 +119,49 @@
 
     private double Slot => (Right - Left) / Math.Max(Bars.Count, 1);
 
-    /// <summary>The smallest of 1k, 2k, 5k, 10k, 20k, … that puts the tallest bar and the band within four intervals of the scale.</summary>
+    /// <summary>The smallest of 1, 2, 5 times a power of ten (which may be below one) that puts the tallest bar and the band within four intervals of the scale. 1 when nothing is drawn.</summary>
     private double TickStep
     {
         get
         {
-            for (var magnitude = 1.0; magnitude < MaxMagnitude; magnitude *= 10)
+            if (MaxValue <= 0)
             {
-                foreach (var step in TickSteps)
+                return 1;
+            }
+
+            var step = 1.0;
+            for (var exponent = MinExponent; exponent <= MaxExponent; exponent++)
+            {
+                foreach (var multiple in TickSteps)
                 {
-                    if (Math.Ceiling(MaxValue / (step * magnitude)) <= MaxIntervals)
+                    step = multiple * Math.Pow(10, exponent);
+                    if (Math.Ceiling(MaxValue / step - 1e-9) <= MaxIntervals)
                     {
-                        return step * magnitude;
+                        return step;
                     }
                 }
             }
 
-            return TickSteps[^1] * MaxMagnitude;
+            return step;
         }
     }
 
-    /// <summary>The top of the y scale: at least 2k, and the first tick at or above the tallest bar and the band. The space above it holds the tooltip, the value and the over marker.</summary>
-    private double Scale => Math.Max(2 * TickStep, Math.Ceiling(MaxValue / TickStep) * TickStep);
+    private int Intervals => Math.Max(1, (int)Math.Ceiling(MaxValue / TickStep - 1e-9));
 
+    /// <summary>The top of the y scale: the first tick at or above the tallest bar and the band. The space above it holds the tooltip, the value and the over marker.</summary>
+    private double Scale => Intervals * TickStep;
+
+    /// <summary>The tallest bar, the band's top and the per-bar targets, which the scale has to hold.</summary>
     private double MaxValue => Math.Min(
         MaxScale,
-        Math.Max(
-            Bars.Where(b => TargetStatuses.IsRecorded(b.Value)).Select(b => b.Value!.Value).DefaultIfEmpty(0).Max(),
-            TargetStatuses.ValidTarget(Target) is { } target ? target * (1 + TargetStatuses.Tolerance) : 0));
+        Bars.Where(b => TargetStatuses.IsRecorded(b.Value))
+            .SelectMany(b => new[] { b.Value!.Value, TargetStatuses.ValidTarget(b.Target) is { } own ? own * (1 + TargetStatuses.Tolerance) : 0 })
+            .Append(TargetStatuses.ValidTarget(Target) is { } target ? target * (1 + TargetStatuses.Tolerance) : 0)
+            .Max());
 
-    private IEnumerable<double> Ticks => Enumerable.Range(0, (int)(Scale / TickStep) + 1).Select(i => i * TickStep);
+    private IEnumerable<double> Ticks => Enumerable.Range(0, Intervals + 1).Select(i => i * TickStep);
 
-    private double Y(double value) => Base - value / Scale * (Base - Top);
+    private double Y(double value) => Base - Math.Min(value, Scale) / Scale * (Base - Top);
 
     private string Column(double x, double width, double top, double height)
     {
@@ -170,23 +183,39 @@
     private static double TipX(double centre, string tip)
     {
         var half = tip.Length * TipCharWidth / 2 + TipMargin;
+        if (half >= Width / 2)
+        {
+            return Width / 2;
+        }
+
         return Math.Clamp(centre, half, Width - half);
     }
 
-    /// <summary>The label cut to what fits under its slot: about three characters for a week of bars, one letter for a year.</summary>
+    /// <summary>The label cut to what fits under its slot: about three characters for a week of bars, one letter for a year. A number is never cut, as "12" would read as "1".</summary>
     private string Short(string label)
     {
+        if (label.All(char.IsDigit))
+        {
+            return label;
+        }
+
         var fit = Math.Max((int)(Slot / 12), 1);
         return label.Length <= fit ? label : fit == 1 ? label[..1] : label[..(fit - 1)] + "…";
     }
 
-    private static string TickText(double tick) => tick == 0 ? "0" : $"{tick / 1000:0.#}k";
+    private static string TickText(double tick) => tick switch
+    {
+        < 1e3 => N(tick),
+        < 1e6 => $"{(tick / 1e3).ToString("0.#", CultureInfo.InvariantCulture)}k",
+        < 1e9 => $"{(tick / 1e6).ToString("0.#", CultureInfo.InvariantCulture)}M",
+        _ => $"{(tick / 1e9).ToString("0.#", CultureInfo.InvariantCulture)}B",
+    };
 
     private async Task Select(TrendBar bar) => await OnSelect.InvokeAsync(bar.Date);
 
     private async Task OnKey(KeyboardEventArgs e, TrendBar bar)
     {
-        if (e.Key is "Enter")
+        if (e.Key is "Enter" or " ")
         {
             await Select(bar);
         }
@@ -213,7 +242,7 @@
         builder.CloseElement();
     };
 
-    private string Id(string part) => $"{TestId}-{part}";
+    private string? Id(string part) => TestId is null ? null : $"{TestId}-{part}";
 
     private static string N(double value) => value.ToString("0.##", CultureInfo.InvariantCulture);
 }

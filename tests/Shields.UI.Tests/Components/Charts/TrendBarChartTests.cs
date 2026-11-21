@@ -121,6 +121,7 @@ public class TrendBarChartTests : ComponentTestBase
         {
             Assert.That(css, Does.Contain("stroke: var(--color-chart-band);"));
             Assert.That(css, Does.Contain("stroke-width: var(--border-width);"));
+            Assert.That(css, Does.Contain("vector-effect: non-scaling-stroke;"));
             Assert.That(css, Does.Not.Contain("fill"));
         });
     }
@@ -256,13 +257,13 @@ public class TrendBarChartTests : ComponentTestBase
     }
 
     [Test]
-    public void Key_Space_DoesNothingAsItWouldScrollThePage()
+    public void Key_Space_RaisesOnSelectWithTheBarsDate()
     {
         var cut = Render([Bar(0, 1000)]);
 
         cut.Find("[data-testid=chart-bar-2026-11-09]").KeyDown(new KeyboardEventArgs { Key = " " });
 
-        Assert.That(selected, Is.Empty);
+        Assert.That(selected, Is.EqualTo(new[] { new DateOnly(2026, 11, 9) }));
     }
 
     [Test]
@@ -305,7 +306,7 @@ public class TrendBarChartTests : ComponentTestBase
         });
     }
 
-    [TestCase(1000, 1500, new[] { "0", "1k", "2k" })]
+    [TestCase(1000, 1500, new[] { "0", "500", "1k", "1.5k", "2k" })]
     [TestCase(2000, 2000, new[] { "0", "1k", "2k", "3k" })]
     [TestCase(3000, 2500, new[] { "0", "1k", "2k", "3k" })]
     [TestCase(3100, 2000, new[] { "0", "1k", "2k", "3k", "4k" })]
@@ -323,11 +324,100 @@ public class TrendBarChartTests : ComponentTestBase
     }
 
     [Test]
-    public void Render_WithoutATargetAndLowBars_StopsAtTwoThousand()
+    public void Render_WithoutATargetAndLowBars_FitsTheScaleToTheBars()
     {
         var cut = Render([Bar(0, 800)], target: null);
 
-        Assert.That(cut.FindAll("text.tick").Select(t => t.TextContent), Is.EqualTo(new[] { "0", "1k", "2k" }));
+        Assert.That(cut.FindAll("text.tick").Select(t => t.TextContent), Is.EqualTo(new[] { "0", "200", "400", "600", "800" }));
+    }
+
+    [Test]
+    public void Render_CalorieSizedTarget_GetsKiloTicksAboveTheBand()
+    {
+        var cut = Render([Bar(0, 2000), Bar(1, 2600)], target: 2400);
+
+        Assert.That(cut.FindAll("text.tick").Select(t => t.TextContent), Is.EqualTo(new[] { "0", "1k", "2k", "3k" }));
+    }
+
+    [Test]
+    public void Render_SmallValuesAroundATarget_GetTheirOwnScale()
+    {
+        var cut = Render([Bar(0, 30), Bar(1, 60), Bar(2, 45)], target: 50);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.FindAll("text.tick").Select(t => t.TextContent), Is.EqualTo(new[] { "0", "20", "40", "60" }));
+            Assert.That(cut.FindAll("[data-testid=chart-grid-60]"), Has.Count.EqualTo(1));
+        });
+    }
+
+    [Test]
+    public void Render_MaxSeven_StepsByTwoToEight()
+    {
+        var cut = Render([Bar(0, 7)], target: null);
+
+        Assert.That(cut.FindAll("text.tick").Select(t => t.TextContent), Is.EqualTo(new[] { "0", "2", "4", "6", "8" }));
+    }
+
+    [Test]
+    public void Render_FractionalValues_GetFractionalTicksWithInvariantIds()
+    {
+        var cut = Render([Bar(0, 0.8)], target: null);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.FindAll("text.tick").Select(t => t.TextContent), Is.EqualTo(new[] { "0", "0.2", "0.4", "0.6", "0.8" }));
+            Assert.That(cut.FindAll("[data-testid=\"chart-grid-0.6\"]"), Has.Count.EqualTo(1));
+            Assert.That(cut.FindAll("[data-testid=\"chart-tick-0.8\"]"), Has.Count.EqualTo(1));
+        });
+    }
+
+    [Test]
+    public void Render_Millions_UseMTicks()
+    {
+        var cut = Render([Bar(0, 3_000_000)], target: null);
+
+        Assert.That(cut.FindAll("text.tick").Select(t => t.TextContent), Is.EqualTo(new[] { "0", "1M", "2M", "3M" }));
+    }
+
+    [Test]
+    public void Render_ValueFarBeyondTheScale_IsDrawnNoTallerThanTheTopTick()
+    {
+        var cut = Render([Bar(0, 1e30)], target: null);
+
+        var baseline = Number(cut.Find("[data-testid=chart-baseline]"), "y1");
+        var topTick = cut.FindAll("line.grid").Min(l => Number(l, "y1"));
+        Assert.That(Height(cut, 0), Is.EqualTo(baseline - topTick).Within(0.02));
+    }
+
+    [Test]
+    public void Render_PerBarTarget_IsHeldByTheScaleButNotDrawnAsALine()
+    {
+        var cut = Render([new TrendBar(Monday, "Mon", 1000, Target: 9000), Bar(1, 1000)], target: null);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.FindAll("text.tick").Select(t => t.TextContent).Last(), Is.EqualTo("10k"));
+            Assert.That(cut.FindAll("[data-testid=chart-target]"), Is.Empty);
+            Assert.That(cut.FindAll("[data-testid=chart-band]"), Is.Empty);
+        });
+    }
+
+    [Test]
+    public void Render_TooltipWiderThanTheChart_DoesNotThrowAndCentresTheText()
+    {
+        var cut = Context.Render<TrendBarChart>(p => p
+            .Add(x => x.Bars, [Bar(0, 1200)]).Add(x => x.DateFormat, "dddd d MMMM yyyy 'in the year' yyyy").Add(x => x.Unit, "steps taken that day").Add(x => x.TestId, "chart"));
+
+        Assert.That(Number(cut.Find("text.tip"), "x"), Is.EqualTo(160));
+    }
+
+    [Test]
+    public void Render_WithoutATestId_AddsNoTestIds()
+    {
+        var cut = Context.Render<TrendBarChart>(p => p.Add(x => x.Bars, [Bar(0, 1000), Bar(1, null)]).Add(x => x.Target, 2000));
+
+        Assert.That(cut.FindAll("[data-testid]"), Is.Empty);
     }
 
     [Test]
@@ -427,6 +517,23 @@ public class TrendBarChartTests : ComponentTestBase
         var cut = Render(Enumerable.Range(0, 12).Select(i => Bar(i, 1000, "Mar")).ToList());
 
         Assert.That(cut.FindAll("text.axis-label").Select(t => t.TextContent), Has.All.EqualTo("M"));
+    }
+
+    [Test]
+    public void Render_DayNumbersOfAMonth_AreNeverCut()
+    {
+        var bars = Enumerable.Range(0, 31).Select(i => Bar(i, 1000, (i + 1).ToString(CultureInfo.InvariantCulture))).ToList();
+        var cut = Render(bars);
+
+        Assert.That(cut.FindAll("text.axis-label").Select(t => t.TextContent), Is.EqualTo(Enumerable.Range(1, 31).Select(i => i.ToString(CultureInfo.InvariantCulture))));
+    }
+
+    [Test]
+    public void Render_SevenBarsLabelledMon_ShowTheWholeLabel()
+    {
+        var cut = Render(Enumerable.Range(0, 7).Select(i => Bar(i, 1000, "Mon")).ToList());
+
+        Assert.That(cut.FindAll("text.axis-label").Select(t => t.TextContent), Has.All.EqualTo("Mon"));
     }
 
     [Test]

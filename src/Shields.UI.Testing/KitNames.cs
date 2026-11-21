@@ -9,7 +9,7 @@ public static class KitNames
         "AppButton", "AppErrorBoundary", "AppScreen", "BackHandler", "BarList", "BottomNav", "Card", "ChartLegend", "ConfirmDialog",
         "DateStrip", "EmptyState", "ErrorView", "FieldInput", "FilterChips", "HostBridges", "Icon", "IconButton", "ListRow", "LoadFailed",
         "NumberField", "PeriodStepper", "ProgressRing", "RadioGroup", "SectionHeader", "SegmentedControl", "SelectField", "Snackbar", "Spinner", "StartupGate",
-        "StartupView", "StatTile", "TextField",
+        "StartupView", "StatTile", "TextField", "TrendBarChart",
     };
 
     /// <summary>
@@ -21,7 +21,7 @@ public static class KitNames
         "AppLifecycle", "AppLifecycleBridge", "BackButton", "BackButtonBridge", "BarListItem", "BottomNavItem",
         "ButtonVariant", "ChangeDirection", "DataSeries", "DataSeriesExtensions", "DayLabel", "IAppLifecycle", "IAppStart", "IBackButton", "IconButtonStyle",
         "IconName", "IconSize", "IconTone", "LegendItem", "LegendSwatch", "PeriodKind", "RadioOption",
-        "ShieldsUiServiceCollectionExtensions", "SnackbarMessage", "SnackbarService", "StatChange",
+        "ShieldsUiServiceCollectionExtensions", "SnackbarMessage", "SnackbarService", "StatChange", "TargetStatus", "TargetStatuses", "TrendBar",
         "SystemBarInsetWriter", "ThemePreference", "ThemeService"
     };
 

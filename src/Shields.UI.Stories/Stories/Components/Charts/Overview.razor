@@ -38,4 +38,23 @@
     <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>{TestId}-row-0</code>, <code>-label-0</code>, <code>-value-0</code> and <code>-bar-0</code> by position, or <code>{TestId}-empty</code> with no items. None are rendered without <code>TestId</code>.</li>
 </ul>
 
-<p>Stories: <a href="./?path=/docs/components-charts-chartlegend--docs">ChartLegend</a>, <a href="./?path=/docs/components-charts-progressring--docs">ProgressRing</a>, <a href="./?path=/docs/components-charts-barlist--docs">BarList</a></p>
+<h2><code>TrendBarChart</code></h2>
+<p>A bar chart of one value per slot, such as a week of days or a year of months, judged against a <code>Target</code>. Bars are <code>TrendBar</code> records; a bar with no value leaves an empty slot. The chart is meant to sit on a card (<code>--color-surface</code>).</p>
+<table>
+    <thead><tr><th>Part</th><th>Looks like</th></tr></thead>
+    <tbody>
+        <tr><td>Under</td><td>A bar in <code>--color-chip</code>, more than 10% below the target.</td></tr>
+        <tr><td>On target</td><td>A bar in <code>--color-accent</code>, within 10% either side of the target.</td></tr>
+        <tr><td>Over</td><td>A bar in <code>--color-error</code> with a ▲ marker above it, more than 10% over.</td></tr>
+        <tr><td>Target</td><td>A dashed line (<code>--chart-dash</code>) at the target.</td></tr>
+        <tr><td>Target range</td><td>The band 10% either side of the target, drawn as a top and bottom edge in <code>--color-chart-band</code> at <code>--border-width</code> with no fill, so no bar loses contrast.</td></tr>
+    </tbody>
+</table>
+<ul>
+    <li>Without a target (or with zero) there is no line, no band and no status.</li>
+    <li>With <code>OnSelect</code> the bars are buttons: click, or Enter on focus, raises it with the bar's date. Without it they are images.</li>
+    <li>Each bar's text alternative is its date, value, <code>Unit</code>, status and <code>Note</code>; a bar with a <code>Note</code> is drawn faded. The chart is a group named by <code>Label</code>; with no values it shows <code>EmptyText</code>.</li>
+    <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>-band</code> (<code>-band-top</code>, <code>-band-bottom</code>), <code>-target</code>, <code>-baseline</code>, <code>-tick-{value}</code>, <code>-bar-{date}</code>, <code>-column-{date}</code>, <code>-marker-{date}</code>, <code>-gap-{date}</code>, <code>-value-label</code>, <code>-empty</code>.</li>
+</ul>
+
+<p>Stories: <a href="./?path=/docs/components-charts-chartlegend--docs">ChartLegend</a>, <a href="./?path=/docs/components-charts-progressring--docs">ProgressRing</a>, <a href="./?path=/docs/components-charts-barlist--docs">BarList</a>, <a href="./?path=/docs/components-charts-trendbarchart--docs">TrendBarChart</a></p>

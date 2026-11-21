@@ -24,20 +24,24 @@ public partial class ChartLegendContrastTests
         Assert.That(Rgb.Contrast(fg, bg), Is.GreaterThanOrEqualTo(minimum), $"{token} {fg} on {bg}");
     }
 
-    [TestCase("--color-accent", ColourScheme.Light)]
-    [TestCase("--color-accent", ColourScheme.Dark)]
-    public void PastSwatch_IsReadableAgainstTheAdjacentAccentBar(string neighbour, ColourScheme scheme)
+    [TestCase(ColourScheme.Light)]
+    [TestCase(ColourScheme.Dark)]
+    public void PastSwatch_IsReadableAgainstTheAdjacentAccentBar(ColourScheme scheme)
     {
         var past = DesignTokens.Colour("--color-chart-past").In(scheme);
-        var other = DesignTokens.Colour(neighbour).In(scheme);
+        var accent = DesignTokens.Colour("--color-accent").In(scheme);
 
-        Assert.That(Rgb.Contrast(past, other), Is.GreaterThanOrEqualTo(Graphic), $"--color-chart-past {past} on {neighbour} {other}");
+        Assert.That(Rgb.Contrast(past, accent), Is.GreaterThanOrEqualTo(Graphic), $"--color-chart-past {past} on --color-accent {accent}");
     }
 
-    [Test]
-    public void PastSwatch_UsesTheChartPastToken()
+    [TestCase("swatch.accent", "--color-accent")]
+    [TestCase("swatch.chip", "--color-chip")]
+    [TestCase("swatch.error", "--color-error")]
+    [TestCase("swatch.past", "--color-chart-past")]
+    [TestCase("swatch.primary", "--color-primary")]
+    public void FilledSwatch_UsesItsOwnColourToken(string selector, string token)
     {
-        Assert.That(Declaration("swatch.past", "background-color"), Is.EqualTo("--color-chart-past"));
+        Assert.That(Declaration(selector, "background-color"), Is.EqualTo(token));
     }
 
     private static string Declaration(string selector, string property) =>

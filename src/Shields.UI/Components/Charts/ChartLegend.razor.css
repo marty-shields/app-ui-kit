@@ -49,7 +49,6 @@
 }
 
 .swatch.outline {
-    box-sizing: border-box;
     border: calc(var(--border-width-error) * 1.5) dashed var(--color-border-strong);
 }
 

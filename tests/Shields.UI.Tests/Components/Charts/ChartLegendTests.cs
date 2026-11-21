@@ -48,12 +48,22 @@ public class ChartLegendTests : ComponentTestBase
     {
         var css = RepoFiles.Read("src", "Shields.UI", "Components", "Charts", "ChartLegend.razor.css");
         var rule = Regex.Match(css, @"\.swatch\.outline\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
+        var baseRule = Regex.Match(css, @"\.swatch\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
 
         Assert.Multiple(() =>
         {
-            Assert.That(rule, Does.Contain("box-sizing: border-box;"));
+            Assert.That(baseRule, Does.Contain("box-sizing: border-box;"));
             Assert.That(rule, Does.Contain("border: calc(var(--border-width-error) * 1.5) dashed var(--color-border-strong);"));
         });
+    }
+
+    [Test]
+    public void LegendSwatch_KeepsItsNumericValuesAndAppendsNewOnes()
+    {
+        Assert.That(Enum.GetValues<LegendSwatch>().Select(v => (v.ToString(), (int)v)), Is.EqualTo(new[]
+        {
+            ("Accent", 0), ("Chip", 1), ("Error", 2), ("Outline", 3), ("Line", 4), ("Band", 5), ("Past", 6), ("Primary", 7), ("Today", 8),
+        }));
     }
 
     [Test]

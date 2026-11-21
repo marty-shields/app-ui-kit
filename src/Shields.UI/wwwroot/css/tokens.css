@@ -31,7 +31,8 @@
     --color-chart-band: light-dark(#3f7fa6, #7fb8de);
     /* Chart past: the bars of earlier periods beside the current one. A grey-teal at least 3:1 against --color-accent (the bar next to
        it) and against the page and cards in both themes. In light the window is narrow, because the accent is dark and the page is
-       light: this is the only luminance that clears 3:1 on all three. */
+       light: this is the only luminance that clears 3:1 on all three.
+       Tuned to sit beside the accent bar, not beside --color-primary (2.6:1 in light). */
     --color-chart-past: light-dark(#8a9092, #6c7274);
     --color-focus: light-dark(#488286, #8cc4c1);
     --color-danger: light-dark(#a8231c, #f2b8b5);

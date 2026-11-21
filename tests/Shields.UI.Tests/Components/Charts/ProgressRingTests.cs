@@ -203,7 +203,7 @@ public class ProgressRingTests : ComponentTestBase
     }
 
     [Test]
-    public void Css_ArcUsesTheArcTokens_AndOverUsesTheOverToken()
+    public void Css_ArcUsesTheArcTokens_AndOverArcAndNumberUseTheOverToken()
     {
         var css = RepoFiles.Read("src", "Shields.UI", "Components", "Charts", "ProgressRing.razor.css");
         string Rule(string selector) => Regex.Match(css, Regex.Escape(selector) + @"\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
@@ -212,6 +212,7 @@ public class ProgressRingTests : ComponentTestBase
         {
             Assert.That(Rule(".arc"), Does.Contain("var(--color-ring-arc)").And.Contain("var(--color-ring-track)"));
             Assert.That(Rule(".over .arc"), Does.Contain("var(--color-ring-arc-over)"));
+            Assert.That(Rule(".over .value"), Does.Contain("var(--color-ring-arc-over)").And.Not.Contain("--color-error"));
         });
     }
 }

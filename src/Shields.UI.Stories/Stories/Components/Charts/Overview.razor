@@ -21,7 +21,7 @@
 </ul>
 
 <h2><code>ProgressRing</code></h2>
-<p>A ring that fills as <code>Value</code> approaches <code>Max</code>, with the value in the middle. Above <code>Max</code> the arc turns <code>--color-ring-arc-over</code> and the number <code>--color-error</code>. <code>Compact</code> uses the smaller <code>--ring-size-compact</code>.</p>
+<p>A ring that fills as <code>Value</code> approaches <code>Max</code>, with the value in the middle. Above <code>Max</code> the arc turns <code>--color-ring-arc-over</code> and the number <code>--color-ring-arc-over</code> too, so an over ring shows one red. <code>Compact</code> uses the smaller <code>--ring-size-compact</code>.</p>
 <ul>
     <li>With a zero or negative <code>Max</code> there is no maximum: the ring is full once <code>Value</code> is above zero, and never over.</li>
     <li><code>Caption</code> is a short line under the number; <code>ChildContent</code> replaces the number, for a figure such as what is left, in which case set <code>AriaLabel</code> to describe it.</li>

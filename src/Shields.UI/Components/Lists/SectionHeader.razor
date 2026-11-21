@@ -2,7 +2,7 @@
     <h2 class="heading">
         @if (ExpandedChanged.HasDelegate)
         {
-            <button type="button" class="toggle" aria-expanded="@(Expanded ? "true" : "false")" aria-controls="@ControlsId" data-testid="@Id("toggle")" @onclick="Toggle">
+            <button type="button" class="control toggle" aria-expanded="@(Expanded ? "true" : "false")" aria-controls="@(Expanded ? ControlsId : null)" data-testid="@Id("toggle")" @onclick="Toggle">
                 @Content
                 <Icon Name="@(Expanded ? IconName.Up : IconName.Down)" Tone="IconTone.Muted" />
             </button>
@@ -48,7 +48,7 @@
     [Parameter]
     public EventCallback<bool> ExpandedChanged { get; set; }
 
-    /// <summary>The <c>id</c> of the element the header opens and closes, written to <c>aria-controls</c> on the button. Null writes none.</summary>
+    /// <summary>The <c>id</c> of the element the header opens and closes, written to <c>aria-controls</c> on the button only while open, so a panel removed when closed is never referenced. Null writes none.</summary>
     [Parameter]
     public string? ControlsId { get; set; }
 
@@ -56,11 +56,7 @@
     [Parameter]
     public string? TestId { get; set; }
 
-    private Task Toggle()
-    {
-        Expanded = !Expanded;
-        return ExpandedChanged.InvokeAsync(Expanded);
-    }
+    private Task Toggle() => ExpandedChanged.InvokeAsync(!Expanded);
 
     private string? Id(string part) => TestId is null ? null : $"{TestId}-{part}";
 }

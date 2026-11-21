@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+using Shields.UI.Components.Actions;
 using Shields.UI.Components.Lists;
 
 namespace Shields.UI.Tests.Components.Lists;
@@ -69,6 +71,7 @@ public class SectionHeaderTests : ComponentTestBase
             Assert.That(cut.FindAll("button"), Is.Empty);
             Assert.That(cut.FindAll("[aria-expanded]"), Is.Empty);
             Assert.That(cut.FindAll("svg"), Is.Empty);
+            Assert.That(cut.Find("h2 [data-testid=head-title]").TextContent, Is.EqualTo("Morning"));
         });
     }
 
@@ -82,33 +85,70 @@ public class SectionHeaderTests : ComponentTestBase
         Assert.That(toggle.GetAttribute("aria-expanded"), Is.EqualTo(expected));
     }
 
-    [Test]
-    public void Render_WithControlsId_SetsAriaControls()
+    [TestCase(true, "panel-1")]
+    [TestCase(false, null)]
+    public void Render_WithControlsId_SetsAriaControlsOnlyWhileExpanded(bool expanded, string? expected)
     {
         var cut = Context.Render<SectionHeader>(p => p
             .Add(x => x.Title, "Morning")
+            .Add(x => x.Expanded, expanded)
             .Add(x => x.ControlsId, "panel-1")
             .Add(x => x.ExpandedChanged, _ => { })
             .Add(x => x.TestId, "head"));
 
-        Assert.That(cut.Find("button").GetAttribute("aria-controls"), Is.EqualTo("panel-1"));
+        Assert.That(cut.Find("button").GetAttribute("aria-controls"), Is.EqualTo(expected));
     }
 
     [Test]
     public void Render_WithoutControlsId_WritesNoAriaControls()
     {
-        var cut = RenderCollapsible(false);
+        var cut = RenderCollapsible(true);
 
         Assert.That(cut.Find("button").HasAttribute("aria-controls"), Is.False);
     }
 
-    [Test]
-    public void Render_ChevronPointsUpWhenExpandedAndDownWhenNot()
+    [TestCase(true, IconName.Up)]
+    [TestCase(false, IconName.Down)]
+    public void Render_ChevronPointsUpWhenExpandedAndDownWhenNot(bool expanded, IconName expected)
     {
-        var open = RenderCollapsible(true).Find("button svg").InnerHtml;
-        var closed = RenderCollapsible(false).Find("button svg").InnerHtml;
+        var cut = RenderCollapsible(expanded);
 
-        Assert.That(open, Is.Not.EqualTo(closed));
+        Assert.That(cut.FindComponent<Icon>().Instance.Name, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Render_WithCallback_KeepsTitleBadgeAndTotalInsideTheButton()
+    {
+        var cut = Context.Render<SectionHeader>(p => p
+            .Add(x => x.Title, "Morning")
+            .Add(x => x.Badge, "Now")
+            .Add(x => x.Total, "3")
+            .Add(x => x.ExpandedChanged, _ => { })
+            .Add(x => x.TestId, "head"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find("button [data-testid=head-title]").TextContent, Is.EqualTo("Morning"));
+            Assert.That(cut.Find("button [data-testid=head-badge]").TextContent, Is.EqualTo("Now"));
+            Assert.That(cut.Find("button [data-testid=head-total]").TextContent, Is.EqualTo("3"));
+        });
+    }
+
+    [Test]
+    public void Render_VeryLongTitle_WrapsAndTotalStaysOnOneLine()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Lists", "SectionHeader.razor.css");
+        var total = Regex.Match(css, @"\.total\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
+        var cut = Context.Render<SectionHeader>(p => p
+            .Add(x => x.Title, new string('W', 200) + " morning snack with a very long name")
+            .Add(x => x.Total, "1,250 total")
+            .Add(x => x.TestId, "head"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find("[data-testid=head-title]").HasAttribute("data-wrap-ok"), Is.True);
+            Assert.That(total, Does.Match(@"white-space\s*:\s*nowrap"));
+        });
     }
 
     [Test]
@@ -119,26 +159,26 @@ public class SectionHeaderTests : ComponentTestBase
 
         cut.Find("[data-testid=head-toggle]").Click();
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(raised, Is.EqualTo(new[] { true }));
-            Assert.That(cut.Find("button").GetAttribute("aria-expanded"), Is.EqualTo("true"));
-        });
+        Assert.That(raised, Is.EqualTo(new[] { true }));
     }
 
     [Test]
-    public void Click_Twice_FoldsAgain()
+    public void Click_WhenTheParentRebinds_TogglesBothWays()
     {
         var raised = new List<bool>();
-        var cut = RenderCollapsible(true, raised.Add);
+        var cut = RenderCollapsible(false, raised.Add);
 
         cut.Find("button").Click();
+        cut.Render(p => p.Add(x => x.Expanded, raised[^1]));
+        Assert.That(cut.Find("button").GetAttribute("aria-expanded"), Is.EqualTo("true"));
+
         cut.Find("button").Click();
+        cut.Render(p => p.Add(x => x.Expanded, raised[^1]));
 
         Assert.Multiple(() =>
         {
-            Assert.That(raised, Is.EqualTo(new[] { false, true }));
-            Assert.That(cut.Find("button").GetAttribute("aria-expanded"), Is.EqualTo("true"));
+            Assert.That(raised, Is.EqualTo(new[] { true, false }));
+            Assert.That(cut.Find("button").GetAttribute("aria-expanded"), Is.EqualTo("false"));
         });
     }
 

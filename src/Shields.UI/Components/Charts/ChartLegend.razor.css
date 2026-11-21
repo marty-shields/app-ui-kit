@@ -46,6 +46,12 @@
     border-radius: 0;
 }
 
+.swatch.band {
+    width: calc(var(--legend-swatch-size) * 2);
+    background-color: var(--color-chart-band);
+    border-radius: var(--radius-sm);
+}
+
 .marker {
     flex: none;
     color: var(--color-text);

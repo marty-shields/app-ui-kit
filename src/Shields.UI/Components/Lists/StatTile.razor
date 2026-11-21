@@ -23,7 +23,7 @@
     }
     @if (NotEnoughData)
     {
-        <span class="caption" data-wrap-ok data-testid="@Id("note")">Not enough data yet</span>
+        <span class="caption" data-wrap-ok data-testid="@Id("note")">@NotEnoughDataNote</span>
     }
 </div>
 
@@ -47,6 +47,10 @@
     /// <summary>Replaces the value with a dash, drops the change and adds "Not enough data yet", so the tile keeps its place in the layout.</summary>
     [Parameter]
     public bool NotEnoughData { get; set; }
+
+    /// <summary>The text shown under the dash when <see cref="NotEnoughData"/> is set.</summary>
+    [Parameter]
+    public string NotEnoughDataNote { get; set; } = "Not enough data yet";
 
     /// <summary>Value of the data-testid attribute, and the prefix of <c>-label</c>, <c>-value</c>, <c>-change</c>, <c>-caption</c> and <c>-note</c>. None are rendered when unset.</summary>
     [Parameter]

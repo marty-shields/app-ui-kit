@@ -11,18 +11,28 @@ public class ChartLegendTests : ComponentTestBase
         [
             new(LegendSwatch.Chip, "Under"), new(LegendSwatch.Accent, "On target"), new(LegendSwatch.Error, "Over"),
             new(LegendSwatch.Outline, "Not logged"), new(LegendSwatch.Line, "Target"),
+            new(LegendSwatch.Band, "Range"),
         ]));
 
         Assert.Multiple(() =>
         {
             Assert.That(cut.FindAll("li").Select(li => li.QuerySelector(".text")!.TextContent),
-                Is.EqualTo(new[] { "Under", "On target", "Over", "Not logged", "Target" }));
+                Is.EqualTo(new[] { "Under", "On target", "Over", "Not logged", "Target", "Range" }));
             Assert.That(cut.FindAll(".swatch").Select(s => s.ClassList.Last()),
-                Is.EqualTo(new[] { "chip", "accent", "error", "outline", "line" }));
+                Is.EqualTo(new[] { "chip", "accent", "error", "outline", "line", "band" }));
             Assert.That(cut.FindAll("li").Select(li => li.GetAttribute("data-testid")),
-                Is.EqualTo(new[] { "legend-0", "legend-1", "legend-2", "legend-3", "legend-4" }));
+                Is.EqualTo(new[] { "legend-0", "legend-1", "legend-2", "legend-3", "legend-4", "legend-5" }));
             Assert.That(cut.FindAll(".marker"), Is.Empty);
         });
+    }
+
+    [Test]
+    public void Band_IsFilledWithTheBandToken()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Charts", "ChartLegend.razor.css");
+        var rule = System.Text.RegularExpressions.Regex.Match(css, @"\.swatch\.band\s*\{([^}]*)\}").Groups[1].Value;
+
+        Assert.That(rule, Does.Contain("background-color: var(--color-chart-band);"));
     }
 
     [Test]

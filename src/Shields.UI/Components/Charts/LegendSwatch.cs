@@ -16,4 +16,10 @@ public enum LegendSwatch
 
     /// <summary>A short dashed line in <c>--color-text-muted</c>, for a reference line.</summary>
     Line,
+
+    /// <summary>
+    /// A see-through filled rectangle in <c>--color-chart-band</c>, for a target band. Apps draw their band with the same
+    /// token so the legend matches the chart.
+    /// </summary>
+    Band,
 }

@@ -26,6 +26,8 @@
     --color-chip-soft: light-dark(#d4e8e7, #2b4444);
     --color-on-chip-soft: light-dark(#1a2b2b, #ffffff);
     --color-accent: light-dark(#29494c, #acd5d2);
+    /* A target band on a chart and its legend swatch: the accent, see-through, so the data shows through it. */
+    --color-chart-band: color-mix(in srgb, var(--color-accent) 20%, transparent);
     --color-focus: light-dark(#488286, #8cc4c1);
     --color-danger: light-dark(#a8231c, #f2b8b5);
     --color-on-danger: light-dark(#ffffff, #1e2324);
@@ -99,6 +101,7 @@
     --ring-width: 0.875rem;
     --ring-size-compact: 6rem;
     --ring-width-compact: 0.625rem;
+    --snackbar-gap-bottom: var(--space-2);
 }
 
 /* Forces a theme on an element and its children. */

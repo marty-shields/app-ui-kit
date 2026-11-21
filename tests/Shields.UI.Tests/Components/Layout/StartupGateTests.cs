@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Shields.UI.Components.Actions;
 using Shields.UI.Components.Layout;
 using Shields.UI.Logging;
 
@@ -83,6 +84,20 @@ public class StartupGateTests : ComponentTestBase
         {
             Assert.That(cut.Find(".title").TextContent, Is.EqualTo("My App"));
             Assert.That(cut.Find("[data-testid=startup-loading]").TextContent.Trim(), Is.EqualTo("Opening…"));
+        });
+    }
+
+    [Test]
+    public void RetryVariant_DefaultsToPrimary_AndPassesThroughToTryAgain()
+    {
+        var primary = Render(() => Task.FromException(new InvalidOperationException()));
+        var secondary = Render(() => Task.FromException(new InvalidOperationException()), p => p.Add(x => x.RetryVariant, ButtonVariant.Secondary));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(primary.Find("[data-testid=startup-retry]").ClassList, Does.Contain("primary"));
+            Assert.That(secondary.Find("[data-testid=startup-retry]").ClassList, Does.Contain("secondary"));
+            Assert.That(secondary.Find("[data-testid=startup-retry]").ClassList, Does.Not.Contain("primary"));
         });
     }
 

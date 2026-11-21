@@ -44,22 +44,27 @@ public class StatTileTests : ComponentTestBase
             Assert.That(css, Does.Contain("padding: var(--stat-tile-compact-padding);"));
             Assert.That(css, Does.Contain("font-size: var(--stat-tile-compact-value-size);"));
             Assert.That(css, Does.Contain("white-space: nowrap;"));
-            Assert.That(css, Does.Contain(".compact .change,\n.compact .up,\n.compact .down {\n    color: var(--color-text-muted);"));
+            Assert.That(css, Does.Not.Contain(".compact .change"));
+            Assert.That(css, Does.Not.Contain(".compact .up"));
+            Assert.That(css, Does.Not.Contain(".compact .down"));
             Assert.That(KitCss.Tokens, Does.Contain("--stat-tile-compact-value-size: var(--font-size-md);"));
         });
     }
 
-    [Test]
-    public void Compact_MutesTheChangeArrowToo()
+    [TestCase(ChangeDirection.Up, "up", "success")]
+    [TestCase(ChangeDirection.Down, "down", "error")]
+    public void Compact_ColoursTheChangeLikeTheNormalTile(ChangeDirection direction, string changeClass, string iconClass)
     {
-        var change = new StatChange(ChangeDirection.Up, "35m");
-        var compact = Context.Render<StatTile>(p => p.Add(x => x.Label, "Time").Add(x => x.Value, "3").Add(x => x.Change, change).Add(x => x.Compact, true));
-        var normal = Context.Render<StatTile>(p => p.Add(x => x.Label, "Time").Add(x => x.Value, "3").Add(x => x.Change, change));
+        var change = new StatChange(direction, "35m");
+        var compact = Context.Render<StatTile>(p => p.Add(x => x.Label, "Time").Add(x => x.Value, "3").Add(x => x.Change, change).Add(x => x.Compact, true).Add(x => x.TestId, "tile"));
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Lists", "StatTile.razor.css");
 
         Assert.Multiple(() =>
         {
-            Assert.That(compact.Find(".change svg, .change .icon").ClassList, Does.Contain("muted"));
-            Assert.That(normal.Find(".change svg, .change .icon").ClassList, Does.Not.Contain("muted"));
+            Assert.That(compact.Find("[data-testid=tile-change]").ClassList, Does.Contain(changeClass));
+            Assert.That(compact.Find(".change svg").ClassList, Does.Contain(iconClass));
+            Assert.That(compact.Find(".change svg").ClassList, Does.Not.Contain("muted"));
+            Assert.That(css, Does.Contain($".{changeClass} {{\n    color: var(--color-{iconClass});"));
         });
     }
 

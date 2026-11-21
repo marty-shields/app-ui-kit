@@ -1,3 +1,4 @@
+using Shields.UI.Components.Actions;
 using Shields.UI.Components.Layout;
 
 namespace Shields.UI.Tests.Components.Layout;
@@ -81,6 +82,20 @@ public class StartupViewTests : ComponentTestBase
         cut.Find("[data-testid=startup-retry]").Click();
 
         Assert.That(retries, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void RetryVariant_DefaultsToPrimary_AndPassesThroughToTryAgain()
+    {
+        var primary = Render(p => p.Add(x => x.Failed, true).Add(x => x.OnRetry, () => { }));
+        var secondary = Render(p => p.Add(x => x.Failed, true).Add(x => x.OnRetry, () => { }).Add(x => x.RetryVariant, ButtonVariant.Secondary));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(primary.Find("[data-testid=startup-retry]").ClassList, Does.Contain("primary"));
+            Assert.That(secondary.Find("[data-testid=startup-retry]").ClassList, Does.Contain("secondary"));
+            Assert.That(secondary.Find("[data-testid=startup-retry]").ClassList, Does.Not.Contain("primary"));
+        });
     }
 
     [TestCase("My App", 1)]

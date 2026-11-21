@@ -212,6 +212,21 @@ public class SectionHeaderTests : ComponentTestBase
     }
 
     [Test]
+    public void Css_HintIsMutedSmallAndNeverWraps()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Lists", "SectionHeader.razor.css");
+        var hint = Regex.Match(css, @"\.hint\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(hint, Does.Match(@"white-space\s*:\s*nowrap"));
+            Assert.That(hint, Does.Match(@"flex-shrink\s*:\s*0"));
+            Assert.That(hint, Does.Match(@"color\s*:\s*var\(--color-text-muted\)"));
+            Assert.That(hint, Does.Match(@"font-size\s*:\s*var\(--font-size-sm\)"));
+        });
+    }
+
+    [Test]
     public void Click_RaisesExpandedChangedWithTheOppositeValue()
     {
         var raised = new List<bool>();

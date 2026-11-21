@@ -114,8 +114,11 @@
     --ring-width-compact: 0.625rem;
     --snackbar-gap-bottom: var(--space-2);
 
-    /* Chart dash: the dash and gap of a dashed chart line (stroke-dasharray), 6px then 4px. */
-    --chart-dash: calc(var(--space-1) * 1.5) var(--space-1);
+    /* Chart dash: the dash and gap of a dashed chart line (stroke-dasharray), 6px then 4px. The chart's target line strokes
+       --chart-dash and the legend's line swatch repeats the same two lengths, so they cannot drift apart. */
+    --chart-dash-on: calc(var(--space-1) * 1.5);
+    --chart-dash-off: var(--space-1);
+    --chart-dash: var(--chart-dash-on) var(--chart-dash-off);
 
     /* Data palette: categorical series colours for charts and stacked bars. Use them in order, 1 to n, so a chart reads the same
        everywhere. Indigo, clay, rose, gold and violet are spread around the hue wheel, so series differ by hue rather than by

@@ -70,6 +70,14 @@
         </Template>
     </Story>
 
+    <Story Name="Without the over marker">
+        <Template>
+            <div class="card">
+                <MonthCalendar Month="new DateOnly(2026, 11, 1)" Days="Month(2026, 11, Today)" Target="2000" Today="Today" ShowOverMarker="false" TestId="calendar" />
+            </div>
+        </Template>
+    </Story>
+
     <Story Name="Light">
         <Template>
             <div class="themed" data-theme="light">
@@ -100,8 +108,8 @@
     private static readonly IReadOnlyList<LegendItem> Legend =
     [
         new(LegendSwatch.Chip, "Under"),
-        new(LegendSwatch.Accent, "On target", "✓"),
-        new(LegendSwatch.Error, "Over", "▲"),
+        new(LegendSwatch.Check, "On target"),
+        new(LegendSwatch.Triangle, "Over"),
         new(LegendSwatch.Outline, "Not recorded"),
     ];
 

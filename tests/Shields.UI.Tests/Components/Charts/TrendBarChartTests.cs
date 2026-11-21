@@ -122,6 +122,7 @@ public class TrendBarChartTests : ComponentTestBase
             Assert.That(css, Does.Contain("stroke: var(--color-chart-band);"));
             Assert.That(css, Does.Contain("stroke-width: var(--border-width);"));
             Assert.That(css, Does.Contain("vector-effect: non-scaling-stroke;"));
+            Assert.That(css, Does.Contain("shape-rendering: crispEdges;"), "a 1px stroke at a fractional y is otherwise blurred across two pixel rows");
             Assert.That(css, Does.Not.Contain("fill"));
         });
     }
@@ -204,6 +205,22 @@ public class TrendBarChartTests : ComponentTestBase
         {
             Assert.That(cut.Find("[data-testid=chart-bar-2026-11-09]").ClassList, Does.Contain("on"));
             Assert.That(cut.Find("[data-testid=chart-bar-2026-11-10]").ClassList, Does.Contain("over"));
+        });
+    }
+
+    [Test]
+    public void Render_WithShowOverMarkerFalse_DrawsNoMarkerAndLowersTheValueLabelByTheMarkersLift()
+    {
+        var with = Render([Bar(0, 2500), Bar(1, 2000)]);
+        var without = Context.Render<TrendBarChart>(p => p.Add(x => x.Bars, [Bar(0, 2500), Bar(1, 2000)]).Add(x => x.Target, 2000).Add(x => x.TestId, "chart").Add(x => x.ShowOverMarker, false));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(with.FindAll("[data-testid^=chart-marker]"), Has.Count.EqualTo(1));
+            Assert.That(without.FindAll("[data-testid^=chart-marker]"), Is.Empty);
+            Assert.That(Number(without.Find("[data-testid=chart-value-label]"), "y") - Number(with.Find("[data-testid=chart-value-label]"), "y"), Is.EqualTo(9).Within(0.01), "the label drops from 15 to 6 above the bar");
+            Assert.That(without.Find("[data-testid=chart-bar-2026-11-09]").GetAttribute("aria-label"), Does.Contain("over target"));
+            Assert.That(without.Find("[data-testid=chart-bar-2026-11-09]").ClassList, Does.Contain("over"));
         });
     }
 

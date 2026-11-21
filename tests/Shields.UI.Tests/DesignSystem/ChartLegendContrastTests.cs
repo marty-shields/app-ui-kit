@@ -10,7 +10,7 @@ public partial class ChartLegendContrastTests
     private static readonly string Css = RepoFiles.Read("src", "Shields.UI", "Components", "Charts", "ChartLegend.razor.css");
 
     private static IEnumerable<TestCaseData> Cases() =>
-        new[] { ("marker", "color", Text), ("swatch.accent", "background-color", Graphic), ("swatch.chip", "background-color", Graphic), ("swatch.error", "background-color", Graphic), ("swatch.outline", "border", Graphic), ("swatch.line", "border-top", Graphic), ("swatch.band", "box-shadow", Graphic), ("swatch.past", "background-color", Graphic), ("swatch.primary", "background-color", Graphic), ("swatch.today", "border", Graphic) }
+        new[] { ("marker", "color", Text), ("swatch.accent", "background-color", Graphic), ("swatch.chip", "background-color", Graphic), ("swatch.error", "background-color", Graphic), ("swatch.outline", "border", Graphic), ("swatch.line", "background-color", Graphic), ("swatch.band", "box-shadow", Graphic), ("swatch.past", "background-color", Graphic), ("swatch.primary", "background-color", Graphic), ("swatch.today", "border", Graphic), ("swatch.check", "background-color", Graphic), ("swatch.triangle", "background-color", Graphic) }
             .SelectMany(c => new[] { "--color-bg", "--color-surface" }.SelectMany(background => Enum.GetValues<ColourScheme>()
                 .Select(scheme => new TestCaseData(c.Item1, c.Item2, background, c.Item3, scheme).SetArgDisplayNames($".{c.Item1} {c.Item2} on {background} ({scheme})"))));
 

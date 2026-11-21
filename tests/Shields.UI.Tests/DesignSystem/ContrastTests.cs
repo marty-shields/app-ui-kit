@@ -37,6 +37,9 @@ public class ContrastTests
         ("--color-on-chip-soft", "--color-chip-soft", Text),
         ("--color-chip", "--color-bg", LargeTextOrControl),
         ("--color-chip", "--color-surface", LargeTextOrControl),
+        // The Soft icon button's outline (--color-chip) and icon sit on the sheet's surface and the page, not on their own fill.
+        ("--color-on-chip-soft", "--color-surface", LargeTextOrControl),
+        ("--color-on-chip-soft", "--color-bg", LargeTextOrControl),
         ("--color-focus", "--color-bg", LargeTextOrControl),
         ("--color-focus", "--color-surface", LargeTextOrControl),
         ("--color-ring-track", "--color-surface", LargeTextOrControl),

@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -542,7 +543,7 @@ public class NumberFieldTests : ComponentTestBase
         var cut = Render(p => p
             .Add(x => x.Text, "")
             .Add(x => x.TextChanged, t => calls.Add("text:" + t))
-            .Add(x => x.ValueChanged, v => calls.Add("value:" + v)));
+            .Add(x => x.ValueChanged, v => calls.Add("value:" + v?.ToString(CultureInfo.InvariantCulture))));
 
         cut.Find("input").Input("22,75");
 
@@ -571,14 +572,50 @@ public class NumberFieldTests : ComponentTestBase
     }
 
     [Test]
-    public void Text_Stepper_WithoutText_DoesNotRaiseTextChanged()
+    public void Text_ChangingFromNonNumberToNumber_ShowsTheNumber()
     {
-        var texts = new List<string>();
-        var cut = Render(p => p.Add(x => x.Stepper, true).Add(x => x.TextChanged, t => texts.Add(t)));
+        var cut = Render(p => p.Add(x => x.Value, null).Add(x => x.Text, "abc"));
 
-        cut.Find("[data-testid=num-plus]").Click();
+        cut.Render(p => p.Add(x => x.Value, 5m).Add(x => x.Text, "5"));
 
-        Assert.That(texts, Is.Empty);
+        Assert.That(cut.Find("input").GetAttribute("value"), Is.EqualTo("5"));
+    }
+
+    [TestCase(null, "")]
+    [TestCase(3, "3")]
+    public void Text_GoingFromNonNumberToNull_ShowsTheValue(int? value, string expected)
+    {
+        var cut = Render(p => p.Add(x => x.Value, null).Add(x => x.Text, "abc"));
+
+        cut.Render(p => p.Add(x => x.Value, (decimal?)value).Add(x => x.Text, null));
+
+        Assert.That(cut.Find("input").GetAttribute("value"), Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Css_TheSharedInputBoxDrawsTheBorderedBoxAndTheCompactOneComesAfterIt()
+    {
+        var shared = RepoFiles.Read("src", "Shields.UI", "wwwroot", "css", "base.css");
+        var box = shared.Split(".input-box {")[1].Split('}')[0];
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(box, Does.Contain("padding: 0 var(--input-box-padding-inline);")
+                .And.Contain("border: var(--border-width) solid var(--color-border-strong);")
+                .And.Contain("border-radius: var(--radius-md);")
+                .And.Contain("background-color: var(--color-surface);")
+                .And.Contain("min-height: var(--touch-target);"));
+            Assert.That(shared, Does.Contain(".input-box:focus-within {"));
+            Assert.That(shared.IndexOf(".input-box-compact {", StringComparison.Ordinal), Is.GreaterThan(shared.IndexOf(".input-box {", StringComparison.Ordinal)));
+        });
+    }
+
+    [Test]
+    public void Css_TheScopedBoxSetsNoPaddingSoTheCompactBoxWins()
+    {
+        var number = RepoFiles.Read("src", "Shields.UI", "Components", "Inputs", "NumberField.razor.css");
+
+        Assert.That(number.Split(".box {")[1].Split('}')[0], Does.Not.Contain("padding"));
     }
 
     [Test]

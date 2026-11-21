@@ -63,6 +63,7 @@
     private ElementReference input;
     private string text = "";
     private decimal? lastValue;
+    private string? lastText;
     private bool echoPending;
     private bool HasMessage => !string.IsNullOrEmpty(InvalidMessage);
     private bool IsInvalid => Invalid || HasMessage;
@@ -77,11 +78,14 @@
         // Right after a keystroke the new Value is the parent taking what was typed, not a change of its own.
         var parentChanged = Value != lastValue && !echoPending;
         lastValue = Value;
+        // When the parent stops holding the text, what it held ("abc") must not stay on screen.
+        var textReleased = Text is null && lastText is not null;
+        lastText = Text;
         if (Text is not null)
         {
             text = Text;
         }
-        else if (parentChanged || Parse(text) != Value)
+        else if (textReleased || parentChanged || Parse(text) != Value)
         {
             text = Value is { } v ? v.ToString(CultureInfo.InvariantCulture) : "";
         }

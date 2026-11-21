@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Components;
+
 namespace Shields.UI.Tests.Testing;
 
 public class KitDataTests
@@ -27,6 +29,16 @@ public class KitDataTests
         var exported = KitComponents.Exported.Select(t => t.Name.Split('`')[0]);
 
         Assert.That(KitNames.Components, Is.EquivalentTo(exported));
+    }
+
+    [Test]
+    public void Types_AreEveryExportedNonComponentTypeOfTheKit()
+    {
+        var exported = typeof(ShieldsUiServiceCollectionExtensions).Assembly.GetExportedTypes()
+            .Where(t => !typeof(ComponentBase).IsAssignableFrom(t) && t.Name != "_Imports")
+            .Select(t => t.Name.Split('`')[0]);
+
+        Assert.That(KitNames.Types, Is.EquivalentTo(exported));
     }
 
     [Test]

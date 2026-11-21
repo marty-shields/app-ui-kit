@@ -44,14 +44,19 @@ public class ErrorViewTests : ComponentTestBase
     public void Restart_SitsInTheBottomBar() =>
         Assert.That(Context.Render<ErrorView>().Find("[data-testid=error-bottom-bar] [data-testid=error-restart]").ClassList, Does.Contain("full"));
 
-    [Test]
-    public void TopBarCss_MatchesAppScreen() =>
-        Assert.That(CssRule("ErrorView", ".top-bar"), Is.EqualTo(CssRule("AppScreen", ".top-bar")));
+    [TestCase(".top-bar")]
+    [TestCase(".title")]
+    public void Css_MatchesAppScreen(string selector) =>
+        Assert.That(CssRules.Declarations("ErrorView", selector), Is.EqualTo(CssRules.Declarations("AppScreen", selector)));
 
-    private static string CssRule(string component, string selector)
-    {
-        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Layout", component + ".razor.css");
-        var start = css.IndexOf("\n" + selector + " {", StringComparison.Ordinal);
-        return css[start..css.IndexOf('}', start)];
-    }
+    [TestCase("border-top")]
+    [TestCase("background-color")]
+    public void BottomCss_MatchesAppScreen(string property) =>
+        Assert.That(CssRules.Declarations("ErrorView", ".bottom")[property], Is.EqualTo(CssRules.Declarations("AppScreen", ".bottom")[property]));
+
+    [Test]
+    public void BottomBarCss_PadsLikeAppScreensLastBottomBar() =>
+        Assert.That(
+            CssRules.Declarations("ErrorView", ".bottom-bar")["padding"],
+            Is.EqualTo("var(--space-3) var(--space-4) calc(var(--space-3) + var(--inset-bottom))"));
 }

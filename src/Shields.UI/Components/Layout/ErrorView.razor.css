@@ -1,7 +1,9 @@
 .screen {
+    position: fixed;
+    inset: 0;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    background-color: var(--color-bg);
 }
 
 .top-bar {
@@ -30,6 +32,11 @@
     place-items: center;
     padding: var(--space-6) var(--space-4);
     text-align: center;
+}
+
+/* With no top bar the content clears the status bar itself. */
+.centre:first-child {
+    padding-top: calc(var(--space-6) + var(--inset-top));
 }
 
 .message {

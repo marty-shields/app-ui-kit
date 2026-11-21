@@ -83,18 +83,10 @@ public class StartupViewTests : ComponentTestBase
     public void WithoutTitle_ShowsNoTopBar() =>
         Assert.That(Render().FindAll("[data-testid=startup-top-bar]"), Is.Empty);
 
-    [Test]
-    public void TopBarCss_MatchesAppScreen()
-    {
-        static string Rule(string component)
-        {
-            var css = RepoFiles.Read("src", "Shields.UI", "Components", "Layout", component + ".razor.css");
-            var start = css.IndexOf("\n.top-bar {", StringComparison.Ordinal);
-            return css[start..css.IndexOf('}', start)];
-        }
-
-        Assert.That(Rule("StartupView"), Is.EqualTo(Rule("AppScreen")));
-    }
+    [TestCase(".top-bar")]
+    [TestCase(".title")]
+    public void Css_MatchesAppScreen(string selector) =>
+        Assert.That(CssRules.Declarations("StartupView", selector), Is.EqualTo(CssRules.Declarations("AppScreen", selector)));
 
     private IRenderedComponent<StartupView> Render(Action<ComponentParameterCollectionBuilder<StartupView>>? more = null) =>
         Context.Render<StartupView>(p =>

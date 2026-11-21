@@ -123,6 +123,15 @@
     /* BarList: the bar and its track (the accent fill keeps 3:1 against the track and the card surface), and the widest the value column grows (a share of the row) before the value ellipsises. */
     --bar-list-bar-height: 0.75rem;
     --bar-list-value-max-width: 50%;
+
+    /* Sheet and SheetAction: the bottom sheet's enter time, widest and tallest size, grab-bar size, and the action tile's height and icon. */
+    --sheet-enter-duration: 200ms;
+    --sheet-max-width: 32rem;
+    --sheet-max-height: 85dvh;
+    --sheet-handle-width: 3rem;
+    --sheet-handle-height: 0.375rem;
+    --sheet-tile-min-height: 6.5rem;
+    --sheet-tile-icon-size: 2rem;
 }
 
 /* Forces a theme on an element and its children. */

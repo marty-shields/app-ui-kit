@@ -10,4 +10,17 @@
     <li><code>data-testid</code>: <code>TestId</code> on the scrim, with <code>-cancel</code> and <code>-confirm</code> on the buttons.</li>
 </ul>
 
-<p>Stories: <a href="./?path=/docs/components-overlays-confirmdialog--docs">ConfirmDialog</a></p>
+<h2><code>Sheet</code></h2>
+<p>A bottom sheet over a scrim, with a handle and a title that names it. It slides up (not with reduced motion) and is at most <code>--sheet-max-width</code> wide. Tab stays inside it (the topmost one, when sheets stack), and a tall body scrolls inside it up to <code>--sheet-max-height</code>. Focus returns to the element marked <code>data-sheet-opener</code> when there is one (the raised button of <code>AppScreen</code> and <code>BottomNav</code> takes it through their attributes), and otherwise to the control that had focus when the sheet opened. A tap on the scrim, Escape (also when focus has fallen to the page) and the Android back button raise <code>OnClose</code>; the sheet stays open until the owner clears <code>Open</code>.</p>
+<ul>
+    <li><code>Open</code>, <code>Title</code> (heading and accessible name), <code>OnClose</code>, <code>ChildContent</code> for the body.</li>
+    <li><code>data-testid</code>: <code>TestId</code> on the sheet, with <code>-scrim</code> and <code>-handle</code>.</li>
+</ul>
+
+<h2><code>SheetAction</code></h2>
+<p>A tile for a sheet's body: an icon over a label, at least a touch target tall. Put the tiles in a grid the sheet's body provides.</p>
+<ul>
+    <li><code>Icon</code>, <code>Label</code>, <code>OnClick</code>; <code>TestId</code> on the button.</li>
+</ul>
+
+<p>Stories: <a href="./?path=/docs/components-overlays-confirmdialog--docs">ConfirmDialog</a>, <a href="./?path=/docs/components-overlays-sheet--docs">Sheet</a>, <a href="./?path=/docs/components-overlays-sheetaction--docs">SheetAction</a></p>

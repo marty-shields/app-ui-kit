@@ -1,0 +1,127 @@
+@using Microsoft.Extensions.Logging
+@using Microsoft.JSInterop
+@using Shields.UI.Components.Navigation
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+@inject ILogger<Sheet> Logger
+
+@if (Open)
+{
+    <BackHandler OnBack="OnClose" />
+    <div class="scrim" data-testid="@($"{TestId}-scrim")" aria-hidden="true" @onclick="OnClose"></div>
+    <div @ref="sheet" class="sheet" role="dialog" aria-modal="true" tabindex="-1" aria-labelledby="@titleId" data-testid="@TestId" @onkeydown="OnKeyDown">
+        <div class="handle" aria-hidden="true" data-testid="@($"{TestId}-handle")"></div>
+        <h2 id="@titleId" class="title">@Title</h2>
+        @ChildContent
+    </div>
+}
+
+@code {
+    private readonly string titleId = $"sheet-title-{Guid.NewGuid():N}";
+    private ElementReference sheet;
+    private Task<IJSObjectReference>? module;
+    private DotNetObjectReference<Sheet>? self;
+    private bool trapping;
+    private bool disposed;
+    private int? trap;
+
+    /// <summary>Shows the sheet. It stays open until the owner clears this, whatever <see cref="OnClose"/> was raised for.</summary>
+    [Parameter]
+    public bool Open { get; set; }
+
+    /// <summary>Accessible name of the sheet, shown as its heading, e.g. Add item.</summary>
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = "";
+
+    /// <summary>Raised by a tap on the scrim, the Android back button and Escape.</summary>
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+    /// <summary>Body under the title. Tab stays inside the sheet while it is open, and focus returns to the control that had it when the sheet opened.</summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>Value of the sheet's data-testid; also the prefix for <c>{TestId}-scrim</c> and <c>{TestId}-handle</c>.</summary>
+    [Parameter]
+    public string TestId { get; set; } = "sheet";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (Open == trapping)
+        {
+            return;
+        }
+
+        var opening = Open;
+        trapping = opening;
+        try
+        {
+            module ??= JS.InvokeAsync<IJSObjectReference>("import", "./_content/Shields.UI/Components/Overlays/Sheet.razor.js").AsTask();
+            var script = await module;
+
+            // The owner may have closed the sheet, or it may have been disposed, while the script loaded.
+            if (disposed)
+            {
+                return;
+            }
+
+            if (opening)
+            {
+                if (Open && trap is null)
+                {
+                    self ??= DotNetObjectReference.Create(this);
+                    trap = await script.InvokeAsync<int>("open", sheet, self);
+                }
+            }
+            else if (trap is { } id)
+            {
+                trap = null;
+                await script.InvokeVoidAsync("close", id);
+            }
+        }
+        catch (JSDisconnectedException)
+        {
+            // The page is gone, and the sheet with it.
+        }
+        catch (JSException exception)
+        {
+            if (module is { IsFaulted: true })
+            {
+                module = null;
+            }
+
+            Log.FocusFailed(Logger, exception);
+        }
+    }
+
+    private Task OnKeyDown(KeyboardEventArgs args) => args.Key == "Escape" ? OnClose.InvokeAsync() : Task.CompletedTask;
+
+    /// <summary>Called by the focus script for Escape pressed while focus is outside the sheet, e.g. on the page body.</summary>
+    [JSInvokable]
+    public Task EscapeOutsideSheet() => OnClose.InvokeAsync();
+
+    public async ValueTask DisposeAsync()
+    {
+        disposed = true;
+        self?.Dispose();
+        if (module is not { IsCompletedSuccessfully: true })
+        {
+            return;
+        }
+
+        try
+        {
+            if (trap is { } id)
+            {
+                trap = null;
+                await module.Result.InvokeVoidAsync("close", id);
+            }
+
+            await module.Result.DisposeAsync();
+        }
+        catch (JSDisconnectedException)
+        {
+            // The page is gone, and the module with it.
+        }
+    }
+}

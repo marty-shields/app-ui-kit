@@ -1,0 +1,22 @@
+<button type="button" class="tile" data-testid="@TestId" @onclick="OnClick">
+    <Icon Name="Icon" />
+    <span class="text">@Label</span>
+</button>
+
+@code {
+    /// <summary>Icon above the label.</summary>
+    [Parameter, EditorRequired]
+    public IconName Icon { get; set; }
+
+    /// <summary>Text under the icon, which also names the button.</summary>
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = "";
+
+    /// <summary>Raised when the tile is tapped.</summary>
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    /// <summary>Value of the button's data-testid.</summary>
+    [Parameter]
+    public string? TestId { get; set; }
+}

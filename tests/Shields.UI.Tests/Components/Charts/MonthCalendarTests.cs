@@ -384,6 +384,37 @@ public class MonthCalendarTests : ComponentTestBase
     }
 
     [Test]
+    public void Render_Marks_WithAHandler_OnlyRecordedDaysAreButtons()
+    {
+        var cut = Context.Render<MonthCalendar>(p => p
+            .Add(x => x.Month, new DateOnly(2026, 11, 20)).Add(x => x.Days, [Day(3, 1000), Day(18, 500)]).Add(x => x.Today, Today)
+            .Add(x => x.Style, CalendarStyle.Marks).Add(x => x.TestId, "cal").Add(x => x.OnSelect, EventCallback.Factory.Create<DateOnly>(this, selected.Add)));
+
+        cut.Find(Selector(3)).Click();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.FindAll("button.cell").Select(b => b.GetAttribute("data-testid")), Is.EqualTo(new[] { "cal-day-2026-11-03", "cal-day-2026-11-18" }));
+            Assert.That(cut.Find(Selector(4)).TagName, Is.EqualTo("DIV"));
+            Assert.That(cut.Find(Selector(19)).TagName, Is.EqualTo("DIV"));
+            Assert.That(selected, Is.EqualTo(new[] { new DateOnly(2026, 11, 3) }));
+        });
+    }
+
+    [Test]
+    public void Css_Marks_PressedStateShowsOnlyOnTheCircle()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Charts", "MonthCalendar.razor.css");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(css, Does.Not.Match(@"(?m)^button\.cell:active"));
+            Assert.That(css, Does.Match(@"\.marks button\.cell:not\(:disabled\):active\s*\{[^}]*background-image: none;"));
+            Assert.That(css, Does.Match(@"\.marks button\.cell:active \.num\s*\{[^}]*background-image: linear-gradient\(var\(--state-pressed\)"));
+        });
+    }
+
+    [Test]
     public void Render_DefaultStyleIsStatus()
     {
         var cut = Render(Day(3, 1000));

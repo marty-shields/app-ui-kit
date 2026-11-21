@@ -140,6 +140,33 @@ public class BarListTests : ComponentTestBase
     }
 
     [Test]
+    public void Render_WithAHandler_ListIsSelectable_AndWithoutOneIsNot()
+    {
+        var with = Context.Render<BarList>(p => p.Add(x => x.Items, [new BarListItem("A", 1, Selectable: false)]).Add(x => x.OnSelect, EventCallback.Factory.Create<int>(this, _ => { })));
+        var without = Render([new("A", 1)]);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(with.Find("ul").ClassList, Does.Contain("selectable"));
+            Assert.That(without.Find("ul").ClassList, Does.Not.Contain("selectable"));
+        });
+    }
+
+    [Test]
+    public void Css_SelectableRowsAreATouchTargetTall_AndInlineBarsUseTheirOwnHeight()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Charts", "BarList.razor.css");
+        string Rule(string selector) => Regex.Match(css, Regex.Escape(selector) + @"\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(Rule(".selectable .row"), Does.Contain("min-height: var(--touch-target);"));
+            Assert.That(Rule(".inline .track"), Does.Contain("height: var(--bar-list-bar-height-inline);"));
+            Assert.That(Rule(".track"), Does.Contain("height: var(--bar-list-bar-height);"));
+        });
+    }
+
+    [Test]
     public void Render_ByDefault_IsStackedWithNormalColumnsAndNoButtons()
     {
         var cut = Render([new("A", 1)]);

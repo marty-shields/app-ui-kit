@@ -131,7 +131,8 @@
     /* BarList: the bar and its track (the fill, --color-ring-arc, keeps 3:1 against the track), and the widest the value column grows (a share of the row) before the value ellipsises. */
     --bar-list-bar-height: 0.75rem;
     --bar-list-value-max-width: 50%;
-    /* BarList inline: the label column (normal, wide, narrow) and the value column (normal, narrow). */
+    /* BarList inline: the thinner bar, the label column (normal, wide, narrow) and the value column (normal, narrow). */
+    --bar-list-bar-height-inline: 0.625rem;
     --bar-list-label-width: 5.5rem;
     --bar-list-label-width-wide: 8rem;
     --bar-list-label-width-narrow: 2.5rem;

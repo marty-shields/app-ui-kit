@@ -67,6 +67,16 @@ public partial class MonthCalendarTodayRingTests
         Assert.That(Rgb.Contrast(ring, background), Is.GreaterThanOrEqualTo(Graphic), $"{Ring()[1]} {ring} on {surface} {background}");
     }
 
+    [TestCase(".marks .cell.marked .num", "background-color: var(--color-primary);")]
+    [TestCase(".marks .cell.marked", "color: var(--color-on-primary);")]
+    [TestCase(".marks .num", "border: var(--border-width) dashed var(--color-border-strong);")]
+    public void MarksStyle_UsesThePrimaryAndBorderTokens(string selector, string declaration)
+    {
+        var rule = Regex.Match(Css, @"(?:^|[},/])\s*" + Regex.Escape(selector) + @"\s*\{(?<body>[^}]*)\}", RegexOptions.None, TimeSpan.FromSeconds(1)).Groups["body"].Value;
+
+        Assert.That(rule, Does.Contain(declaration));
+    }
+
     private static List<double> Spreads()
     {
         var rule = Regex.Match(Css, @"\.cell\.today\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;

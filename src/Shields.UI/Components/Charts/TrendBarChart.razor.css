@@ -89,7 +89,7 @@
     display: none;
 }
 
-/* PastAndCurrent style: the current period's bar is the accent, the others and every earlier bar of a pair are the past colour. */
+/* PastAndCurrent style: without pairs only the Current bar is the accent and the others are past; in a pair every bar's own column is the accent and every earlier column the past colour. */
 .bar.past .column,
 .column.earlier {
     fill: var(--color-chart-past);

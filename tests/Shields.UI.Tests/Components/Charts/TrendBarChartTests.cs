@@ -717,4 +717,85 @@ public class TrendBarChartTests : ComponentTestBase
             Assert.That(cut.FindAll("[data-testid=chart-value-label]"), Has.Count.EqualTo(1));
         });
     }
+
+    [TestCase(".bar.past .column", "--color-chart-past")]
+    [TestCase(".column.earlier", "--color-chart-past")]
+    [TestCase(".bar.now .column:not(.earlier)", "--color-accent")]
+    public void PastAndCurrentStyle_UsesThePastAndAccentColours(string selector, string token)
+    {
+        Assert.That(Rule(selector), Does.Contain($"fill: var({token});"));
+    }
+
+    [Test]
+    public void PastAndCurrent_Scale_IgnoresTheChartTargetAndEachBarsOwn()
+    {
+        var cut = RenderPast([Past(0, 500), Past(1, 1000) with { Target = 9000 }]);
+
+        var ticks = cut.FindAll("[data-testid^=chart-tick-]").Select(e => double.Parse(e.GetAttribute("data-testid")!["chart-tick-".Length..], CultureInfo.InvariantCulture));
+        var top = Number(cut.Find("[data-testid=chart-grid-1000]"), "y1");
+        Assert.Multiple(() =>
+        {
+            Assert.That(ticks.Max(), Is.LessThan(2200));
+            Assert.That(DrawnTop(cut, 1), Is.EqualTo(top).Within(0.02));
+            Assert.That(Height(cut, 1), Is.EqualTo(2 * Height(cut, 0)).Within(0.05));
+        });
+    }
+
+    [Test]
+    public void StatusStyle_EarlierOnlyBar_IsAGapAndWithoutAColumn()
+    {
+        var cut = Render([Past(0, null, earlier: 800)]);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.FindAll("[data-testid=chart-gap-2026-11-09]"), Has.Count.EqualTo(1));
+            Assert.That(cut.FindAll("[data-testid=chart-bar-2026-11-09]"), Is.Empty);
+            Assert.That(cut.Find("[data-testid=chart-empty]").TextContent, Is.EqualTo("Nothing recorded yet"));
+        });
+    }
+
+    [Test]
+    public void PastAndCurrent_LabelledBarWithOnlyAnEarlierValue_PrintsNoValueLabel()
+    {
+        var cut = RenderPast([Past(0, null, labelled: true, earlier: 800)]);
+
+        Assert.That(cut.FindAll("[data-testid^=chart-value-label]"), Is.Empty);
+    }
+
+    [Test]
+    public void PastAndCurrent_Paired_ValueLabelIsCentredOnTheCurrentColumnAboveTheTallerOne()
+    {
+        var cut = RenderPast([Past(0, 500, labelled: true, earlier: 1500), Past(1, 2000, labelled: true, earlier: 100)]);
+
+        var column = (int day) =>
+        {
+            var d = cut.Find($"[data-testid=chart-column-{Monday.AddDays(day):yyyy-MM-dd}]").GetAttribute("d")!.Split(' ');
+            var left = double.Parse(d[1], CultureInfo.InvariantCulture);
+            var right = double.Parse(d[^5], CultureInfo.InvariantCulture);
+            return (left + right) / 2;
+        };
+        var label = (int day) => cut.Find($"[data-testid=chart-value-label-{Monday.AddDays(day):yyyy-MM-dd}]");
+        var baseline = Number(cut.Find("[data-testid=chart-baseline]"), "y1");
+        Assert.Multiple(() =>
+        {
+            Assert.That(Number(label(0), "x"), Is.EqualTo(column(0)).Within(0.05));
+            Assert.That(Number(label(1), "x"), Is.EqualTo(column(1)).Within(0.05));
+            Assert.That(baseline - Number(label(0), "y"), Is.GreaterThan(Number(cut.Find("[data-testid=chart-earlier-2026-11-09]"), "data-height")), "above the taller earlier column");
+            Assert.That(baseline - Number(label(1), "y"), Is.GreaterThan(Height(cut, 1)));
+        });
+    }
+
+    [Test]
+    public void PastAndCurrent_Paired_TooltipAndNameCarryTheEarlierValue()
+    {
+        var cut = RenderPast([Past(0, 1500, earlier: 1200), Past(1, null, earlier: 800), Past(2, 900)], "last week");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find("[data-testid=chart-bar-2026-11-09] .tip").TextContent, Is.EqualTo("Mon 9 Nov, 1,500 pts, last week 1,200 pts"));
+            Assert.That(cut.Find("[data-testid=chart-bar-2026-11-10] .tip").TextContent, Is.EqualTo("Tue 10 Nov, last week 800 pts"));
+            Assert.That(cut.Find("[data-testid=chart-bar-2026-11-11] .tip").TextContent, Is.EqualTo("Wed 11 Nov, 900 pts"));
+            Assert.That(cut.Find("[data-testid=chart-bar-2026-11-09]").GetAttribute("aria-label"), Is.EqualTo("Mon 9 Nov, 1,500 pts, last week 1,200 pts"));
+        });
+    }
 }

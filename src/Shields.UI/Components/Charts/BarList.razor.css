@@ -65,6 +65,11 @@
     cursor: pointer;
 }
 
+/* In a list with a handler, rows that are not tappable keep the height of those that are. */
+.selectable .row {
+    min-height: var(--touch-target);
+}
+
 /* Inline: label, bar and value on one line, the label and value in columns of fixed width. */
 .list {
     --label-width: var(--bar-list-label-width);
@@ -96,6 +101,7 @@
 
 .inline .track {
     grid-column: 2;
+    height: var(--bar-list-bar-height-inline);
     grid-row: 1;
 }
 

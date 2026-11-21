@@ -52,7 +52,8 @@
                 }
                 @if (recorded && (Past ? bar.Labelled : bar == highest))
                 {
-                    @Text("value-label", centre, top - (status == TargetStatus.Over ? 15 : 6), "middle", TargetStatuses.Number(value), Id(Past ? $"value-label-{Day(bar)}" : "value-label"))
+                    var labelTop = paired && TargetStatuses.IsRecorded(bar.Earlier) ? Math.Min(top, Y(bar.Earlier!.Value)) : top;
+                    @Text("value-label", left + width / 2, labelTop - (status == TargetStatus.Over ? 15 : 6), "middle", TargetStatuses.Number(value), Id(Past ? $"value-label-{Day(bar)}" : "value-label"))
                 }
                 @{ var tip = Tip(bar); }
                 @Text("tip", TipX(centre, tip), 12, "middle", tip, hidden: true)
@@ -210,14 +211,14 @@
 
     private string Name(TrendBarPoint bar, TargetStatus status) =>
         $"{Tip(bar)}" + (status == TargetStatus.None ? "" : $", {TargetStatuses.Word(status)}") + (bar.Note is null ? "" : $", {bar.Note}")
-        + (paired && TargetStatuses.IsRecorded(bar.Earlier) ? $", {EarlierLabel} {TargetStatuses.Number(bar.Earlier!.Value)}{UnitSuffix}" : "")
         + (Past && bar.Current ? ", current" : "");
 
     private string UnitSuffix => Unit is null ? "" : $" {Unit}";
 
-    /// <summary>The date and value, which is all the tooltip shows; the status is in the colour and the marker.</summary>
+    /// <summary>The date and value, and in a paired chart the earlier value; the status is in the colour and the marker.</summary>
     private string Tip(TrendBarPoint bar) => bar.Date.ToString(DateFormat, CultureInfo.InvariantCulture)
-        + (TargetStatuses.IsRecorded(bar.Value) ? $", {TargetStatuses.Number(bar.Value!.Value)}{UnitSuffix}" : "");
+        + (TargetStatuses.IsRecorded(bar.Value) ? $", {TargetStatuses.Number(bar.Value!.Value)}{UnitSuffix}" : "")
+        + (paired && TargetStatuses.IsRecorded(bar.Earlier) ? $", {EarlierLabel} {TargetStatuses.Number(bar.Earlier!.Value)}{UnitSuffix}" : "");
 
     private string BarClass(TrendBarPoint bar, TargetStatus status, bool selectable) =>
         $"bar {(Past ? (bar.Current || paired ? "now" : "past") : TargetStatuses.Class(status))}" + (selectable ? " selectable" : "") + (bar.Note is not null ? " thin" : "");

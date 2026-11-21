@@ -28,7 +28,7 @@ public class KitTokensTests
         "--color-ring-track", "--color-ring-arc", "--color-ring-arc-over", "--font-size-xs", "--ring-size", "--ring-width", "--ring-size-compact", "--ring-width-compact",
         "--color-chart-band", "--color-chart-past", "--snackbar-gap-bottom",
         "--opacity-thin", "--chart-dash", "--color-data-1", "--color-data-2", "--color-data-3", "--color-data-4", "--color-data-5",
-        "--bar-list-bar-height", "--bar-list-value-max-width", "--bar-list-label-width", "--bar-list-label-width-wide", "--bar-list-label-width-narrow", "--bar-list-value-width", "--bar-list-value-width-narrow", "--calendar-day-size",
+        "--bar-list-bar-height", "--bar-list-bar-height-inline", "--bar-list-value-max-width", "--bar-list-label-width", "--bar-list-label-width-wide", "--bar-list-label-width-narrow", "--bar-list-value-width", "--bar-list-value-width-narrow", "--calendar-day-size",
         "--stacked-bar-height", "--stacked-bar-gap", "--stacked-bar-segment-min-width",
         // AppScreen, StatTile and Card compact.
         "--app-screen-nav-clearance", "--stat-tile-compact-padding", "--stat-tile-compact-value-size", "--card-compact-padding", "--card-compact-title-gap", "--entry-grid-index-width", "--entry-grid-aside-width", "--calendar-day-size", "--calendar-dot-size",

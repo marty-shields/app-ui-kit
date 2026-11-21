@@ -6,6 +6,6 @@ public enum CalendarStyle
     /// <summary>Each recorded day is a cell filled by how it compares with the target, with a marker for on target and over.</summary>
     Status,
 
-    /// <summary>Each recorded day is a solid circle in <c>--color-primary</c>, a day not recorded is a dashed circle, and the target is ignored.</summary>
+    /// <summary>Each recorded day is a solid circle in <c>--color-primary</c>, a day not recorded is a dashed circle, and the target is ignored. With a handler only the recorded days are buttons; the others are plain cells.</summary>
     Marks,
 }

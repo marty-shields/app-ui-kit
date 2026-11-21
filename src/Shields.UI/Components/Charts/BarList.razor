@@ -6,7 +6,7 @@
 else
 {
     var full = FullBar();
-    <ul class="list @(Inline ? "inline" : null) @LabelClass @ValueClass" aria-label="@Label" data-testid="@TestId">
+    <ul class="list @(Inline ? "inline" : null) @(OnSelect.HasDelegate ? "selectable" : null) @LabelClass @ValueClass" aria-label="@Label" data-testid="@TestId">
         @for (var i = 0; i < Items.Count; i++)
         {
             var item = Items[i];

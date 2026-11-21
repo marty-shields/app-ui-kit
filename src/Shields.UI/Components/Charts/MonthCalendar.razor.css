@@ -107,7 +107,12 @@ button.cell {
     background-color: var(--color-primary);
 }
 
-button.cell:active .num {
+/* Only the circle shows the pressed state, not the cell around it. */
+.marks button.cell:not(:disabled):active {
+    background-image: none;
+}
+
+.marks button.cell:active .num {
     background-image: linear-gradient(var(--state-pressed), var(--state-pressed));
 }
 

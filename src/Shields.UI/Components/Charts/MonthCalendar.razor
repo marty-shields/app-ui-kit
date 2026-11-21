@@ -15,7 +15,7 @@
         @foreach (var date in DatesOfMonth)
         {
             var cell = Cell(date);
-            if (OnSelect.HasDelegate)
+            if (OnSelect.HasDelegate && (Style != CalendarStyle.Marks || cell.Recorded))
             {
                 <button type="button" class="cell @cell.Class" disabled="@cell.Disabled" data-testid="@Id($"day-{Day(date)}")"
                         @onclick="() => Select(date)">
@@ -33,7 +33,7 @@
 </div>
 
 @code {
-    private sealed record CellInfo(string Class, string Name, bool Disabled, TargetStatus Status);
+    private sealed record CellInfo(string Class, string Name, bool Disabled, TargetStatus Status, bool Recorded = false);
 
     /// <summary>Any day of the month to show.</summary>
     [Parameter]
@@ -51,7 +51,7 @@
     [Parameter]
     public DateOnly? Today { get; set; }
 
-    /// <summary>Raised with the day's date when an enabled day is clicked or gets Enter or Space. Without a handler the days are plain text, not buttons.</summary>
+    /// <summary>Raised with the day's date when an enabled day is clicked or gets Enter or Space. Without a handler the days are plain text, not buttons. With <see cref="CalendarStyle.Marks"/> only the recorded days are buttons.</summary>
     [Parameter]
     public EventCallback<DateOnly> OnSelect { get; set; }
 
@@ -133,7 +133,7 @@
         var value = TargetStatuses.Number(day!.Value!.Value) + (Unit is null ? "" : $" {Unit}");
         if (Style == CalendarStyle.Marks)
         {
-            return new CellInfo("marked" + today, $"{name}{todayName}, {value}, recorded", false, TargetStatus.None);
+            return new CellInfo("marked" + today, $"{name}{todayName}, {value}, recorded", false, TargetStatus.None, true);
         }
 
         var status = TargetStatuses.Of(day.Value!.Value, TargetStatuses.ValidTarget(day.Target) ?? Target);

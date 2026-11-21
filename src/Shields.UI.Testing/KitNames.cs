@@ -20,7 +20,7 @@ public static class KitNames
     {
         "AppLifecycle", "AppLifecycleBridge", "BackButton", "BackButtonBridge", "BarListItem", "BottomNavItem",
         "ButtonVariant", "CalendarDay", "ChangeDirection", "DataSeries", "DataSeriesExtensions", "DayLabel", "IAppLifecycle", "IAppStart", "IBackButton", "IconButtonStyle",
-        "IconName", "IconSize", "IconTone", "LegendItem", "LegendSwatch", "PeriodKind", "RadioOption",
+        "IconName", "IconSize", "IconTone", "KitEvent", "LegendItem", "LegendSwatch", "PeriodKind", "RadioOption",
         "ShieldsUiServiceCollectionExtensions", "SnackbarMessage", "SnackbarService", "StackedBarSegment", "StatChange",
         "SystemBarInsetWriter", "TargetStatus", "TargetStatuses", "ThemePreference", "ThemeService", "TrendBar"
     };

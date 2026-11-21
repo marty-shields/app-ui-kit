@@ -2,7 +2,9 @@
 <div class="screen">
     @if (Title is not null)
     {
-        <h1 class="title">@Title</h1>
+        <header class="top-bar" data-testid="startup-top-bar">
+            <h1 class="title">@Title</h1>
+        </header>
     }
     <div class="centre">
         @if (!Failed)

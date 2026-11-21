@@ -67,6 +67,27 @@ public class StartupViewTests : ComponentTestBase
         Assert.That(cut.FindAll(".title"), Has.Count.EqualTo(count));
     }
 
+    [Test]
+    public void Title_ShowsInATopBar()
+    {
+        var bar = Render(p => p.Add(x => x.Title, "My App")).Find("[data-testid=startup-top-bar]");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(bar.TagName, Is.EqualTo("HEADER"));
+            Assert.That(bar.QuerySelector(".title")!.TextContent, Is.EqualTo("My App"));
+        });
+    }
+
+    [Test]
+    public void WithoutTitle_ShowsNoTopBar() =>
+        Assert.That(Render().FindAll("[data-testid=startup-top-bar]"), Is.Empty);
+
+    [TestCase(".top-bar")]
+    [TestCase(".title")]
+    public void Css_MatchesAppScreen(string selector) =>
+        Assert.That(CssRules.Declarations("StartupView", selector), Is.EqualTo(CssRules.Declarations("AppScreen", selector)));
+
     private IRenderedComponent<StartupView> Render(Action<ComponentParameterCollectionBuilder<StartupView>>? more = null) =>
         Context.Render<StartupView>(p =>
         {

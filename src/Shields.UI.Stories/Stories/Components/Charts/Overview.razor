@@ -52,7 +52,7 @@
     <thead><tr><th>Part</th><th>Looks like</th></tr></thead>
     <tbody>
         <tr><td>Under</td><td>A bar in <code>--color-chip</code>, more than 10% below the target.</td></tr>
-        <tr><td>On target</td><td>A bar in <code>--color-accent</code>, within 10% either side of the target.</td></tr>
+        <tr><td>On target</td><td>A bar in <code>--color-accent</code>, within 10% either side of the target, with a ✓ marker.</td></tr>
         <tr><td>Over</td><td>A bar in <code>--color-error</code> with a ▲ marker above it, more than 10% over.</td></tr>
         <tr><td>Target</td><td>A dashed line (<code>--chart-dash</code>) at the target.</td></tr>
         <tr><td>Target range</td><td>The band 10% either side of the target, drawn as a top and bottom edge in <code>--color-chart-band</code> at <code>--border-width</code> with no fill, so no bar loses contrast.</td></tr>
@@ -71,11 +71,11 @@
     <thead><tr><th>Day</th><th>Looks like</th></tr></thead>
     <tbody>
         <tr><td>Under</td><td>A cell in <code>--color-chip</code>, more than 10% below the target.</td></tr>
-        <tr><td>On target</td><td>A cell in <code>--color-accent</code>, within 10% either side of the target.</td></tr>
-        <tr><td>Over</td><td>A cell in <code>--color-error</code> with a ▲ marker, more than 10% over.</td></tr>
+        <tr><td>On target</td><td>A cell in <code>--color-accent</code>, within 10% either side of the target, with a ✓ marker.</td></tr>
+        <tr><td>Over</td><td>A cell in <code>--color-error</code> with a ▲ marker, more than 10% over. Under has no marker, so the three differ without colour.</td></tr>
         <tr><td>Not recorded</td><td>A dashed outline in <code>--color-border-strong</code> and no fill.</td></tr>
         <tr><td>Future</td><td>Faded and disabled; data on a future day is ignored.</td></tr>
-        <tr><td>Today</td><td>A <code>--color-text</code> ring and bold number. <code>Today</code> sets the day; without it the clock does.</td></tr>
+        <tr><td>Today</td><td>A double ring (a <code>--color-surface</code> gap, then <code>--color-text</code>) that stays visible on every fill, and a bold number. <code>Today</code> sets the day; without it the clock does.</td></tr>
     </tbody>
 </table>
 <ul>

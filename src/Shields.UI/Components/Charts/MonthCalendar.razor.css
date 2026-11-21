@@ -63,7 +63,7 @@ button.cell {
 }
 
 .cell.today {
-    box-shadow: 0 0 0 var(--focus-width) var(--color-text);
+    box-shadow: 0 0 0 var(--focus-width) var(--color-surface), 0 0 0 calc(var(--focus-width) * 2) var(--color-text);
     font-weight: var(--font-weight-bold);
 }
 

@@ -455,7 +455,7 @@ public class AppScreenTests : ComponentTestBase
 
         await Context.DisposeComponentsAsync();
         runtime.Import.SetResult(module);
-        await Task.Yield();
+        await module.DisposeSignal.Task.WaitAsync(TimeSpan.FromSeconds(30));
 
         Assert.Multiple(() =>
         {
@@ -509,6 +509,8 @@ public class AppScreenTests : ComponentTestBase
 
         public bool Disposed { get; private set; }
 
+        public TaskCompletionSource DisposeSignal { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
         public ValueTask<TValue> InvokeAsync<TValue>(string identifier, object?[]? args)
         {
             Calls.Add(identifier);
@@ -521,6 +523,7 @@ public class AppScreenTests : ComponentTestBase
         public ValueTask DisposeAsync()
         {
             Disposed = true;
+            DisposeSignal.SetResult();
             return ValueTask.CompletedTask;
         }
     }

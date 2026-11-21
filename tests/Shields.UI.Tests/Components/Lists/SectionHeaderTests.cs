@@ -48,11 +48,71 @@ public class SectionHeaderTests : ComponentTestBase
     }
 
     [Test]
+    public void Render_ShowsTheHintWithTestIdBeforeTheTotal()
+    {
+        var cut = Context.Render<SectionHeader>(p => p
+            .Add(x => x.Title, "Lunch")
+            .Add(x => x.Hint, "from 11:00")
+            .Add(x => x.Total, "521 kcal")
+            .Add(x => x.TestId, "head"));
+
+        var hint = cut.Find("[data-testid=head-hint]");
+        Assert.Multiple(() =>
+        {
+            Assert.That(hint.TextContent, Is.EqualTo("from 11:00"));
+            Assert.That(hint.ClassList, Does.Contain("hint"));
+            Assert.That(hint.ParentElement!.NextElementSibling!.GetAttribute("data-testid"), Is.EqualTo("head-total"));
+        });
+    }
+
+    [TestCase(null)]
+    [TestCase("")]
+    [TestCase("   ")]
+    public void Render_WithNullOrBlankHint_RendersNoHint(string? hint)
+    {
+        var cut = Context.Render<SectionHeader>(p => p
+            .Add(x => x.Title, "Lunch")
+            .Add(x => x.Hint, hint)
+            .Add(x => x.TestId, "head"));
+
+        Assert.That(cut.FindAll(".hint,[data-testid=head-hint]"), Is.Empty);
+    }
+
+    [Test]
+    public void Render_PlainHeader_ShowsTheHintInsideTheHeading()
+    {
+        var cut = Context.Render<SectionHeader>(p => p
+            .Add(x => x.Title, "Lunch")
+            .Add(x => x.Hint, "from 11:00")
+            .Add(x => x.TestId, "head"));
+
+        Assert.That(cut.Find("h2 span.toggle [data-testid=head-hint]").TextContent, Is.EqualTo("from 11:00"));
+    }
+
+    [Test]
+    public void Render_CollapsibleHeader_PutsTheHintInTheButtonSoItIsInTheAccessibleName()
+    {
+        var cut = Context.Render<SectionHeader>(p => p
+            .Add(x => x.Title, "Lunch")
+            .Add(x => x.Hint, "from 11:00")
+            .Add(x => x.ExpandedChanged, _ => { })
+            .Add(x => x.TestId, "head"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find("button [data-testid=head-hint]").TextContent, Is.EqualTo("from 11:00"));
+            Assert.That(cut.Find("button").TextContent, Does.Contain("from 11:00"));
+            Assert.That(cut.Find("button").HasAttribute("aria-describedby"), Is.False);
+        });
+    }
+
+    [Test]
     public void Render_WithoutTestId_RendersNoTestIds()
     {
         var cut = Context.Render<SectionHeader>(p => p
             .Add(x => x.Title, "Morning")
             .Add(x => x.Badge, "Now")
+            .Add(x => x.Hint, "from 11:00")
             .Add(x => x.Total, "3"));
 
         Assert.That(cut.FindAll("[data-testid]"), Is.Empty);
@@ -148,6 +208,35 @@ public class SectionHeaderTests : ComponentTestBase
         {
             Assert.That(cut.Find("[data-testid=head-title]").HasAttribute("data-wrap-ok"), Is.True);
             Assert.That(total, Does.Match(@"white-space\s*:\s*nowrap"));
+        });
+    }
+
+    [Test]
+    public void Css_LeadGroupWrapsSoTheHintDropsUnderTheTitleWhenNarrow()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Lists", "SectionHeader.razor.css");
+        var lead = Regex.Match(css, @"\.lead\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(lead, Does.Match(@"flex-wrap\s*:\s*wrap"));
+            Assert.That(lead, Does.Match(@"flex\s*:\s*1\s*;"));
+            Assert.That(lead, Does.Match(@"min-width\s*:\s*0"));
+        });
+    }
+
+    [Test]
+    public void Css_HintIsMutedSmallAndNeverWraps()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Lists", "SectionHeader.razor.css");
+        var hint = Regex.Match(css, @"\.hint\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(hint, Does.Match(@"white-space\s*:\s*nowrap"));
+            Assert.That(hint, Does.Match(@"flex-shrink\s*:\s*0"));
+            Assert.That(hint, Does.Match(@"color\s*:\s*var\(--color-text-muted\)"));
+            Assert.That(hint, Does.Match(@"font-size\s*:\s*var\(--font-size-sm\)"));
         });
     }
 

@@ -38,6 +38,14 @@
     <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>{TestId}-row-0</code>, <code>-label-0</code>, <code>-value-0</code> and <code>-bar-0</code> by position, or <code>{TestId}-empty</code> with no items. None are rendered without <code>TestId</code>.</li>
 </ul>
 
+<h2><code>StackedBar</code></h2>
+<p>One bar split into <code>StackedBarSegment</code>s, each sized by its share of the total and coloured by its <code>DataSeries</code>, with a label and value under the bar. Neighbouring data colours are under 3:1 against each other, so the segments are separated by a gap in the card colour (<code>--stacked-bar-gap</code>, drawn in <code>--color-surface</code>). Like <code>BarList</code>, it is meant to sit on a card.</p>
+<ul>
+    <li>A segment at zero, negative or not finite draws nothing but keeps its label, with 0 as its value. With every segment at zero the track is empty and the text alternative ends with <code>EmptyText</code>.</li>
+    <li>The bar is one image named by its text alternative, which starts with <code>Label</code> and lists each segment's label, value (followed by <code>Unit</code>) and percentage; percentages are rounded so they add up to 100. <code>ShowLabels</code> hides the visible labels, not the text alternative.</li>
+    <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>{TestId}-segment-0</code> (only above zero) and <code>-label-0</code> by position. None are rendered without <code>TestId</code>.</li>
+</ul>
+
 <h2><code>TrendBarChart</code></h2>
 <p>A bar chart of one value per slot, such as a week of days or a year of months, judged against a <code>Target</code>. Bars are <code>TrendBar</code> records; a bar with no value leaves an empty slot. The chart is meant to sit on a card (<code>--color-surface</code>).</p>
 <table>
@@ -78,4 +86,4 @@
     <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>-day-{date}</code> and <code>-marker-{date}</code>, the date as yyyy-MM-dd.</li>
 </ul>
 
-<p>Stories: <a href="./?path=/docs/components-charts-chartlegend--docs">ChartLegend</a>, <a href="./?path=/docs/components-charts-progressring--docs">ProgressRing</a>, <a href="./?path=/docs/components-charts-barlist--docs">BarList</a>, <a href="./?path=/docs/components-charts-trendbarchart--docs">TrendBarChart</a>, <a href="./?path=/docs/components-charts-monthcalendar--docs">MonthCalendar</a></p>
+<p>Stories: <a href="./?path=/docs/components-charts-chartlegend--docs">ChartLegend</a>, <a href="./?path=/docs/components-charts-progressring--docs">ProgressRing</a>, <a href="./?path=/docs/components-charts-barlist--docs">BarList</a>, <a href="./?path=/docs/components-charts-stackedbar--docs">StackedBar</a>, <a href="./?path=/docs/components-charts-trendbarchart--docs">TrendBarChart</a>, <a href="./?path=/docs/components-charts-monthcalendar--docs">MonthCalendar</a></p>

@@ -1,0 +1,96 @@
+@using System.Globalization
+<div class="stack" role="img" aria-label="@Description" data-testid="@TestId">
+    <div class="track @(Total > 0 ? null : "none")" aria-hidden="true">
+        @for (var i = 0; i < Segments.Count; i++)
+        {
+            var segment = Segments[i];
+            @if (Counted(segment.Value) > 0)
+            {
+                <span class="segment @segment.Series.CssClass()" style="flex-grow: @Grow(segment)" data-testid="@Id($"segment-{i}")"></span>
+            }
+        }
+    </div>
+    @if (ShowLabels)
+    {
+        <div class="labels" aria-hidden="true">
+            @for (var i = 0; i < Segments.Count; i++)
+            {
+                var segment = Segments[i];
+                <span class="label @segment.Series.CssClass()" data-testid="@Id($"label-{i}")"><span class="label-text">@segment.Label</span> <strong>@ValueText(segment)</strong></span>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    /// <summary>The segments, in the order drawn. The bar is meant to sit on a card (<c>--color-surface</c>): the gaps between segments are that colour, because neighbouring palette colours are under 3:1 against each other.</summary>
+    [Parameter]
+    public IReadOnlyList<StackedBarSegment> Segments { get; set; } = [];
+
+    /// <summary>The accessible name that starts the text alternative, such as "Sales by region". The text alternative lists each segment's label, value and percentage of the total.</summary>
+    [Parameter]
+    public string? Label { get; set; }
+
+    /// <summary>Follows each value, in the labels and the text alternative, such as "g" or "units". None when unset.</summary>
+    [Parameter]
+    public string? Unit { get; set; }
+
+    /// <summary>Ends the text alternative when every segment is zero.</summary>
+    [Parameter]
+    public string EmptyText { get; set; } = "Nothing yet";
+
+    /// <summary>Whether to show each segment's label and value under the bar. The text alternative is the same either way.</summary>
+    [Parameter]
+    public bool ShowLabels { get; set; } = true;
+
+    /// <summary>Value of the data-testid attribute, and the prefix of <c>-segment-{n}</c> (only for a segment above zero) and <c>-label-{n}</c> by position. None are rendered when unset.</summary>
+    [Parameter]
+    public string? TestId { get; set; }
+
+    private static double Counted(double value) => double.IsFinite(value) ? Math.Max(value, 0) : 0;
+
+    private double Total { get; set; }
+
+    protected override void OnParametersSet() => Total = Segments.Sum(s => Counted(s.Value));
+
+    /// <summary>Whole percentages of the total, largest-remainder rounded so they add up to 100. Ties go to the earlier segment.</summary>
+    private int[] Percents()
+    {
+        var exact = Segments.Select(s => Counted(s.Value) / Total * 100).ToArray();
+        var whole = exact.Select(x => (int)Math.Floor(x)).ToArray();
+        var missing = 100 - whole.Sum();
+        foreach (var i in Enumerable.Range(0, whole.Length).OrderByDescending(i => exact[i] - whole[i]).Take(missing))
+        {
+            whole[i]++;
+        }
+
+        return whole;
+    }
+
+    private string Description
+    {
+        get
+        {
+            var prefix = string.IsNullOrWhiteSpace(Label) ? "" : $"{Label}: ";
+            if (Total <= 0)
+            {
+                var zeros = string.Join(", ", Segments.Select(s => $"{s.Label} {ValueText(s)}"));
+                return $"{prefix}{(zeros.Length > 0 ? zeros + ". " : "")}{EmptyText}.";
+            }
+
+            var percent = Percents();
+            return $"{prefix}{string.Join("; ", Segments.Select((s, i) => $"{s.Label} {ValueText(s)}, {percent[i]}%"))}.";
+        }
+    }
+
+    // Never rounds a drawn segment to 0, which would collapse it.
+    private string Grow(StackedBarSegment segment) => Math.Max(Counted(segment.Value) / Total * 100, 0.001).ToString("0.###", CultureInfo.InvariantCulture);
+
+    private string ValueText(StackedBarSegment segment)
+    {
+        var number = Counted(segment.Value).ToString("#,0.#", CultureInfo.InvariantCulture);
+        return string.IsNullOrEmpty(Unit) ? number : $"{number} {Unit}";
+    }
+
+    private string? Id(string part) => TestId is null ? null : $"{TestId}-{part}";
+}

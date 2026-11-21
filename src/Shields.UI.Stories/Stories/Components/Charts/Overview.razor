@@ -68,8 +68,9 @@
 <ul>
     <li>Without a target (or with zero) there is no line, no band and no status.</li>
     <li>With <code>OnSelect</code> the bars are buttons: click, or Enter on focus, raises it with the bar's date. Without it they are images.</li>
+    <li><code>Style</code> is <code>Status</code> by default. <code>PastAndCurrent</code> drops the target, band and markers: the bar whose <code>Current</code> is true is <code>--color-accent</code> (its axis label bold, "current" in its text alternative) and the others <code>--color-chart-past</code>. There, <code>Labelled</code> prints a bar's value above it, and <code>Earlier</code> draws the period before as a second bar to the left of each, named in the text alternative with <code>EarlierLabel</code> ("last week"); add a <code>ChartLegend</code> to say which is which. <code>Current</code> also bolds the axis label in <code>Status</code>; the other two do nothing there.</li>
     <li>Each bar's text alternative is its date, value, <code>Unit</code>, status and <code>Note</code>; a bar with a <code>Note</code> is drawn faded. The chart is a group named by <code>Label</code>; with no values it shows <code>EmptyText</code>.</li>
-    <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>-band</code> (<code>-band-top</code>, <code>-band-bottom</code>), <code>-target</code>, <code>-baseline</code>, <code>-tick-{value}</code>, <code>-bar-{date}</code>, <code>-column-{date}</code>, <code>-marker-{date}</code>, <code>-gap-{date}</code>, <code>-value-label</code>, <code>-empty</code>.</li>
+    <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>-band</code> (<code>-band-top</code>, <code>-band-bottom</code>), <code>-target</code>, <code>-baseline</code>, <code>-tick-{value}</code>, <code>-bar-{date}</code>, <code>-column-{date}</code>, <code>-marker-{date}</code>, <code>-gap-{date}</code>, <code>-value-label</code> (<code>-value-label-{date}</code> in <code>PastAndCurrent</code>), <code>-earlier-{date}</code>, <code>-empty</code>.</li>
 </ul>
 
 <h2><code>MonthCalendar</code></h2>

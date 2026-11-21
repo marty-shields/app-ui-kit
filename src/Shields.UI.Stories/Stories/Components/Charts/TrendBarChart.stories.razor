@@ -63,6 +63,35 @@
         </Template>
     </Story>
 
+    <Story Name="Past and current">
+        <Template>
+            <div class="card">
+                <TrendBarChart Bars="PastWeek" Style="TrendBarStyle.PastAndCurrent" Unit="min" Label="Minutes per day" TestId="chart" />
+                <ChartLegend Items="PastLegend" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Past and current, with the period before">
+        <Template>
+            <div class="card">
+                <TrendBarChart Bars="PairedWeek" Style="TrendBarStyle.PastAndCurrent" EarlierLabel="last week" Unit="min" Label="Minutes per day" TestId="chart" />
+                <ChartLegend Items="PairedLegend" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Past and current, dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <div class="card">
+                    <TrendBarChart Bars="PairedWeek" Style="TrendBarStyle.PastAndCurrent" Unit="min" />
+                    <ChartLegend Items="PairedLegend" />
+                </div>
+            </div>
+        </Template>
+    </Story>
+
     <Story Name="Dark">
         <Template>
             <div class="themed" data-theme="dark">
@@ -88,6 +117,10 @@
         new(LegendSwatch.Band, "Target range"),
     ];
 
+    private static readonly IReadOnlyList<LegendItem> PastLegend = [new(LegendSwatch.Accent, "Today"), new(LegendSwatch.Chip, "Earlier days")];
+
+    private static readonly IReadOnlyList<LegendItem> PairedLegend = [new(LegendSwatch.Accent, "This week"), new(LegendSwatch.Chip, "Last week")];
+
     private static TrendBarPoint Day(int day, double? value, string? label = null) =>
         new(Monday.AddDays(day), label ?? Monday.AddDays(day).ToString("ddd", CultureInfo.InvariantCulture), value);
 
@@ -104,4 +137,10 @@
 
     private static readonly IReadOnlyList<TrendBarPoint> Year =
         [.. Enumerable.Range(1, 12).Select(m => new TrendBarPoint(new DateOnly(2026, m, 1), new DateOnly(2026, m, 1).ToString("MMM", CultureInfo.InvariantCulture), m is 4 or 8 ? null : 1400 + m * 90))];
+
+    private static readonly IReadOnlyList<TrendBarPoint> PastWeek =
+        [Day(0, 40) with { Labelled = true }, Day(1, 55) with { Labelled = true }, Day(2, null), Day(3, 35) with { Labelled = true }, Day(4, 62) with { Labelled = true, Current = true }, Day(5, null), Day(6, null)];
+
+    private static readonly IReadOnlyList<TrendBarPoint> PairedWeek =
+        [Day(0, 40) with { Earlier = 30 }, Day(1, 55) with { Earlier = 60 }, Day(2, null) with { Earlier = 45 }, Day(3, 35, "Thu") with { Earlier = null }, Day(4, 62) with { Current = true, Labelled = true, Earlier = 50 }, Day(5, null), Day(6, null)];
 }

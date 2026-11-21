@@ -626,4 +626,95 @@ public class TrendBarChartTests : ComponentTestBase
             Assert.That(cut.Find("[data-testid=chart]").GetAttribute("aria-label"), Is.EqualTo("Steps"));
         });
     }
+
+    private IRenderedComponent<TrendBarChart> RenderPast(IReadOnlyList<TrendBarPoint> bars, string? earlierLabel = null) =>
+        Context.Render<TrendBarChart>(p =>
+        {
+            p.Add(x => x.Bars, bars).Add(x => x.Target, 2000).Add(x => x.Unit, "pts").Add(x => x.TestId, "chart").Add(x => x.Style, TrendBarStyle.PastAndCurrent);
+            if (earlierLabel is not null)
+            {
+                p.Add(x => x.EarlierLabel, earlierLabel);
+            }
+        });
+
+    private static TrendBarPoint Past(int day, double? value, bool current = false, bool labelled = false, double? earlier = null) =>
+        Bar(day, value) with { Current = current, Labelled = labelled, Earlier = earlier };
+
+    [Test]
+    public void PastAndCurrent_CurrentBarIsNowAndOthersArePast_WithoutTargetOrStatus()
+    {
+        var cut = RenderPast([Past(0, 1500), Past(1, 2600, current: true)]);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find("[data-testid=chart-bar-2026-11-09]").ClassList, Does.Contain("past"));
+            Assert.That(cut.Find("[data-testid=chart-bar-2026-11-10]").ClassList, Does.Contain("now"));
+            Assert.That(cut.FindAll("[data-testid=chart-target],[data-testid=chart-band],[data-testid^=chart-marker]"), Is.Empty);
+            Assert.That(cut.Find("[data-testid=chart-bar-2026-11-10]").GetAttribute("aria-label"), Is.EqualTo("Tue 10 Nov, 2,600 pts, current"));
+            Assert.That(cut.Find("[data-testid=chart-bar-2026-11-09]").GetAttribute("aria-label"), Is.EqualTo("Mon 9 Nov, 1,500 pts"));
+        });
+    }
+
+    [Test]
+    public void PastAndCurrent_CurrentAxisLabelIsMarked()
+    {
+        var cut = RenderPast([Past(0, 1500), Past(1, 2600, current: true)]);
+
+        Assert.That(cut.FindAll(".axis-label.current").Select(e => e.TextContent), Is.EqualTo(new[] { "Tue" }));
+    }
+
+    [Test]
+    public void PastAndCurrent_PrintsTheValueOfLabelledBarsOnly()
+    {
+        var cut = RenderPast([Past(0, 1500), Past(1, 2600, labelled: true), Past(2, 900, labelled: true)]);
+
+        Assert.That(cut.FindAll("[data-testid^=chart-value-label]").Select(e => e.TextContent), Is.EqualTo(new[] { "2,600", "900" }));
+    }
+
+    [Test]
+    public void PastAndCurrent_WithEarlierValues_DrawsAPairAndNamesTheEarlierValue()
+    {
+        var cut = RenderPast([Past(0, 1500, earlier: 1200), Past(1, 2600, current: true, earlier: null), Past(2, null, earlier: 800)], "last week");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.FindAll(".column.earlier"), Has.Count.EqualTo(2));
+            Assert.That(cut.Find("[data-testid=chart-bar-2026-11-09]").GetAttribute("aria-label"), Is.EqualTo("Mon 9 Nov, 1,500 pts, last week 1,200 pts"));
+            Assert.That(cut.Find("[data-testid=chart-bar-2026-11-11]").GetAttribute("aria-label"), Is.EqualTo("Wed 11 Nov, last week 800 pts"));
+            Assert.That(cut.FindAll("[data-testid=chart-gap-2026-11-11]"), Is.Empty, "a day with only an earlier value is not a gap");
+            Assert.That(cut.Find("[data-testid=chart-bar-2026-11-09]").ClassList, Does.Contain("now"));
+            Assert.That(Number(cut.Find("[data-testid=chart-earlier-2026-11-09]"), "data-height"), Is.GreaterThan(0));
+        });
+    }
+
+    [Test]
+    public void PastAndCurrent_EarlierAndValueShareOneScale()
+    {
+        var cut = RenderPast([Past(0, 500, earlier: 5000)]);
+
+        var earlier = Number(cut.Find("[data-testid=chart-earlier-2026-11-09]"), "data-height");
+        Assert.That(earlier, Is.EqualTo(10 * Height(cut, 0)).Within(0.1), "5000 stands 10 times as tall as 500, and fits the chart");
+    }
+
+    [Test]
+    public void PastAndCurrent_AllEmpty_ShowsTheEmptyText()
+    {
+        var cut = RenderPast([Past(0, null), Past(1, null)]);
+
+        Assert.That(cut.Find("[data-testid=chart-empty]").TextContent, Is.EqualTo("Nothing recorded yet"));
+    }
+
+    [Test]
+    public void StatusStyle_IgnoresCurrentLabelledAndEarlier()
+    {
+        var cut = Render([Past(0, 2600, current: true, labelled: true, earlier: 900), Past(1, 1000)]);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find("[data-testid=chart-bar-2026-11-09]").ClassList, Does.Contain("over"));
+            Assert.That(cut.FindAll(".column.earlier"), Is.Empty);
+            Assert.That(cut.Find("[data-testid=chart-bar-2026-11-09]").GetAttribute("aria-label"), Does.Not.Contain("current"));
+            Assert.That(cut.FindAll("[data-testid=chart-value-label]"), Has.Count.EqualTo(1));
+        });
+    }
 }

@@ -131,14 +131,17 @@ public class MonthCalendarTests : ComponentTestBase
     }
 
     [Test]
-    public void Render_OverDayHasAMarkerAndOthersDoNot()
+    public void Render_OnAndOverDaysHaveADistinctHiddenMarkerAndUnderDoesNot()
     {
         var cut = Render(Day(3, 2500), Day(4, 2000), Day(5, 1000));
 
         Assert.Multiple(() =>
         {
-            Assert.That(cut.FindAll("[data-testid=cal-marker-2026-11-03]"), Has.Count.EqualTo(1));
-            Assert.That(cut.FindAll(".marker"), Has.Count.EqualTo(1));
+            Assert.That(cut.Find("[data-testid=cal-marker-2026-11-03]").TextContent, Is.EqualTo("▲"));
+            Assert.That(cut.Find("[data-testid=cal-marker-2026-11-04]").TextContent, Is.EqualTo("✓"));
+            Assert.That(cut.Find("[data-testid=cal-marker-2026-11-04]").GetAttribute("aria-hidden"), Is.EqualTo("true"));
+            Assert.That(cut.FindAll("[data-testid=cal-marker-2026-11-05]"), Is.Empty);
+            Assert.That(cut.FindAll(".marker"), Has.Count.EqualTo(2));
         });
     }
 
@@ -323,6 +326,7 @@ public class MonthCalendarTests : ComponentTestBase
             Assert.That(NameOf(cut.Find(Selector(4))), Does.EndWith("on target"));
             Assert.That(NameOf(cut.Find(Selector(5))), Does.EndWith("over target"));
             Assert.That(cut.Find("[data-testid=cal-marker-2026-11-05]").TextContent, Is.EqualTo("▲"));
+            Assert.That(cut.Find("[data-testid=cal-marker-2026-11-04]").TextContent, Is.EqualTo("✓"));
         });
     }
 

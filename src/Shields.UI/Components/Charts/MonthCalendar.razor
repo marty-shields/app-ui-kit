@@ -103,9 +103,9 @@
     private RenderFragment Content(DateOnly date, CellInfo cell) => @<text>
         <span class="visually-hidden">@cell.Name</span>
         <span aria-hidden="true">@date.Day</span>
-        @if (cell.Status == TargetStatus.Over)
+        @if (cell.Status is TargetStatus.Over or TargetStatus.On)
         {
-            <span class="marker" aria-hidden="true" data-testid="@Id($"marker-{Day(date)}")">▲</span>
+            <span class="marker" aria-hidden="true" data-testid="@Id($"marker-{Day(date)}")">@(cell.Status == TargetStatus.Over ? "▲" : "✓")</span>
         }
     </text>;
 

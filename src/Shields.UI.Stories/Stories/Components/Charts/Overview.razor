@@ -71,11 +71,11 @@
     <thead><tr><th>Day</th><th>Looks like</th></tr></thead>
     <tbody>
         <tr><td>Under</td><td>A cell in <code>--color-chip</code>, more than 10% below the target.</td></tr>
-        <tr><td>On target</td><td>A cell in <code>--color-accent</code>, within 10% either side of the target.</td></tr>
-        <tr><td>Over</td><td>A cell in <code>--color-error</code> with a ▲ marker, more than 10% over.</td></tr>
+        <tr><td>On target</td><td>A cell in <code>--color-accent</code>, within 10% either side of the target, with a ✓ marker.</td></tr>
+        <tr><td>Over</td><td>A cell in <code>--color-error</code> with a ▲ marker, more than 10% over. Under has no marker, so the three differ without colour.</td></tr>
         <tr><td>Not recorded</td><td>A dashed outline in <code>--color-border-strong</code> and no fill.</td></tr>
         <tr><td>Future</td><td>Faded and disabled; data on a future day is ignored.</td></tr>
-        <tr><td>Today</td><td>A <code>--color-text</code> ring and bold number. <code>Today</code> sets the day; without it the clock does.</td></tr>
+        <tr><td>Today</td><td>A thin <code>--color-surface</code> gap and a <code>--color-text</code> ring outside the cell, visible on every fill, and a bold number. <code>Today</code> sets the day; without it the clock does.</td></tr>
     </tbody>
 </table>
 <ul>

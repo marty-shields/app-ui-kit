@@ -63,8 +63,13 @@ button.cell {
 }
 
 .cell.today {
-    box-shadow: 0 0 0 var(--focus-width) var(--color-text);
+    box-shadow: 0 0 0 var(--border-width) var(--color-surface), 0 0 0 calc(var(--border-width) + var(--border-width-error)) var(--color-text);
     font-weight: var(--font-weight-bold);
+}
+
+/* Push the focus outline past the today ring so keyboard focus does not hide it. */
+.cell.today:focus-visible {
+    outline-offset: calc(var(--focus-offset) + var(--border-width) + var(--border-width-error));
 }
 
 .marker {

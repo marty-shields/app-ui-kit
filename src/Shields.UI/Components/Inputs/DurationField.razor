@@ -7,7 +7,7 @@
             Message="@InvalidMessage"
             MessageId="@messageId"
             MessageTestId="@($"{Id}-error")">
-    <div class="parts" role="group" aria-label="@Label" @onfocusin="() => focused = true" @onfocusout="OnFocusOut">
+    <div class="parts @(Compact ? "compact" : null)" role="group" aria-label="@Label" @onfocusin="() => focused = true" @onfocusout="OnFocusOut">
         @for (var i = 0; i < Parts.Length; i++)
         {
             var index = i;
@@ -39,7 +39,9 @@
 
 @code {
     private static readonly Part[] Parts = [new("Hours", "h"), new("Minutes", "mm"), new("Seconds", "ss")];
-    private static readonly TimeSpan FocusMoveWait = TimeSpan.FromMilliseconds(10);
+
+    /// <summary>How long after focus leaves a box the field waits to see whether focus moved to another box before it fills the parts in. A test that fakes <see cref="TimeProvider"/> advances it by this much.</summary>
+    public static readonly TimeSpan FocusMoveWait = TimeSpan.FromMilliseconds(10);
 
     private readonly string baseId = $"duration-field-{Guid.NewGuid():N}";
     private readonly string messageId = $"duration-field-message-{Guid.NewGuid():N}";
@@ -66,6 +68,10 @@
     /// <summary>Error shown under the boxes in the error tone and announced. Null or empty means no message.</summary>
     [Parameter]
     public string? InvalidMessage { get; set; }
+
+    /// <summary>Tighter than the default: no padding either side of each box's digits and no gap around the separators, a smaller digit size, so "01" and "00" fit three fields in a narrow cell (a third of a 328px row). The height stays the touch target.</summary>
+    [Parameter]
+    public bool Compact { get; set; }
 
     /// <summary>Greys out the boxes and ignores input.</summary>
     [Parameter]

@@ -38,14 +38,18 @@ public class DurationFieldTests : ComponentTestBase
     }
 
     [Test]
-    public void Boxes_AreInTheSharedInputBoxWithCompactPadding()
+    public void Boxes_AreInTheSharedInputBoxWithCompactPadding_AndCompactGoesTighter()
     {
-        var boxes = Render().FindAll(".box");
+        var normal = Render().FindAll(".box");
+        var boxes = Render(p => p.Add(x => x.Compact, true)).FindAll(".box");
 
         Assert.Multiple(() =>
         {
             Assert.That(boxes, Has.Count.EqualTo(3));
             Assert.That(boxes.Select(b => b.ClassList.Contains("input-box") && b.ClassList.Contains("input-box-compact")), Is.All.True);
+            Assert.That(normal.Select(b => b.ClassList.Contains("input-box") && b.ClassList.Contains("input-box-compact")), Is.All.True);
+            Assert.That(Render().Find(".parts").ClassList, Does.Not.Contain("compact"));
+            Assert.That(Render(p => p.Add(x => x.Compact, true)).Find(".parts").ClassList, Does.Contain("compact"));
             Assert.That(boxes.Select(b => b.GetAttribute("data-testid")), Is.EqualTo(new[] { "duration-h-box", "duration-mm-box", "duration-ss-box" }));
         });
     }
@@ -131,10 +135,45 @@ public class DurationFieldTests : ComponentTestBase
         var cut = Render(p => p.Add(x => x.Value, value).Add(x => x.ValueChanged, (string? v) => raised = v));
 
         var leaving = cut.Find("[role=group]").FocusOutAsync(new FocusEventArgs());
-        clock.Advance(TimeSpan.FromMilliseconds(10));
+        clock.Advance(DurationField.FocusMoveWait);
         await leaving;
 
         Assert.That(raised, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Css_Compact_DropsPaddingAndGapAndShrinksTheDigits()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Inputs", "DurationField.razor.css");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(css, Does.Contain(".parts.compact .box {\n    padding-inline: 0;"));
+            Assert.That(css, Does.Contain(".parts.compact .input {\n    font-size: var(--font-size-md);"));
+            Assert.That(css, Does.Contain(".parts.compact {\n    gap: 0;"));
+        });
+    }
+
+    [Test]
+    public void FocusMoveWait_IsTheTenMillisecondsTheFieldWaitsBeforeFillingIn()
+    {
+        Assert.That(DurationField.FocusMoveWait, Is.EqualTo(TimeSpan.FromMilliseconds(10)));
+    }
+
+    [Test]
+    public async Task FocusLeaves_FillsInOnlyOnceFocusMoveWaitHasPassed()
+    {
+        string? raised = null;
+        var cut = Render(p => p.Add(x => x.Value, "1::").Add(x => x.ValueChanged, (string? v) => raised = v));
+
+        var leaving = cut.Find("[role=group]").FocusOutAsync(new FocusEventArgs());
+        clock.Advance(DurationField.FocusMoveWait - TimeSpan.FromMilliseconds(1));
+        await cut.InvokeAsync(() => { });
+        Assert.That(raised, Is.Null);
+        clock.Advance(TimeSpan.FromMilliseconds(1));
+        await leaving;
+
+        Assert.That(raised, Is.EqualTo("1:00:00"));
     }
 
     [TestCase(null)]
@@ -145,7 +184,7 @@ public class DurationFieldTests : ComponentTestBase
         var cut = Render(p => p.Add(x => x.Value, value).Add(x => x.ValueChanged, (string? _) => raised = true));
 
         var leaving = cut.Find("[role=group]").FocusOutAsync(new FocusEventArgs());
-        clock.Advance(TimeSpan.FromMilliseconds(10));
+        clock.Advance(DurationField.FocusMoveWait);
         await leaving;
 
         Assert.That(raised, Is.False);
@@ -159,7 +198,7 @@ public class DurationFieldTests : ComponentTestBase
 
         var leaving = cut.Find("[role=group]").FocusOutAsync(new FocusEventArgs());
         await cut.Find("[role=group]").FocusInAsync(new FocusEventArgs());
-        clock.Advance(TimeSpan.FromMilliseconds(10));
+        clock.Advance(DurationField.FocusMoveWait);
         await leaving;
 
         Assert.That(raised, Is.Null);
@@ -201,7 +240,7 @@ public class DurationFieldTests : ComponentTestBase
 
         var leaving = cut.Find("[role=group]").FocusOutAsync(new FocusEventArgs());
         await Context.DisposeComponentsAsync();
-        clock.Advance(TimeSpan.FromMilliseconds(10));
+        clock.Advance(DurationField.FocusMoveWait);
         await leaving;
 
         Assert.That(raised, Is.Null);

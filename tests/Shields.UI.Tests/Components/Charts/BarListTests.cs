@@ -153,6 +153,32 @@ public class BarListTests : ComponentTestBase
     }
 
     [Test]
+    public void Render_ZeroRow_GetsTheZeroClass_AndOthersDoNot()
+    {
+        var cut = Context.Render<BarList>(p => p.Add(x => x.Items, [new BarListItem("A", 0, "Not trained"), new BarListItem("B", -2), new BarListItem("C", 3)]).Add(x => x.TestId, "list"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find("[data-testid=list-value-0]").ClassList, Does.Contain("zero"));
+            Assert.That(cut.Find("[data-testid=list-value-1]").ClassList, Does.Contain("zero"));
+            Assert.That(cut.Find("[data-testid=list-value-2]").ClassList, Does.Not.Contain("zero"));
+        });
+    }
+
+    [Test]
+    public void Css_ZeroValue_IsRegularWeightAndStaysMuted()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Charts", "BarList.razor.css");
+        string Rule(string selector) => Regex.Match(css, Regex.Escape(selector) + @"\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(Rule(".value.zero"), Does.Contain("font-weight: var(--font-weight-regular);").And.Not.Contain("color"));
+            Assert.That(Rule(".value"), Does.Contain("color: var(--color-text-muted);").And.Contain("font-weight: var(--font-weight-bold);"));
+        });
+    }
+
+    [Test]
     public void Css_SelectableRowsAreATouchTargetTall_AndInlineBarsUseTheirOwnHeight()
     {
         var css = RepoFiles.Read("src", "Shields.UI", "Components", "Charts", "BarList.razor.css");

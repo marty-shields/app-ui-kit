@@ -126,7 +126,7 @@ else
     private RenderFragment Cells(BarListItem item, int index, double full, string[]? slugs) =>
         @<text>
             <span class="name" data-testid="@Id($"label-{Key(index, slugs)}")">@item.Label</span>
-            <span class="value" data-testid="@Id($"value-{Key(index, slugs)}")">@(item.ValueText ?? Number(item.Value))@if (Unit is not null) {<span class="visually-hidden">@($" {Unit}")</span>}</span>
+            <span class="value @(Counted(item.Value) == 0 ? "zero" : null)" data-testid="@Id($"value-{Key(index, slugs)}")">@(item.ValueText ?? Number(item.Value))@if (Unit is not null) {<span class="visually-hidden">@($" {Unit}")</span>}</span>
             <span class="track" aria-hidden="true"><span class="fill" style="--fill: @Share(item, full)" data-testid="@Id($"bar-{Key(index, slugs)}")"></span></span>
         </text>;
 

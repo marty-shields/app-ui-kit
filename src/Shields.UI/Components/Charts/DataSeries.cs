@@ -15,7 +15,7 @@ public static class DataSeriesExtensions
     /// <summary>The colour token of the series, such as <c>--color-data-1</c>.</summary>
     public static string Token(this DataSeries series) => $"--color-data-{Number(series)}";
 
-    /// <summary>The CSS class a component gives a mark of the series, such as <c>series-1</c>, and styles with <see cref="Token"/>.</summary>
+    /// <summary>The CSS class a component gives a mark of the series, such as <c>series-1</c>. The kit has no shared rule for it: each component writes its own, using <see cref="Token"/>.</summary>
     public static string CssClass(this DataSeries series) => $"series-{Number(series)}";
 
     private static int Number(DataSeries series) =>

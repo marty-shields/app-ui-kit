@@ -270,7 +270,7 @@ ol.steps { margin: 0; padding-left: 1.3rem; display: flex; flex-direction: colum
           <tr><th><code>Icon</code></th><td>A fixed list of icon names that differs between the apps (Scan and Star in one, Record and Note in the other).</td><td>The kit holds every icon either app uses. A new icon is a kit change.</td></tr>
           <tr><th><code>theme.js</code></th><td>The storage key and script name contain the app's name. The upgrade tests check that a saved theme survives.</td><td>The key is read from an attribute on the script tag, so each app keeps its current key. Both apps' content security policy allows this.</td></tr>
           <tr><th>Log event ids</th><td>Each app has its own <code>UiEvent</code> list. Ids never change once logged.</td><td>The kit gets its own list. The shared ids already match in both apps (2001–2002, 2101, 2201–2203, 3301, 3403–3405); the owner then gave the kit its own range, 9000–9999.</td></tr>
-          <tr><th><code>tokens.css</code></th><td>One file holding shared and app-only tokens.</td><td>The kit ships the shared tokens. Each app keeps a small file for its own (ring and macro colours; meter and calendar sizes).</td></tr>
+          <tr><th><code>tokens.css</code></th><td>One file holding shared and app-only tokens.</td><td>The kit ships every token, including the chart, ring and calendar ones. Apps keep none of their own.</td></tr>
         </tbody>
       </table>
     </div>
@@ -331,7 +331,7 @@ ol.steps { margin: 0; padding-left: 1.3rem; display: flex; flex-direction: colum
         <thead><tr><th>Check</th><th>Kit</th><th>Each app</th></tr></thead>
         <tbody>
           <tr><th>Tokens only, no literal colours or sizes</th><td>For the kit's CSS</td><td>For the app's CSS, using the kit's token list from the testing package</td></tr>
-          <tr><th>Contrast and touch targets</th><td>For shared tokens and components</td><td>Only for app-only tokens and components</td></tr>
+          <tr><th>Contrast and touch targets</th><td>For every token and kit component</td><td>Only for its own screens</td></tr>
           <tr><th>Component tests (bUnit)</th><td>For moved components</td><td>For app components and screens</td></tr>
           <tr><th>Story for every component and view</th><td>For kit components</td><td>For app components and views</td></tr>
           <tr><th>Story layout (clipping, overflow)</th><td>Kit stories; optionally the combined site</td><td>Unchanged, on the app's own site</td></tr>

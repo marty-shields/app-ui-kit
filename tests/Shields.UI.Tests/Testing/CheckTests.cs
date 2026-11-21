@@ -214,6 +214,14 @@ public class CheckTests
     }
 
     [Test]
+    public void Distance_OfBlackAndWhite_IsOne() =>
+        Assert.That(Rgb.Distance(new Rgb(0, 0, 0), new Rgb(255, 255, 255)), Is.EqualTo(1.0).Within(0.001));
+
+    [Test]
+    public void Distance_OfAColourToItself_IsZero() =>
+        Assert.That(Rgb.Distance(new Rgb(47, 127, 134), new Rgb(47, 127, 134)), Is.Zero.Within(1e-9));
+
+    [Test]
     public void ContrastResult_PassesAtExactlyTheMinimum()
     {
         var result = new ContrastResult("--a", "--b", ColourScheme.Light, new Rgb(0, 0, 0), new Rgb(255, 255, 255), 4.5, 4.5);

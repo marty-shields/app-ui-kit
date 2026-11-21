@@ -22,7 +22,7 @@ public class DataSeriesTests
     [Test]
     public void Series_CoverEveryPaletteToken() =>
         Assert.That(Enum.GetValues<DataSeries>().Select(s => s.Token()),
-            Is.EqualTo(DesignTokens.Names.Where(n => n.StartsWith("--color-data-")).Order()));
+            Is.EquivalentTo(DesignTokens.Names.Where(n => n.StartsWith("--color-data-"))));
 
     [Test]
     public void UnknownSeries_IsRejected() =>

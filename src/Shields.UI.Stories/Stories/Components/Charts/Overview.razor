@@ -57,4 +57,25 @@
     <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>-band</code> (<code>-band-top</code>, <code>-band-bottom</code>), <code>-target</code>, <code>-baseline</code>, <code>-tick-{value}</code>, <code>-bar-{date}</code>, <code>-column-{date}</code>, <code>-marker-{date}</code>, <code>-gap-{date}</code>, <code>-value-label</code>, <code>-empty</code>.</li>
 </ul>
 
-<p>Stories: <a href="./?path=/docs/components-charts-chartlegend--docs">ChartLegend</a>, <a href="./?path=/docs/components-charts-progressring--docs">ProgressRing</a>, <a href="./?path=/docs/components-charts-barlist--docs">BarList</a>, <a href="./?path=/docs/components-charts-trendbarchart--docs">TrendBarChart</a></p>
+<h2><code>MonthCalendar</code></h2>
+<p>A grid of one month, Monday first unless <code>FirstDayOfWeek</code> says otherwise, with a cell per day judged against a <code>Target</code>. Days are <code>CalendarDay</code> records; a day missing from <code>Days</code>, or without a value, counts as not recorded. It is meant to sit on a card (<code>--color-surface</code>).</p>
+<table>
+    <thead><tr><th>Day</th><th>Looks like</th></tr></thead>
+    <tbody>
+        <tr><td>Under</td><td>A cell in <code>--color-chip</code>, more than 10% below the target.</td></tr>
+        <tr><td>On target</td><td>A cell in <code>--color-accent</code>, within 10% either side of the target.</td></tr>
+        <tr><td>Over</td><td>A cell in <code>--color-error</code> with a ▲ marker, more than 10% over.</td></tr>
+        <tr><td>Not recorded</td><td>A dashed outline in <code>--color-border-strong</code> and no fill.</td></tr>
+        <tr><td>Future</td><td>Faded and disabled; data on a future day is ignored.</td></tr>
+        <tr><td>Today</td><td>A <code>--color-text</code> ring and bold number. <code>Today</code> sets the day; without it the clock does.</td></tr>
+    </tbody>
+</table>
+<ul>
+    <li>Without a target (or with zero) a recorded day has no status, unless the day carries its own target.</li>
+    <li><code>FirstDayOfWeek</code> (Monday by default) sets the first column. <code>DayNames</code> is seven labels, Sunday first; without it each heading is the first letter of the current culture's shortest day name, and a list of any other length throws.</li>
+    <li>With <code>OnSelect</code> the enabled days are buttons that raise it with the day's date; without it they are plain cells.</li>
+    <li>Each day's text alternative is its date, "today" when it is, its value, <code>Unit</code> and status, or "not recorded" or "future". The grid is a group named by the month; the weekday letters are hidden from screen readers.</li>
+    <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>-day-{date}</code> and <code>-marker-{date}</code>, the date as yyyy-MM-dd.</li>
+</ul>
+
+<p>Stories: <a href="./?path=/docs/components-charts-chartlegend--docs">ChartLegend</a>, <a href="./?path=/docs/components-charts-progressring--docs">ProgressRing</a>, <a href="./?path=/docs/components-charts-barlist--docs">BarList</a>, <a href="./?path=/docs/components-charts-trendbarchart--docs">TrendBarChart</a>, <a href="./?path=/docs/components-charts-monthcalendar--docs">MonthCalendar</a></p>

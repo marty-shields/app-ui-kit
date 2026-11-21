@@ -31,7 +31,7 @@ public class KitTokensTests
         "--bar-list-bar-height", "--bar-list-value-max-width",
         "--stacked-bar-height", "--stacked-bar-gap", "--stacked-bar-segment-min-width",
         // AppScreen, StatTile and Card compact.
-        "--app-screen-nav-clearance", "--stat-tile-compact-padding", "--stat-tile-compact-value-size", "--card-compact-padding", "--card-compact-title-gap", "--calendar-day-size", "--calendar-dot-size",
+        "--app-screen-nav-clearance", "--stat-tile-compact-padding", "--stat-tile-compact-value-size", "--card-compact-padding", "--card-compact-title-gap", "--entry-grid-index-width", "--entry-grid-aside-width", "--calendar-day-size", "--calendar-dot-size",
         // Sheet and SheetAction.
         "--sheet-enter-duration", "--sheet-max-width", "--sheet-max-height", "--sheet-handle-width",
         "--sheet-handle-height", "--sheet-tile-min-height", "--sheet-tile-icon-size",

@@ -7,9 +7,9 @@ public static class KitNames
     public static IReadOnlySet<string> Components { get; } = new HashSet<string>
     {
         "AppButton", "AppErrorBoundary", "AppScreen", "BackHandler", "BarList", "BottomNav", "Card", "ChartLegend", "ConfirmDialog",
-        "DateStrip", "EmptyState", "ErrorView", "FieldInput", "FilterChips", "HostBridges", "Icon", "IconButton", "ListRow", "LoadFailed",
+        "DateStrip", "DurationField", "EmptyState", "ErrorView", "FieldInput", "FilterChips", "HostBridges", "Icon", "IconButton", "ListRow", "LoadFailed",
         "MonthCalendar", "NumberField", "PeriodStepper", "ProgressRing", "RadioGroup", "RangeCalendar", "SectionHeader", "SegmentedControl", "SelectField", "Sheet", "SheetAction", "Snackbar", "Spinner", "StackedBar", "StartupGate",
-        "StartupView", "StatTile", "TextField", "TrendBarChart",
+        "StartupView", "StatTile", "TextField", "TrendBarChart", "ValueField",
     };
 
     /// <summary>
@@ -22,7 +22,7 @@ public static class KitNames
         "ButtonVariant", "CalendarDay", "ChangeDirection", "DataSeries", "DataSeriesExtensions", "DateRange", "DayLabel", "IAppLifecycle", "IAppStart", "IBackButton", "IconButtonStyle",
         "IconName", "IconSize", "IconTone", "KitEvent", "LegendItem", "LegendSwatch", "PeriodKind", "RadioOption",
         "ShieldsUiServiceCollectionExtensions", "SnackbarMessage", "SnackbarService", "StackedBarSegment", "StatChange",
-        "SystemBarInsetWriter", "TargetStatus", "TargetStatuses", "ThemePreference", "ThemeService", "TrendBar"
+        "SystemBarInsetWriter", "TargetStatus", "TargetStatuses", "ThemePreference", "ThemeService", "TrendBar", "ValueKind"
     };
 
     /// <summary>Every custom property the kit declares in tokens.css and base.css.</summary>

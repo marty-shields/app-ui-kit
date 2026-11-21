@@ -49,7 +49,7 @@
 }
 
 .swatch.outline {
-    border: var(--border-width) dashed var(--color-border-strong);
+    border: calc(var(--border-width-error) * 1.5) dashed var(--color-border-strong);
 }
 
 .swatch.line {

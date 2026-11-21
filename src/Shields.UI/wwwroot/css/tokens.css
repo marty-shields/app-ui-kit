@@ -96,9 +96,12 @@
     --add-button-lift: 1.5rem;
     --legend-swatch-size: 0.75rem;
 
-    /* ProgressRing: the track is 3:1 against the card surface, and the accent and error arcs keep 3:1 against it
-       (accent is a darkened teal; error is darker in light and lighter in dark for that). The xs size is the compact caption. */
-    --color-ring-track: light-dark(#829493, #667476);
+    /* The empty track of ProgressRing, BarList and StackedBar: at least 3:1 on the page and on cards in both themes. The arcs and
+       bar fills drawn on it have their own tokens, at least 3:1 against it: darker than --color-accent and --color-error in
+       light, lighter in dark, because the track sits between the page and the arc in lightness. The xs size is the compact caption. */
+    --color-ring-track: light-dark(#7d8f8e, #6a7a7c);
+    --color-ring-arc: light-dark(#1f3a3d, #c4e6e3);
+    --color-ring-arc-over: light-dark(#6b1812, #f9d9d6);
     --font-size-xs: 0.75rem;
     --ring-size: 8.75rem;
     --ring-width: 0.875rem;
@@ -120,7 +123,7 @@
     --color-data-4: light-dark(#96812a, #f0d776);
     --color-data-5: light-dark(#673692, #d4b4f7);
 
-    /* BarList: the bar and its track (the accent fill keeps 3:1 against the track and the card surface), and the widest the value column grows (a share of the row) before the value ellipsises. */
+    /* BarList: the bar and its track (the fill, --color-ring-arc, keeps 3:1 against the track), and the widest the value column grows (a share of the row) before the value ellipsises. */
     --bar-list-bar-height: 0.75rem;
     --bar-list-value-max-width: 50%;
 

@@ -43,7 +43,7 @@
     width: calc(var(--fill) * 100%);
     height: 100%;
     border-radius: var(--radius-sm);
-    background-color: var(--color-accent);
+    background-color: var(--color-ring-arc);
 }
 
 .none {

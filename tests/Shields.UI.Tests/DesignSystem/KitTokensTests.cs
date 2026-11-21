@@ -25,7 +25,7 @@ public class KitTokensTests
     [
         "--color-chip", "--color-on-chip", "--color-chip-soft", "--color-on-chip-soft", "--letter-spacing-label",
         "--dialog-max-width", "--add-button-size", "--add-button-lift", "--legend-swatch-size",
-        "--color-ring-track", "--font-size-xs", "--ring-size", "--ring-width", "--ring-size-compact", "--ring-width-compact",
+        "--color-ring-track", "--color-ring-arc", "--color-ring-arc-over", "--font-size-xs", "--ring-size", "--ring-width", "--ring-size-compact", "--ring-width-compact",
         "--color-chart-band", "--snackbar-gap-bottom",
         "--opacity-thin", "--chart-dash", "--color-data-1", "--color-data-2", "--color-data-3", "--color-data-4", "--color-data-5",
         "--bar-list-bar-height", "--bar-list-value-max-width",

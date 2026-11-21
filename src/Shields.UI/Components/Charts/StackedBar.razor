@@ -23,7 +23,7 @@
 </div>
 
 @code {
-    /// <summary>The segments, in the order drawn. The bar is meant to sit on a card (<c>--color-surface</c>): the gaps between segments are that colour, because neighbouring palette colours are under 3:1 against each other.</summary>
+    /// <summary>The segments, in the order drawn. The gaps between segments are <c>--color-surface</c>, because neighbouring palette colours are under 3:1 against each other.</summary>
     [Parameter]
     public IReadOnlyList<StackedBarSegment> Segments { get; set; } = [];
 

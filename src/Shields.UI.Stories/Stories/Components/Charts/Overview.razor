@@ -58,7 +58,7 @@
 </ul>
 
 <h2><code>MonthCalendar</code></h2>
-<p>A grid of one month, Monday first, with a cell per day judged against a <code>Target</code>. Days are <code>CalendarDay</code> records; a day missing from <code>Days</code>, or without a value, counts as not recorded. It is meant to sit on a card (<code>--color-surface</code>).</p>
+<p>A grid of one month, Monday first unless <code>FirstDayOfWeek</code> says otherwise, with a cell per day judged against a <code>Target</code>. Days are <code>CalendarDay</code> records; a day missing from <code>Days</code>, or without a value, counts as not recorded. It is meant to sit on a card (<code>--color-surface</code>).</p>
 <table>
     <thead><tr><th>Day</th><th>Looks like</th></tr></thead>
     <tbody>
@@ -71,7 +71,8 @@
     </tbody>
 </table>
 <ul>
-    <li>Without a target (or with zero) a recorded day has no status.</li>
+    <li>Without a target (or with zero) a recorded day has no status, unless the day carries its own target.</li>
+    <li><code>FirstDayOfWeek</code> (Monday by default) sets the first column. <code>DayNames</code> is seven labels, Sunday first; without it each heading is the first letter of the current culture's shortest day name, and a list of any other length throws.</li>
     <li>With <code>OnSelect</code> the enabled days are buttons that raise it with the day's date; without it they are plain cells.</li>
     <li>Each day's text alternative is its date, "today" when it is, its value, <code>Unit</code> and status, or "not recorded" or "future". The grid is a group named by the month; the weekday letters are hidden from screen readers.</li>
     <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>-day-{date}</code> and <code>-marker-{date}</code>, the date as yyyy-MM-dd.</li>

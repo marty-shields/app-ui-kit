@@ -1,3 +1,4 @@
+using System.Globalization;
 using AngleSharp.Dom;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
@@ -42,6 +43,66 @@ public class MonthCalendarTests : ComponentTestBase
             Assert.That(cut.FindAll("button.cell"), Has.Count.EqualTo(30));
             Assert.That(cut.FindAll(".days .blank"), Has.Count.EqualTo(6), "the 1st is a Sunday, the seventh column");
         });
+    }
+
+    [Test]
+    public void Render_StartsOnSundayWhenAsked()
+    {
+        var cut = Context.Render<MonthCalendar>(p => p.Add(x => x.Month, new DateOnly(2026, 11, 1)).Add(x => x.Today, Today).Add(x => x.FirstDayOfWeek, DayOfWeek.Sunday));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.FindAll(".weekdays span").Select(s => s.TextContent), Is.EqualTo(new[] { "S", "M", "T", "W", "T", "F", "S" }));
+            Assert.That(cut.FindAll(".days .blank"), Has.Count.EqualTo(0), "the 1st is a Sunday, the first column");
+        });
+    }
+
+    [Test]
+    public void Render_PadsFromAWednesdayStart()
+    {
+        var cut = Context.Render<MonthCalendar>(p => p.Add(x => x.Month, new DateOnly(2026, 7, 1)).Add(x => x.Today, Today).Add(x => x.FirstDayOfWeek, DayOfWeek.Saturday));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.FindAll(".weekdays span").Select(s => s.TextContent), Is.EqualTo(new[] { "S", "S", "M", "T", "W", "T", "F" }));
+            Assert.That(cut.FindAll(".days .blank"), Has.Count.EqualTo(4), "1 July 2026 is a Wednesday, the fifth column from Saturday");
+        });
+    }
+
+    [Test]
+    public void Render_UsesTheGivenDayNamesInDayOfWeekOrder()
+    {
+        string[] names = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
+        var cut = Context.Render<MonthCalendar>(p => p.Add(x => x.Month, new DateOnly(2026, 11, 1)).Add(x => x.Today, Today).Add(x => x.DayNames, names));
+
+        Assert.That(cut.FindAll(".weekdays span").Select(s => s.TextContent), Is.EqualTo(new[] { "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" }));
+    }
+
+    [Test]
+    public void Render_DefaultsDayNamesToTheCurrentCulturesFirstLetters()
+    {
+        var saved = CultureInfo.CurrentCulture;
+        try
+        {
+            CultureInfo.CurrentCulture = new CultureInfo("de-DE");
+            var cut = Context.Render<MonthCalendar>(p => p.Add(x => x.Month, new DateOnly(2026, 11, 1)).Add(x => x.Today, Today));
+
+            Assert.That(cut.FindAll(".weekdays span").Select(s => s.TextContent), Is.EqualTo(new[] { "M", "D", "M", "D", "F", "S", "S" }));
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = saved;
+        }
+    }
+
+    [TestCase(0)]
+    [TestCase(6)]
+    [TestCase(8)]
+    public void Render_RejectsDayNamesOfTheWrongLength(int count)
+    {
+        var names = Enumerable.Repeat("x", count).ToArray();
+
+        Assert.Throws<ArgumentException>(() => Context.Render<MonthCalendar>(p => p.Add(x => x.Month, new DateOnly(2026, 11, 1)).Add(x => x.DayNames, names)));
     }
 
     [TestCase(2026, 6, 0)]

@@ -1,0 +1,69 @@
+@using System.Globalization
+<div class="ring @(IsOver ? "over" : null) @(Compact ? "compact" : null)" role="img" aria-label="@Description" data-testid="@TestId" style="--fill: @Fill">
+    <span class="arc" aria-hidden="true"></span>
+    <span class="centre" aria-hidden="true">
+        @if (ChildContent is not null)
+        {
+            @ChildContent
+        }
+        else
+        {
+            <span class="value @Width" data-testid="@Id("value")">@Shown</span>
+        }
+        @if (Caption is not null)
+        {
+            <span class="caption" data-testid="@Id("caption")">@Caption</span>
+        }
+    </span>
+</div>
+
+@code {
+    /// <summary>How far along it is, in the same unit as <see cref="Max"/>. Negative values count as zero; fractions are rounded for display.</summary>
+    [Parameter]
+    public double Value { get; set; }
+
+    /// <summary>The value that fills the ring. Zero or negative means no maximum: the ring is full once <see cref="Value"/> is above zero, and never over.</summary>
+    [Parameter]
+    public double Max { get; set; }
+
+    /// <summary>The smaller ring (<c>--ring-size-compact</c>) that sits beside other figures in a card.</summary>
+    [Parameter]
+    public bool Compact { get; set; }
+
+    /// <summary>A short line under the centre text, such as its unit.</summary>
+    [Parameter]
+    public string? Caption { get; set; }
+
+    /// <summary>Replaces the centre text, for a figure other than <see cref="Value"/>, such as what is left. Hidden from screen readers like the rest of the centre, so <see cref="AriaLabel"/> must say it.</summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>The accessible name of the ring. Defaults to the value, the maximum and the caption.</summary>
+    [Parameter]
+    public string? AriaLabel { get; set; }
+
+    /// <summary>Value of the data-testid attribute, and the prefix of <c>{TestId}-value</c> and <c>-caption</c>.</summary>
+    [Parameter]
+    public string? TestId { get; set; }
+
+    private int Rounded => (int)Math.Round(Math.Max(Value, 0), MidpointRounding.AwayFromZero);
+
+    private bool HasMax => Max > 0;
+
+    private bool IsOver => HasMax && Value > Max;
+
+    private string Shown => Number(Rounded);
+
+    /// <summary>Steps the number's size down as it gets wider: 6 characters ("12,345") is wider, 7 or more ("123,456") is widest; shorter numbers keep the base size.</summary>
+    private string? Width => Shown.Length switch { >= 7 => "widest", 6 => "wider", _ => null };
+
+    /// <summary>Share of the ring that is filled, 0 to 1.</summary>
+    private string Fill => (HasMax ? Math.Clamp(Math.Max(Value, 0) / Max, 0, 1) : Value > 0 ? 1 : 0)
+        .ToString("0.####", CultureInfo.InvariantCulture);
+
+    private string Description => AriaLabel ?? (HasMax ? $"{Shown} of {Number(Max)}" : Shown) + (Caption is null ? null : $" {Caption}");
+
+    private string Id(string part) => $"{TestId}-{part}";
+
+    private static string Number(double value) => Math.Round(value, MidpointRounding.AwayFromZero).ToString("N0", CultureInfo.InvariantCulture);
+}

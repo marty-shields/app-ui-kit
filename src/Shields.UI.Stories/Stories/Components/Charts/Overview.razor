@@ -19,4 +19,13 @@
     <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>{TestId}-0</code>, <code>{TestId}-1</code>, … by position.</li>
 </ul>
 
-<p>Stories: <a href="./?path=/docs/components-charts-chartlegend--docs">ChartLegend</a></p>
+<h2><code>ProgressRing</code></h2>
+<p>A ring that fills as <code>Value</code> approaches <code>Max</code>, with the value in the middle. Above <code>Max</code> it turns <code>--color-error</code> and the number does too. <code>Compact</code> uses the smaller <code>--ring-size-compact</code>.</p>
+<ul>
+    <li>With a zero or negative <code>Max</code> there is no maximum: the ring is full once <code>Value</code> is above zero, and never over.</li>
+    <li><code>Caption</code> is a short line under the number; <code>ChildContent</code> replaces the number, for a figure such as what is left.</li>
+    <li>The ring is an image named by <code>AriaLabel</code>, by default "{value} of {max} {caption}"; its centre is hidden from screen readers.</li>
+    <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>{TestId}-value</code> and <code>{TestId}-caption</code>.</li>
+</ul>
+
+<p>Stories: <a href="./?path=/docs/components-charts-chartlegend--docs">ChartLegend</a>, <a href="./?path=/docs/components-charts-progressring--docs">ProgressRing</a></p>

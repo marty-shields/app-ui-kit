@@ -1,10 +1,11 @@
 @using Microsoft.Extensions.Logging
 @using Microsoft.JSInterop
+@using Shields.UI.Components.Actions
 @inject ILogger<LoadFailed> Logger
 
-<div class="failed">
+<div class="failed @(Plain ? "plain" : null)">
     <p class="error" role="alert" data-testid="@($"{TestId}-error")">@Message</p>
-    <AppButton @ref="retry" FullWidth TestId="@($"{TestId}-retry")" OnClick="OnRetry">Try again</AppButton>
+    <AppButton @ref="retry" FullWidth Variant="RetryVariant" TestId="@($"{TestId}-retry")" OnClick="OnRetry">Try again</AppButton>
 </div>
 
 @code {
@@ -15,6 +16,14 @@
     /// <summary>Raised by Try again.</summary>
     [Parameter]
     public EventCallback OnRetry { get; set; }
+
+    /// <summary>Visual weight of Try again.</summary>
+    [Parameter]
+    public ButtonVariant RetryVariant { get; set; } = ButtonVariant.Primary;
+
+    /// <summary>Shows the message centred and without the red border, for a failure that fills the screen.</summary>
+    [Parameter]
+    public bool Plain { get; set; }
 
     /// <summary>Prefix of the data-testid attributes: <c>{TestId}-error</c> on the message and <c>{TestId}-retry</c> on Try again.</summary>
     [Parameter, EditorRequired]

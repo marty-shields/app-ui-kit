@@ -46,6 +46,31 @@ public class StartupViewTests : ComponentTestBase
     }
 
     [Test]
+    public void Failed_MarksTheViewStartupFailed_WithAndWithoutOnRetry()
+    {
+        var without = Render(p => p.Add(x => x.Failed, true));
+        var with = Render(p => p.Add(x => x.Failed, true).Add(x => x.OnRetry, () => { }));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(without.FindAll("[data-testid=startup-failed]"), Has.Count.EqualTo(1));
+            Assert.That(with.FindAll("[data-testid=startup-failed]"), Has.Count.EqualTo(1));
+        });
+    }
+
+    [Test]
+    public void NotFailed_HasNoStartupFailedMarker() =>
+        Assert.That(Render().FindAll("[data-testid=startup-failed]"), Is.Empty);
+
+    [Test]
+    public void FailedWithRetry_ShowsAPlainCentredFailure()
+    {
+        var cut = Render(p => p.Add(x => x.Failed, true).Add(x => x.OnRetry, () => { }));
+
+        Assert.That(cut.Find("[data-testid=startup-failed] .failed").ClassList, Does.Contain("plain"));
+    }
+
+    [Test]
     public void Failed_TryAgainRaisesOnRetry()
     {
         var retries = 0;

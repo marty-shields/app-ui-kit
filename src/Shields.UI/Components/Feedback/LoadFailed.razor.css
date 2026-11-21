@@ -12,3 +12,13 @@
     color: var(--color-error);
     font-weight: var(--font-weight-bold);
 }
+
+/* Plain: the failure is the whole screen, so the message stands alone, centred, in the error colour. */
+.plain {
+    text-align: center;
+}
+
+.plain .error {
+    padding: 0;
+    border: 0;
+}

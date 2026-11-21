@@ -148,6 +148,8 @@
     --stacked-bar-gap: 0.25rem;
     /* StackedBar: the narrowest a drawn segment gets, so a tiny share stays visible. */
     --stacked-bar-segment-min-width: 0.25rem;
+    /* AppScreen: extra room under the content when the bottom navigation bar's raised button overlaps its foot. */
+    --app-screen-nav-clearance: 0.75rem;
 }
 
 /* Forces a theme on an element and its children. */

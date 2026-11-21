@@ -30,13 +30,75 @@ public class AppLifecycleBridgeTests
     public async Task Connect_AfterAttach_MakesTheCurrentActivityCurrentInTheScope()
     {
         bridge.Attach(activity);
+        RegisterStart(scoped);
         bridge.Connect(scoped);
+        await scoped.NotifyStartedAsync();
+        var afterConnect = started;
+
         RegisterStart(scoped);
         bridge.Detach(activity);
+        await scoped.NotifyStartedAsync();
 
-        await bridge.StartedAsync();
+        Assert.Multiple(() =>
+        {
+            Assert.That(afterConnect, Is.Zero, "connect attached the activity, so it cleared the earlier handler");
+            Assert.That(started, Is.Zero, "detach reached the scope with the same activity, so it cleared the handler");
+        });
+    }
 
-        Assert.That(started, Is.Zero, "detach reached the scope, so it cleared the handler");
+    [Test]
+    public async Task Connect_BeforeAttach_HandsTheActivityOnWhenItIsAttached()
+    {
+        bridge.Connect(scoped);
+        RegisterStart(scoped);
+
+        bridge.Attach(activity);
+        await scoped.NotifyStartedAsync();
+
+        Assert.That(started, Is.Zero, "attach reached the connected scope and cleared its handler");
+    }
+
+    [Test]
+    public async Task Connect_AgainAfterDisconnect_KeepsTheHandlersOfAScopeAlreadyAttached()
+    {
+        bridge.Attach(activity);
+        bridge.Connect(scoped);
+        bridge.Disconnect(scoped);
+        RegisterStart(scoped);
+
+        bridge.Connect(scoped);
+        await scoped.NotifyStartedAsync();
+
+        Assert.That(started, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void Connect_WhenAnActivityIsDetachedWhileAttaching_DoesNotFollowTheScope()
+    {
+        var reentrant = new ReentrantLifecycle(bridge);
+        bridge.Attach(activity);
+
+        bridge.Connect(reentrant);
+        bridge.Attach(new object());
+
+        Assert.That(reentrant.Attached, Is.EqualTo(1), "the detach during connect dropped the scope, so the later attach never reached it");
+    }
+
+    private sealed class ReentrantLifecycle(AppLifecycleBridge bridge) : IAppLifecycle
+    {
+        public int Attached { get; private set; }
+
+        public void Attach(object activity)
+        {
+            Attached++;
+            bridge.Detach(activity);
+        }
+
+        public Task NotifyStartedAsync() => Task.CompletedTask;
+
+        public void Detach(object activity)
+        {
+        }
     }
 
     [Test]

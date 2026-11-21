@@ -6,7 +6,8 @@ namespace Shields.UI.Navigation;
 /// <remarks>
 /// Registered as a singleton by <c>AddShieldsUi</c>. The host calls <see cref="Attach"/> and <see cref="Detach"/> from its activity and turns its back callback on and off with <see cref="Enabled"/>:
 /// without a handler Android handles back and the app closes. <c>HostBridges</c> connects the scoped back button before any page registers.
-/// Android calls arrive on the UI thread and Blazor runs on its own dispatcher, so state is guarded by a lock and events are raised outside it.
+/// Android calls arrive on the UI thread and Blazor runs on its own dispatcher, so state is guarded by a lock that is also held while the scoped instance is told about the activity, so the bridge and the scope never disagree; <see cref="EnabledChanged"/> is raised outside it.
+/// It follows the scope that connected last, so it serves a single BlazorWebView, not Blazor Server with many circuits.
 /// </remarks>
 public sealed class BackButtonBridge
 {
@@ -37,43 +38,42 @@ public sealed class BackButtonBridge
     /// <summary>Makes a created activity current, which replaces any earlier one and removes its handlers.</summary>
     public void Attach(object activity)
     {
-        IBackButton? scoped;
         lock (gate)
         {
             current = activity;
-            scoped = backButton;
+            if (backButton is { } scoped)
+            {
+                scoped.Changed -= Update;
+                scoped.Attach(activity);
+                Follow(scoped);
+            }
         }
 
-        scoped?.Attach(activity);
-        EnabledChanged?.Invoke();
+        Update();
     }
 
     /// <summary>Follows the back button of the scope the pages use, and makes the current activity current there. Connecting the same instance again does nothing.</summary>
     public void Connect(IBackButton scoped)
     {
-        IBackButton? previous;
-        object? activity;
         lock (gate)
         {
-            previous = backButton;
-            if (ReferenceEquals(previous, scoped))
+            if (ReferenceEquals(backButton, scoped))
             {
                 return;
             }
 
+            if (backButton is not null)
+            {
+                backButton.Changed -= Update;
+            }
+
             backButton = scoped;
-            activity = current;
-        }
+            if (current is not null)
+            {
+                scoped.Attach(current);
+            }
 
-        if (previous is not null)
-        {
-            previous.Changed -= Update;
-        }
-
-        scoped.Changed += Update;
-        if (activity is not null)
-        {
-            scoped.Attach(activity);
+            Follow(scoped);
         }
 
         Update();
@@ -90,9 +90,9 @@ public sealed class BackButtonBridge
             }
 
             backButton = null;
+            scoped.Changed -= Update;
         }
 
-        scoped.Changed -= Update;
         Update();
     }
 
@@ -102,7 +102,6 @@ public sealed class BackButtonBridge
     /// </summary>
     public void Detach(object activity)
     {
-        IBackButton? scoped;
         lock (gate)
         {
             if (!ReferenceEquals(activity, current))
@@ -111,14 +110,12 @@ public sealed class BackButtonBridge
             }
 
             current = null;
-            scoped = backButton;
-            backButton = null;
-        }
-
-        if (scoped is not null)
-        {
-            scoped.Changed -= Update;
-            scoped.Detach(activity);
+            if (backButton is { } scoped)
+            {
+                backButton = null;
+                scoped.Changed -= Update;
+                scoped.Detach(activity);
+            }
         }
 
         Update();
@@ -134,6 +131,16 @@ public sealed class BackButtonBridge
         }
 
         return scoped is { HasHandler: true } ? scoped.HandleAsync() : null;
+    }
+
+    // Called with the lock held, after the scoped call that may raise Changed, so that event does not raise EnabledChanged under the lock.
+    // A re-entrant Detach or Connect during that call has already replaced the scope, which must then stay unsubscribed.
+    private void Follow(IBackButton scoped)
+    {
+        if (ReferenceEquals(backButton, scoped))
+        {
+            scoped.Changed += Update;
+        }
     }
 
     private void Update() => EnabledChanged?.Invoke();

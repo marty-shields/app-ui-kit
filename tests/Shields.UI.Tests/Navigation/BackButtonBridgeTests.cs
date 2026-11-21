@@ -207,10 +207,86 @@ public class BackButtonBridgeTests
         bridge.Attach(activity);
         bridge.Connect(scoped);
         var enabledSeenFromAnotherThread = false;
-        bridge.EnabledChanged += () => enabledSeenFromAnotherThread = Task.Run(() => bridge.Enabled).GetAwaiter().GetResult();
+        var finished = false;
+        bridge.EnabledChanged += () =>
+        {
+            var read = Task.Run(() => bridge.Enabled);
+            finished = read.Wait(TimeSpan.FromSeconds(5));
+            enabledSeenFromAnotherThread = finished && read.Result;
+        };
 
         scoped.Register(() => Task.CompletedTask);
 
-        Assert.That(enabledSeenFromAnotherThread, Is.True, "a handler on another thread read the bridge, so the lock was free");
+        Assert.Multiple(() =>
+        {
+            Assert.That(finished, Is.True, "the read on another thread must not wait for the bridge's lock");
+            Assert.That(enabledSeenFromAnotherThread, Is.True);
+        });
+    }
+
+    [Test]
+    public void Connect_RaisesEnabledChanged()
+    {
+        var raised = 0;
+        bridge.EnabledChanged += () => raised++;
+
+        bridge.Connect(scoped);
+
+        Assert.That(raised, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void Disconnect_RaisesEnabledChangedAndStopsFollowingTheScope()
+    {
+        bridge.Attach(activity);
+        bridge.Connect(scoped);
+        var raised = 0;
+        bridge.EnabledChanged += () => raised++;
+
+        bridge.Disconnect(scoped);
+        var afterDisconnect = raised;
+        scoped.Register(() => Task.CompletedTask);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(afterDisconnect, Is.EqualTo(1));
+            Assert.That(raised, Is.EqualTo(1), "a handler registered after disconnect must not reach the bridge");
+        });
+    }
+
+    [Test]
+    public void Connect_WhenAnActivityIsDetachedWhileAttaching_DoesNotFollowTheScope()
+    {
+        var reentrant = new ReentrantBackButton(bridge);
+        bridge.Attach(activity);
+
+        bridge.Connect(reentrant);
+
+        Assert.That(reentrant.Subscribers, Is.Zero, "the detach during connect dropped the scope, so it must not stay subscribed");
+    }
+
+    private sealed class ReentrantBackButton(BackButtonBridge bridge) : IBackButton
+    {
+        private Action? changed;
+
+        public int Subscribers => changed?.GetInvocationList().Length ?? 0;
+
+        public bool HasHandler => false;
+
+        public event Action? Changed
+        {
+            add => changed += value;
+            remove => changed -= value;
+        }
+
+        public IDisposable Register(Func<Task> handler) => throw new NotSupportedException();
+
+        public Task HandleAsync() => Task.CompletedTask;
+
+        public void Attach(object activity) => bridge.Detach(activity);
+
+        public void Detach(object activity)
+        {
+        }
     }
 }

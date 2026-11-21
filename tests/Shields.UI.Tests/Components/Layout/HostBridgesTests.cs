@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Shields.UI.Components.Layout;
 using Shields.UI.Lifecycle;
@@ -71,5 +72,15 @@ public class HostBridgesTests : ComponentTestBase
             Assert.That(backBridge.HandleAsync(), Is.Null);
             Assert.That(started, Is.Zero);
         });
+    }
+
+    [Test]
+    public void Render_WithoutAnAppLifecycle_ExplainsWhatToRegister()
+    {
+        Context.Services.RemoveAll<IAppLifecycle>();
+
+        var failure = Assert.Throws<InvalidOperationException>(() => Context.Render<HostBridges>());
+
+        Assert.That(failure!.Message, Does.Contain("IAppLifecycle"));
     }
 }

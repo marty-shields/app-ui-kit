@@ -5,31 +5,36 @@ namespace Shields.UI.Lifecycle;
 /// </summary>
 /// <remarks>
 /// Registered as a singleton by <c>AddShieldsUi</c>. The host calls <see cref="Attach"/> when an activity is created, <see cref="StartedAsync"/> when it starts and <see cref="Detach"/> when it is destroyed.
-/// <c>HostBridges</c> connects the scoped lifecycle before any page registers. State is guarded by a lock and the scoped instance is called outside it.
+/// <c>HostBridges</c> connects the scoped lifecycle before any page registers. State is guarded by a lock that is also held while the scoped instance is called, so the bridge and the scope never disagree.
+/// Attaching clears the scope's handlers, so <c>HostBridges</c> must come first in the root component and exist once per scope. It follows the scope that connected last, so it serves a single BlazorWebView, not Blazor Server with many circuits.
 /// </remarks>
 public sealed class AppLifecycleBridge
 {
     private readonly Lock gate = new();
     private object? current;
     private IAppLifecycle? lifecycle;
+    private IAppLifecycle? attachedScope;
+    private object? attachedActivity;
 
     /// <summary>Makes a created activity current, which removes the earlier activity's handlers.</summary>
     public void Attach(object activity)
     {
-        IAppLifecycle? scoped;
         lock (gate)
         {
             current = activity;
-            scoped = lifecycle;
+            if (lifecycle is { } scoped)
+            {
+                AttachScope(scoped, activity);
+            }
         }
-
-        scoped?.Attach(activity);
     }
 
-    /// <summary>Follows the lifecycle of the scope the pages use, and makes the current activity current there. Connecting the same instance again does nothing.</summary>
+    /// <summary>
+    /// Follows the lifecycle of the scope the pages use, and makes the current activity current there unless it already is, which would clear handlers registered since.
+    /// Connecting the same instance again does nothing.
+    /// </summary>
     public void Connect(IAppLifecycle scoped)
     {
-        object? activity;
         lock (gate)
         {
             if (ReferenceEquals(lifecycle, scoped))
@@ -38,12 +43,10 @@ public sealed class AppLifecycleBridge
             }
 
             lifecycle = scoped;
-            activity = current;
-        }
-
-        if (activity is not null)
-        {
-            scoped.Attach(activity);
+            if (current is not null && !(ReferenceEquals(attachedScope, scoped) && ReferenceEquals(attachedActivity, current)))
+            {
+                AttachScope(scoped, current);
+            }
         }
     }
 
@@ -74,7 +77,6 @@ public sealed class AppLifecycleBridge
     /// <summary>Removes the handlers and stops following the lifecycle when the current activity is destroyed: its pages are not disposed with it. An earlier activity is ignored.</summary>
     public void Detach(object activity)
     {
-        IAppLifecycle? scoped;
         lock (gate)
         {
             if (!ReferenceEquals(activity, current))
@@ -83,10 +85,18 @@ public sealed class AppLifecycleBridge
             }
 
             current = null;
-            scoped = lifecycle;
+            var scoped = lifecycle;
             lifecycle = null;
+            attachedScope = null;
+            attachedActivity = null;
+            scoped?.Detach(activity);
         }
+    }
 
-        scoped?.Detach(activity);
+    private void AttachScope(IAppLifecycle scoped, object activity)
+    {
+        attachedScope = scoped;
+        attachedActivity = activity;
+        scoped.Attach(activity);
     }
 }

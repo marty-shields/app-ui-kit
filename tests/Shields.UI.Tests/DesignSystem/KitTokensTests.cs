@@ -29,6 +29,7 @@ public class KitTokensTests
         "--color-chart-band", "--snackbar-gap-bottom",
         "--opacity-thin", "--chart-dash", "--color-data-1", "--color-data-2", "--color-data-3", "--color-data-4", "--color-data-5",
         "--bar-list-bar-height", "--bar-list-value-max-width",
+        "--stacked-bar-height", "--stacked-bar-gap",
         // Sheet and SheetAction.
         "--sheet-enter-duration", "--sheet-max-width", "--sheet-max-height", "--sheet-handle-width",
         "--sheet-handle-height", "--sheet-tile-min-height", "--sheet-tile-icon-size",

@@ -1,0 +1,61 @@
+.stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.track {
+    display: flex;
+    gap: var(--stacked-bar-gap);
+    height: var(--stacked-bar-height);
+    border-radius: var(--radius-sm);
+    /* The gaps between segments show this colour. */
+    background-color: var(--color-surface);
+    overflow: hidden;
+}
+
+.track.none {
+    background-color: var(--color-ring-track);
+}
+
+.segment {
+    flex-basis: 0;
+    min-width: 0;
+}
+
+.labels {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-1) var(--space-2);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+}
+
+.label {
+    white-space: nowrap;
+}
+
+.label strong {
+    color: var(--color-text);
+    font-weight: var(--font-weight-bold);
+}
+
+.label::before {
+    content: "";
+    display: inline-block;
+    width: var(--legend-swatch-size);
+    height: var(--legend-swatch-size);
+    margin-right: var(--space-1);
+    border-radius: var(--radius-round);
+}
+
+.series-1 { --series: var(--color-data-1); }
+.series-2 { --series: var(--color-data-2); }
+.series-3 { --series: var(--color-data-3); }
+.series-4 { --series: var(--color-data-4); }
+.series-5 { --series: var(--color-data-5); }
+
+.segment, .label::before {
+    background-color: var(--series);
+}

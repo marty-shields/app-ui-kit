@@ -6,6 +6,7 @@
     gap: var(--space-2);
     box-sizing: border-box;
     min-width: 0;
+    /* TouchTargetCheck accepts only the literal var(--touch-target) here; the taller minimum is the second .tile rule below. */
     min-height: var(--touch-target);
     padding: var(--space-4);
     border: 0;

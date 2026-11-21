@@ -30,11 +30,11 @@ public class KitTokensTests
         "--opacity-thin", "--chart-dash", "--color-data-1", "--color-data-2", "--color-data-3", "--color-data-4", "--color-data-5",
         "--bar-list-bar-height", "--bar-list-value-max-width",
         // Sheet and SheetAction.
-        "--sheet-enter-duration", "--sheet-max-width", "--sheet-handle-width", "--sheet-handle-height",
-        "--sheet-tile-min-height", "--sheet-tile-icon-size",
+        "--sheet-enter-duration", "--sheet-max-width", "--sheet-max-height", "--sheet-handle-width",
+        "--sheet-handle-height", "--sheet-tile-min-height", "--sheet-tile-icon-size",
     ];
 
-    // Calorie Tracker's macro, target band, share bar and sheet tokens; Workout Log's bar-past, set, calendar and meter
+    // Calorie Tracker's macro, target band and share bar tokens, and the app's own sheet names (the kit's are allowed above); Workout Log's bar-past, set, calendar and meter
     // tokens; the old name of the raised button; and the ring names, of which only the kit's own are allowed.
     private static readonly string[] AppOnlyPrefixes =
     [
@@ -64,6 +64,7 @@ public class KitTokensTests
             Assert.That(DesignTokens.Value("--chart-dash"), Is.EqualTo("calc(var(--space-1) * 1.5) var(--space-1)"));
             Assert.That(DesignTokens.Value("--sheet-enter-duration"), Is.EqualTo("200ms"));
             Assert.That(DesignTokens.Value("--sheet-max-width"), Is.EqualTo("32rem"));
+            Assert.That(DesignTokens.Value("--sheet-max-height"), Is.EqualTo("85dvh"));
         });
     }
 

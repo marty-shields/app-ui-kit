@@ -16,6 +16,8 @@
     gap: var(--space-4);
     box-sizing: border-box;
     max-width: var(--sheet-max-width);
+    max-height: var(--sheet-max-height);
+    overflow-y: auto;
     margin: 0 auto;
     padding: var(--space-3) var(--space-4) calc(var(--space-6) + var(--inset-bottom));
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;

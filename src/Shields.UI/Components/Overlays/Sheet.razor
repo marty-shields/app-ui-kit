@@ -19,8 +19,11 @@
 @code {
     private readonly string titleId = $"sheet-title-{Guid.NewGuid():N}";
     private ElementReference sheet;
-    private IJSObjectReference? module;
+    private Task<IJSObjectReference>? module;
+    private DotNetObjectReference<Sheet>? self;
     private bool trapping;
+    private bool disposed;
+    private int? trap;
 
     /// <summary>Shows the sheet. It stays open until the owner clears this, whatever <see cref="OnClose"/> was raised for.</summary>
     [Parameter]
@@ -49,17 +52,31 @@
             return;
         }
 
-        trapping = Open;
+        var opening = Open;
+        trapping = opening;
         try
         {
-            module ??= await JS.InvokeAsync<IJSObjectReference>("import", "./_content/Shields.UI/Components/Overlays/Sheet.razor.js");
-            if (Open)
+            module ??= JS.InvokeAsync<IJSObjectReference>("import", "./_content/Shields.UI/Components/Overlays/Sheet.razor.js").AsTask();
+            var script = await module;
+
+            // The owner may have closed the sheet, or it may have been disposed, while the script loaded.
+            if (disposed)
             {
-                await module.InvokeVoidAsync("open", sheet);
+                return;
             }
-            else
+
+            if (opening)
             {
-                await module.InvokeVoidAsync("close");
+                if (Open && trap is null)
+                {
+                    self ??= DotNetObjectReference.Create(this);
+                    trap = await script.InvokeAsync<int>("open", sheet, self);
+                }
+            }
+            else if (trap is { } id)
+            {
+                trap = null;
+                await script.InvokeVoidAsync("close", id);
             }
         }
         catch (JSDisconnectedException)
@@ -68,27 +85,39 @@
         }
         catch (JSException exception)
         {
+            if (module is { IsFaulted: true })
+            {
+                module = null;
+            }
+
             Log.FocusFailed(Logger, exception);
         }
     }
 
     private Task OnKeyDown(KeyboardEventArgs args) => args.Key == "Escape" ? OnClose.InvokeAsync() : Task.CompletedTask;
 
+    /// <summary>Called by the focus script for Escape pressed while focus is outside the sheet, e.g. on the page body.</summary>
+    [JSInvokable]
+    public Task EscapeOutsideSheet() => OnClose.InvokeAsync();
+
     public async ValueTask DisposeAsync()
     {
-        if (module is null)
+        disposed = true;
+        self?.Dispose();
+        if (module is not { IsCompletedSuccessfully: true })
         {
             return;
         }
 
         try
         {
-            if (trapping)
+            if (trap is { } id)
             {
-                await module.InvokeVoidAsync("close");
+                trap = null;
+                await module.Result.InvokeVoidAsync("close", id);
             }
 
-            await module.DisposeAsync();
+            await module.Result.DisposeAsync();
         }
         catch (JSDisconnectedException)
         {

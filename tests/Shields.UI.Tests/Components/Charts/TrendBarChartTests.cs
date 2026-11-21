@@ -16,10 +16,10 @@ public class TrendBarChartTests : ComponentTestBase
     [SetUp]
     public void ClearSelection() => selected.Clear();
 
-    private static TrendBar Bar(int day, double? value, string? label = null) =>
+    private static TrendBarPoint Bar(int day, double? value, string? label = null) =>
         new(Monday.AddDays(day), label ?? Monday.AddDays(day).ToString("ddd", CultureInfo.InvariantCulture), value);
 
-    private IRenderedComponent<TrendBarChart> Render(IReadOnlyList<TrendBar> bars, double? target = 2000) =>
+    private IRenderedComponent<TrendBarChart> Render(IReadOnlyList<TrendBarPoint> bars, double? target = 2000) =>
         Context.Render<TrendBarChart>(p => p
             .Add(x => x.Bars, bars).Add(x => x.Target, target).Add(x => x.Unit, "pts").Add(x => x.TestId, "chart")
             .Add(x => x.OnSelect, EventCallback.Factory.Create<DateOnly>(this, selected.Add)));
@@ -198,7 +198,7 @@ public class TrendBarChartTests : ComponentTestBase
     [Test]
     public void Render_JudgesABarAgainstItsOwnTarget()
     {
-        var cut = Render([new TrendBar(Monday, "Mon", 2500, Target: 2400), Bar(1, 2500)], target: 2000);
+        var cut = Render([new TrendBarPoint(Monday, "Mon", 2500, Target: 2400), Bar(1, 2500)], target: 2000);
 
         Assert.Multiple(() =>
         {
@@ -393,7 +393,7 @@ public class TrendBarChartTests : ComponentTestBase
     [Test]
     public void Render_PerBarTarget_IsHeldByTheScaleButNotDrawnAsALine()
     {
-        var cut = Render([new TrendBar(Monday, "Mon", 1000, Target: 9000), Bar(1, 1000)], target: null);
+        var cut = Render([new TrendBarPoint(Monday, "Mon", 1000, Target: 9000), Bar(1, 1000)], target: null);
 
         Assert.Multiple(() =>
         {
@@ -438,7 +438,7 @@ public class TrendBarChartTests : ComponentTestBase
     [TestCase(11)]
     public void Render_TooltipAtEitherEnd_StaysInsideTheChart(int index)
     {
-        var bars = Enumerable.Range(0, 12).Select(i => new TrendBar(new DateOnly(2026, 1 + i, 1), "Month", i == 0 || i == 11 ? 1200 : 1000)).ToList();
+        var bars = Enumerable.Range(0, 12).Select(i => new TrendBarPoint(new DateOnly(2026, 1 + i, 1), "Month", i == 0 || i == 11 ? 1200 : 1000)).ToList();
         var cut = Context.Render<TrendBarChart>(p => p
             .Add(x => x.Bars, bars).Add(x => x.Target, 2000).Add(x => x.DateFormat, "MMMM yyyy").Add(x => x.TestId, "chart"));
 
@@ -540,7 +540,7 @@ public class TrendBarChartTests : ComponentTestBase
     public void Render_DateFormatShapesTheName()
     {
         var cut = Context.Render<TrendBarChart>(p => p
-            .Add(x => x.Bars, [new TrendBar(new DateOnly(2026, 3, 1), "Mar", 1500)]).Add(x => x.DateFormat, "MMMM yyyy").Add(x => x.Unit, "pts").Add(x => x.TestId, "chart"));
+            .Add(x => x.Bars, [new TrendBarPoint(new DateOnly(2026, 3, 1), "Mar", 1500)]).Add(x => x.DateFormat, "MMMM yyyy").Add(x => x.Unit, "pts").Add(x => x.TestId, "chart"));
 
         Assert.That(cut.Find("g.bar").GetAttribute("aria-label"), Is.EqualTo("March 2026, 1,500 pts"));
     }

@@ -22,7 +22,7 @@ public static class KitNames
         "ButtonVariant", "CalendarDay", "CalendarStyle", "ChangeDirection", "DataSeries", "DataSeriesExtensions", "DateRange", "DayLabel", "IAppLifecycle", "IAppStart", "IBackButton", "IconButtonStyle",
         "IconName", "IconSize", "IconTone", "KitEvent", "LegendItem", "LegendSwatch", "PeriodKind", "RadioOption",
         "ShieldsUiServiceCollectionExtensions", "SnackbarMessage", "SnackbarService", "StackedBarSegment", "StatChange",
-        "SystemBarInsetWriter", "TargetStatus", "TargetStatuses", "ThemePreference", "ThemeService", "TrendBar", "ValueKind"
+        "SystemBarInsetWriter", "TargetStatus", "TargetStatuses", "ThemePreference", "ThemeService", "TrendBarPoint", "TrendBarStyle", "ValueKind"
     };
 
     /// <summary>Every custom property the kit declares in tokens.css and base.css.</summary>

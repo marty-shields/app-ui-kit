@@ -83,7 +83,7 @@
 
     /// <summary>The bars, left to right.</summary>
     [Parameter]
-    public IReadOnlyList<TrendBar> Bars { get; set; } = [];
+    public IReadOnlyList<TrendBarPoint> Bars { get; set; } = [];
 
     /// <summary>The target. Draws the dashed target line and the outline of the band 10% either side of it, and sets each bar's status. Null or zero draws neither.</summary>
     [Parameter]
@@ -113,7 +113,7 @@
     [Parameter]
     public string? TestId { get; set; }
 
-    private TrendBar? highest;
+    private TrendBarPoint? highest;
 
     protected override void OnParametersSet() => highest = Bars.Where(b => TargetStatuses.IsRecorded(b.Value)).MaxBy(b => b.Value);
 
@@ -169,15 +169,15 @@
         return $"M {N(x)} {N(Base)} V {N(top + r)} A {N(r)} {N(r)} 0 0 1 {N(x + r)} {N(top)} H {N(x + width - r)} A {N(r)} {N(r)} 0 0 1 {N(x + width)} {N(top + r)} V {N(Base)} Z";
     }
 
-    private string Name(TrendBar bar, TargetStatus status) =>
+    private string Name(TrendBarPoint bar, TargetStatus status) =>
         $"{Tip(bar)}" + (status == TargetStatus.None ? "" : $", {TargetStatuses.Word(status)}") + (bar.Note is null ? "" : $", {bar.Note}");
 
     /// <summary>The date and value, which is all the tooltip shows; the status is in the colour and the marker.</summary>
-    private string Tip(TrendBar bar) => $"{bar.Date.ToString(DateFormat, CultureInfo.InvariantCulture)}, {TargetStatuses.Number(bar.Value!.Value)}" + (Unit is null ? "" : $" {Unit}");
+    private string Tip(TrendBarPoint bar) => $"{bar.Date.ToString(DateFormat, CultureInfo.InvariantCulture)}, {TargetStatuses.Number(bar.Value!.Value)}" + (Unit is null ? "" : $" {Unit}");
 
     private static string BarClass(TargetStatus status, bool selectable, bool thin) => $"bar {TargetStatuses.Class(status)}" + (selectable ? " selectable" : "") + (thin ? " thin" : "");
 
-    private static string Day(TrendBar bar) => bar.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+    private static string Day(TrendBarPoint bar) => bar.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
 
     /// <summary>The tooltip's centre, kept far enough from both ends of the chart for the whole text to show.</summary>
     private static double TipX(double centre, string tip)
@@ -211,9 +211,9 @@
         _ => $"{(tick / 1e9).ToString("0.#", CultureInfo.InvariantCulture)}B",
     };
 
-    private async Task Select(TrendBar bar) => await OnSelect.InvokeAsync(bar.Date);
+    private async Task Select(TrendBarPoint bar) => await OnSelect.InvokeAsync(bar.Date);
 
-    private async Task OnKey(KeyboardEventArgs e, TrendBar bar)
+    private async Task OnKey(KeyboardEventArgs e, TrendBarPoint bar)
     {
         if (e.Key is "Enter" or " ")
         {

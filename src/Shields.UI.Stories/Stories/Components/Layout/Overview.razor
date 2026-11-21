@@ -49,7 +49,21 @@
 <h2><code>ErrorView</code></h2>
 <p>"Something went wrong" with a Restart button that raises <code>OnRestart</code>. <code>data-testid</code>: <code>error-top-bar</code>, <code>error-message</code>, <code>error-bottom-bar</code> and <code>error-restart</code>.</p>
 
-<p>Stories: <a href="./?path=/docs/components-layout-startupgate--docs">StartupGate</a>, <a href="./?path=/docs/components-layout-startupview--docs">StartupView</a>, <a href="./?path=/docs/components-layout-apperrorboundary--docs">AppErrorBoundary</a>, <a href="./?path=/docs/components-layout-errorview--docs">ErrorView</a></p>
+<h2><code>Text</code></h2>
+<p>Text in one of the kit's looks, so a screen sets only layout. <code>Variant</code> (<code>TextVariant</code>): <code>Body</code> (default), <code>Label</code> (muted, small, bold, upper case, <code>--letter-spacing-label</code>), <code>Muted</code>, <code>MutedSmall</code>, <code>Strong</code> (bold, normal text colour, also inside muted text), <code>Figure</code> (<code>--font-size-xl</code>, bold) and <code>Error</code> (<code>--color-error</code>). Every variant reads at 4.5:1 on the page and on cards in both themes.</p>
+<ul>
+    <li><code>As</code> (<code>TextElement</code>): the element, <code>Span</code> by default; <code>P</code>, <code>Div</code> and <code>H2</code> to <code>H6</code> let a label be a heading of the right level.</li>
+    <li>Other attributes (an <code>id</code>, a <code>class</code>) go on the element; a <code>class</code> is added to the component's own. A class from the caller's scoped CSS does not match the element, so use <code>::deep</code> or a global class.</li>
+    <li><code>data-testid</code>: <code>TestId</code>.</li>
+</ul>
+
+<h2><code>Divider</code></h2>
+<p>A line in <code>--color-border</code>, <code>--border-width</code> thick. Horizontal by default (the full width); <code>Vertical</code> stretches to the height of a flex row. It is a <code>role="separator"</code> with <code>aria-orientation</code>; <code>Decorative</code> hides it from screen readers (<code>aria-hidden</code>, no role) for a line that only separates what is already grouped, such as the rule inside <code>SearchField</code>.</p>
+<ul>
+    <li><code>data-testid</code>: <code>TestId</code>.</li>
+</ul>
+
+<p>Stories: <a href="./?path=/docs/components-layout-startupgate--docs">StartupGate</a>, <a href="./?path=/docs/components-layout-startupview--docs">StartupView</a>, <a href="./?path=/docs/components-layout-apperrorboundary--docs">AppErrorBoundary</a>, <a href="./?path=/docs/components-layout-errorview--docs">ErrorView</a>, <a href="./?path=/docs/components-layout-text--docs">Text</a>, <a href="./?path=/docs/components-layout-divider--docs">Divider</a></p>
 
 <h2><code>HostBridges</code></h2>
 <p>Renders nothing. The back button and app lifecycle are scoped to the BlazorWebView, but Android's activity events happen outside that scope. <code>AddShieldsUi()</code> registers two singletons, <code>BackButtonBridge</code> and <code>AppLifecycleBridge</code>, for the activity to call; <code>HostBridges</code> connects the scoped <code>IBackButton</code> and <code>IAppLifecycle</code> to them when it initialises and disconnects them when it is disposed. Put <code>&lt;HostBridges /&gt;</code> first in the root component (<code>Routes</code>), so it connects before any page registers.</p>

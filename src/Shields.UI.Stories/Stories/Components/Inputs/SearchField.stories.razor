@@ -1,0 +1,47 @@
+@attribute [Stories("Components/Inputs/SearchField")]
+
+<Stories TComponent="SearchField" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Empty">
+        <Template>
+            <SearchField Placeholder="Search foods" AriaLabel="Search foods" TestId="search" />
+        </Template>
+    </Story>
+
+    <Story Name="With trailing Scan button">
+        <Template>
+            <SearchField Placeholder="Search foods" AriaLabel="Search foods" TestId="search">
+                <Trailing>
+                    <IconButton Icon="IconName.Scan" AriaLabel="Scan a barcode" Compact TestId="scan" />
+                </Trailing>
+            </SearchField>
+        </Template>
+    </Story>
+
+    <Story Name="Typed">
+        <Template>
+            <SearchField Value="oats" Placeholder="Search foods" AriaLabel="Search foods" />
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <SearchField Placeholder="Search foods" AriaLabel="Search foods">
+                    <Trailing><IconButton Icon="IconName.Scan" AriaLabel="Scan a barcode" Compact /></Trailing>
+                </SearchField>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <SearchField Placeholder="Search foods" AriaLabel="Search foods">
+                    <Trailing><IconButton Icon="IconName.Scan" AriaLabel="Scan a barcode" Compact /></Trailing>
+                </SearchField>
+            </div>
+        </Template>
+    </Story>
+
+</Stories>

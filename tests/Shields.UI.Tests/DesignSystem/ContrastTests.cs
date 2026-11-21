@@ -74,6 +74,37 @@ public class ContrastTests
         Assert.That(result.Passes, Is.True, result.ToString());
     }
 
+    // Read from each component's CSS, so a variant that gains a new colour is measured without a row here.
+    private static readonly (string Css, string Selector, string Property, string[] Backgrounds, double Minimum)[] ComponentColours =
+    [
+        .. new[] { ".text", ".label", ".muted", ".muted-small", ".strong", ".figure", ".error" }
+            .Select(selector => ("Layout/Text.razor.css", selector, "color", new[] { "--color-bg", "--color-surface" }, Text)),
+        ("Feedback/InlineAlert.razor.css", ".error", "color", ["--color-surface"], Text),
+        ("Feedback/InlineAlert.razor.css", ".error", "border-color", ["--color-bg", "--color-surface"], LargeTextOrControl),
+        ("Feedback/Banner.razor.css", ".banner", "color", ["--color-selected"], Text),
+    ];
+
+    private static IEnumerable<TestCaseData> ComponentCases() =>
+        ComponentColours.SelectMany(c => c.Backgrounds.SelectMany(background => Enum.GetValues<ColourScheme>()
+            .Select(scheme => new TestCaseData(c.Css, c.Selector, c.Property, background, c.Minimum, scheme)
+                .SetArgDisplayNames($"{Path.GetFileNameWithoutExtension(c.Css)} {c.Selector} {c.Property} on {background} ({scheme})"))));
+
+    [TestCaseSource(nameof(ComponentCases))]
+    public void ComponentColour_MeetsWcagAA(string cssFile, string selector, string property, string background, double minimum, ColourScheme scheme)
+    {
+        var css = RepoFiles.Read(["src", "Shields.UI", "Components", .. cssFile.Split('/')]);
+        string? Declared(string rule) => TouchTargetCheck.Declarations(css, rule).SingleOrDefault(d => d.StartsWith(property + ":", StringComparison.Ordinal));
+
+        // A Text variant that sets no colour keeps the one of the base .text rule.
+        var declaration = Declared(selector) ?? Declared(".text");
+        Assert.That(declaration, Is.Not.Null, $"{selector} {property}");
+        var foreground = declaration![(declaration.IndexOf("var(", StringComparison.Ordinal) + 4)..declaration.IndexOf(')')];
+
+        var result = ContrastCheck.Measure(foreground, background, minimum, scheme);
+
+        Assert.That(result.Passes, Is.True, result.ToString());
+    }
+
     // The Soft chip's border is --color-chip (already checked above on bg and surface); its fill must read as different from the Filled chip.
     [TestCase(ColourScheme.Light)]
     [TestCase(ColourScheme.Dark)]

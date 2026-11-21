@@ -1,0 +1,55 @@
+@attribute [Stories("Components/Layout/Divider")]
+
+<Stories TComponent="Divider" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Horizontal">
+        <Template>
+            <div class="stack">
+                <span>Above</span>
+                <Divider TestId="rule" />
+                <span>Below</span>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Vertical">
+        <Template>
+            <div class="row">
+                <span>Left</span>
+                <Divider Vertical TestId="rule" />
+                <span>Right</span>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Decorative">
+        <Template>
+            <div class="row">
+                <span>Left</span>
+                <Divider Vertical Decorative />
+                <span>Right</span>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed stack" data-theme="light">
+                <span>Above</span>
+                <Divider />
+                <div class="row"><span>Left</span><Divider Vertical /><span>Right</span></div>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed stack" data-theme="dark">
+                <span>Above</span>
+                <Divider />
+                <div class="row"><span>Left</span><Divider Vertical /><span>Right</span></div>
+            </div>
+        </Template>
+    </Story>
+
+</Stories>

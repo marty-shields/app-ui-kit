@@ -6,10 +6,10 @@ public static class KitNames
     /// <summary>Type names of the kit's components, without generic arity; <c>SegmentedControl</c> stands for <c>SegmentedControl&lt;T&gt;</c>.</summary>
     public static IReadOnlySet<string> Components { get; } = new HashSet<string>
     {
-        "AppButton", "AppErrorBoundary", "AppScreen", "BackHandler", "BarList", "BottomNav", "Card", "ChartLegend", "ConfirmDialog",
-        "DateStrip", "DurationField", "EmptyState", "ErrorView", "FieldInput", "FilterChips", "HostBridges", "Icon", "IconButton", "ListRow", "LoadFailed",
-        "MonthCalendar", "NumberField", "PeriodStepper", "ProgressRing", "RadioGroup", "RangeCalendar", "SectionHeader", "SegmentedControl", "SelectField", "Sheet", "SheetAction", "Snackbar", "Spinner", "StackedBar", "StartupGate",
-        "StartupView", "StatTile", "TextField", "TrendBarChart", "ValueField",
+        "AppButton", "AppErrorBoundary", "AppScreen", "BackHandler", "Banner", "BarList", "BottomNav", "Card", "ChartLegend", "ConfirmDialog",
+        "DateStrip", "Divider", "DurationField", "EmptyState", "ErrorView", "FieldInput", "FilterChips", "HostBridges", "Icon", "IconButton", "InlineAlert", "ListRow", "LoadFailed",
+        "MonthCalendar", "NumberField", "PeriodStepper", "ProgressRing", "RadioGroup", "RangeCalendar", "SearchField", "SectionHeader", "SegmentedControl", "SelectField", "Sheet", "SheetAction", "Snackbar", "Spinner", "StackedBar", "StartupGate",
+        "StartupView", "StatTile", "Text", "TextField", "TrendBarChart", "ValueField",
     };
 
     /// <summary>
@@ -18,11 +18,11 @@ public static class KitNames
     /// </summary>
     public static IReadOnlySet<string> Types { get; } = new HashSet<string>
     {
-        "AppLifecycle", "AppLifecycleBridge", "BackButton", "BackButtonBridge", "BarListItem", "BarListLabelWidth", "BarListValueWidth", "BottomNavItem",
+        "AlertTone", "AppLifecycle", "AppLifecycleBridge", "BackButton", "BackButtonBridge", "BannerTone", "BarListItem", "BarListLabelWidth", "BarListValueWidth", "BottomNavItem",
         "ButtonVariant", "CalendarDay", "CalendarStyle", "ChangeDirection", "DataSeries", "DataSeriesExtensions", "DateRange", "DayLabel", "IAppLifecycle", "IAppStart", "IBackButton", "IconButtonStyle",
         "IconName", "IconSize", "IconTone", "KitEvent", "LegendItem", "LegendSwatch", "PeriodKind", "RadioOption",
         "ShieldsUiServiceCollectionExtensions", "SnackbarMessage", "SnackbarService", "StackedBarSegment", "StatChange",
-        "SystemBarInsetWriter", "TargetStatus", "TargetStatuses", "ThemePreference", "ThemeService", "TrendBarPoint", "TrendBarStyle", "ValueKind"
+        "SystemBarInsetWriter", "TargetStatus", "TargetStatuses", "TextElement", "TextVariant", "ThemePreference", "ThemeService", "TrendBarPoint", "TrendBarStyle", "ValueKind"
     };
 
     /// <summary>Every custom property the kit declares in tokens.css and base.css.</summary>

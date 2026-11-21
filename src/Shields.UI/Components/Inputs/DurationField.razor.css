@@ -44,3 +44,16 @@
     border-color: var(--color-error);
     box-shadow: inset 0 0 0 calc(var(--border-width-error) - var(--border-width)) var(--color-error);
 }
+
+/* Compact: the boxes lose the padding and the gap so two digits fit when the field gets a third of a row. */
+.parts.compact {
+    gap: 0;
+}
+
+.parts.compact .box {
+    padding-inline: 0;
+}
+
+.parts.compact .separator {
+    font-size: var(--font-size-sm);
+}

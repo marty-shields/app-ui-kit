@@ -38,14 +38,18 @@ public class DurationFieldTests : ComponentTestBase
     }
 
     [Test]
-    public void Boxes_AreInTheSharedInputBoxWithCompactPadding()
+    public void Boxes_AreInTheSharedInputBoxWithCompactPadding_AndCompactGoesTighter()
     {
-        var boxes = Render().FindAll(".box");
+        var normal = Render().FindAll(".box");
+        var boxes = Render(p => p.Add(x => x.Compact, true)).FindAll(".box");
 
         Assert.Multiple(() =>
         {
             Assert.That(boxes, Has.Count.EqualTo(3));
             Assert.That(boxes.Select(b => b.ClassList.Contains("input-box") && b.ClassList.Contains("input-box-compact")), Is.All.True);
+            Assert.That(normal.Select(b => b.ClassList.Contains("input-box") && b.ClassList.Contains("input-box-compact")), Is.All.True);
+            Assert.That(Render().Find(".parts").ClassList, Does.Not.Contain("compact"));
+            Assert.That(Render(p => p.Add(x => x.Compact, true)).Find(".parts").ClassList, Does.Contain("compact"));
             Assert.That(boxes.Select(b => b.GetAttribute("data-testid")), Is.EqualTo(new[] { "duration-h-box", "duration-mm-box", "duration-ss-box" }));
         });
     }
@@ -135,6 +139,27 @@ public class DurationFieldTests : ComponentTestBase
         await leaving;
 
         Assert.That(raised, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void FocusMoveWait_IsTheTenMillisecondsTheFieldWaitsBeforeFillingIn()
+    {
+        Assert.That(DurationField.FocusMoveWait, Is.EqualTo(TimeSpan.FromMilliseconds(10)));
+    }
+
+    [Test]
+    public async Task FocusLeaves_FillsInOnlyOnceFocusMoveWaitHasPassed()
+    {
+        string? raised = null;
+        var cut = Render(p => p.Add(x => x.Value, "1::").Add(x => x.ValueChanged, (string? v) => raised = v));
+
+        var leaving = cut.Find("[role=group]").FocusOutAsync(new FocusEventArgs());
+        clock.Advance(DurationField.FocusMoveWait - TimeSpan.FromMilliseconds(1));
+        Assert.That(raised, Is.Null);
+        clock.Advance(TimeSpan.FromMilliseconds(1));
+        await leaving;
+
+        Assert.That(raised, Is.EqualTo("1:00:00"));
     }
 
     [TestCase(null)]

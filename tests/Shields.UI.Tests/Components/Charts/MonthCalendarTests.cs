@@ -378,10 +378,24 @@ public class MonthCalendarTests : ComponentTestBase
 
         Assert.Multiple(() =>
         {
-            Assert.That(NameOf(cut.Find(Selector(3))), Is.EqualTo("Tue 3 Nov, 1,000 pts, recorded"));
+            Assert.That(NameOf(cut.Find(Selector(3))), Is.EqualTo("Tue 3 Nov, 1,000 pts"));
             Assert.That(NameOf(cut.Find(Selector(4))), Is.EqualTo("Wed 4 Nov, not recorded"));
             Assert.That(NameOf(cut.Find(Selector(18))), Is.EqualTo("Wed 18 Nov, today, not recorded"));
             Assert.That(NameOf(cut.Find(Selector(19))), Is.EqualTo("Thu 19 Nov, future"));
+        });
+    }
+
+    [Test]
+    public void Render_Marks_WithoutUnit_LeavesTheValueOut()
+    {
+        var cut = Context.Render<MonthCalendar>(p => p
+            .Add(x => x.Month, new DateOnly(2026, 11, 20)).Add(x => x.Days, [Day(3, 1000), Day(18, 1)]).Add(x => x.Today, Today)
+            .Add(x => x.Style, CalendarStyle.Marks).Add(x => x.TestId, "cal"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(NameOf(cut.Find(Selector(3))), Is.EqualTo("Tue 3 Nov, recorded"));
+            Assert.That(NameOf(cut.Find(Selector(18))), Is.EqualTo("Wed 18 Nov, today, recorded"));
         });
     }
 

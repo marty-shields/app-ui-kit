@@ -55,7 +55,7 @@
     [Parameter]
     public EventCallback<DateOnly> OnSelect { get; set; }
 
-    /// <summary>The unit that follows each value in a day's text alternative, such as "steps". Null for none.</summary>
+    /// <summary>The unit that follows each value in a day's text alternative, such as "steps". Null for none. With <see cref="CalendarStyle.Marks"/> a recorded day names its value only when this is set ("1 steps"); without it the day reads "recorded".</summary>
     [Parameter]
     public string? Unit { get; set; }
 
@@ -139,7 +139,8 @@
         var value = TargetStatuses.Number(day!.Value!.Value) + (Unit is null ? "" : $" {Unit}");
         if (Style == CalendarStyle.Marks)
         {
-            return new CellInfo("marked" + today, $"{name}{todayName}, {value}, recorded", false, TargetStatus.None, true);
+            var marked = string.IsNullOrEmpty(Unit) ? "recorded" : value;
+            return new CellInfo("marked" + today, $"{name}{todayName}, {marked}", false, TargetStatus.None, true);
         }
 
         var status = TargetStatuses.Of(day.Value!.Value, TargetStatuses.ValidTarget(day.Target) ?? Target);

@@ -58,9 +58,3 @@
     overflow-wrap: normal;
     white-space: nowrap;
 }
-
-.compact .change,
-.compact .up,
-.compact .down {
-    color: var(--color-text-muted);
-}

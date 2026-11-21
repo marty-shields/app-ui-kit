@@ -1,6 +1,6 @@
 @if (Title is not null)
 {
-    <section class="card @(Compact ? "compact" : null) @(Error ? "error" : null)" data-testid="@TestId">
+    <section class="card @(Compact ? "compact" : null) @(Error ? "error" : null) @(ChildContent is null ? "no-body" : null) @(ChildContent is null && HeaderActions is not null ? "has-actions" : null)" data-testid="@TestId">
         <div class="header @(HeaderActions is not null ? "with-actions" : null)">
             <h2 class="title" data-wrap-ok>@Title</h2>
             @if (Aside is not null)
@@ -17,7 +17,7 @@
 }
 else
 {
-    <div class="card @(Compact ? "compact" : null) @(Error ? "error" : null)" data-testid="@TestId">
+    <div class="card @(Compact ? "compact" : null) @(Error ? "error" : null) @(ChildContent is null ? "no-body" : null) @(ChildContent is null && HeaderActions is not null ? "has-actions" : null)" data-testid="@TestId">
         @if (HeaderActions is not null)
         {
             <div class="header with-actions">
@@ -48,7 +48,7 @@ else
     [Parameter]
     public bool Error { get; set; }
 
-    /// <summary>What the card holds.</summary>
+    /// <summary>What the card holds. Null (a card with only a header) drops the gap under the header, and with <see cref="HeaderActions"/> trims the card's vertical padding, so a collapsed card is as tall as its action row.</summary>
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 

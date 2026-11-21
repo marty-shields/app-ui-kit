@@ -11,7 +11,7 @@
             }
             else
             {
-                <Icon Name="Change.Direction == ChangeDirection.Up ? IconName.Up : IconName.Down" Tone="Compact ? IconTone.Muted : Change.Direction == ChangeDirection.Up ? IconTone.Success : IconTone.Error" Size="IconSize.Small" />
+                <Icon Name="Change.Direction == ChangeDirection.Up ? IconName.Up : IconName.Down" Tone="Change.Direction == ChangeDirection.Up ? IconTone.Success : IconTone.Error" Size="IconSize.Small" />
                 <span class="visually-hidden">@(Change.Direction == ChangeDirection.Up ? "up " : "down ")</span>
                 @Change.Amount
             }
@@ -52,7 +52,7 @@
     [Parameter]
     public string NotEnoughDataNote { get; set; } = "Not enough data yet";
 
-    /// <summary>Shrinks the tile for a row of small tiles: less padding, a smaller value that stays on one line, and a muted change line.</summary>
+    /// <summary>Shrinks the tile for a row of small tiles: less padding, and a smaller value that stays on one line. The change keeps its colours.</summary>
     [Parameter]
     public bool Compact { get; set; }
 

@@ -50,6 +50,60 @@ public class CardTests : ComponentTestBase
         });
     }
 
+    [TestCase("Done", true, true)]
+    [TestCase(null, true, true)]
+    [TestCase("Done", false, false)]
+    public void WithoutContent_MarksTheCardNoBody_AndTrimsItOnlyWithActions(string? title, bool withActions, bool trimmed)
+    {
+        var cut = Context.Render<Card>(p =>
+        {
+            p.Add(x => x.Title, title);
+            if (withActions)
+            {
+                p.Add(x => x.HeaderActions, "<button>Edit</button>");
+            }
+            else
+            {
+                p.Add(x => x.Aside, "1");
+            }
+        });
+
+        var card = cut.Find(".card");
+        Assert.Multiple(() =>
+        {
+            Assert.That(card.ClassList, Does.Contain("no-body"));
+            Assert.That(card.ClassList.Contains("has-actions"), Is.EqualTo(trimmed));
+        });
+    }
+
+    [Test]
+    public void WithContent_HasNoNoBodyClass()
+    {
+        var cut = Context.Render<Card>(p => p
+            .Add(x => x.Title, "Open")
+            .Add(x => x.HeaderActions, "<button>Edit</button>")
+            .Add(x => x.ChildContent, "<p>Body</p>"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find(".card").ClassList, Does.Not.Contain("no-body"));
+            Assert.That(cut.Find(".card").ClassList, Does.Not.Contain("has-actions"));
+        });
+    }
+
+    [Test]
+    public void Css_NoBody_DropsTheHeaderGapAndTrimsPaddingWithActions()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Layout", "Card.razor.css");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(css, Does.Contain(".no-body .header {\n    margin: 0;\n}"));
+            Assert.That(css, Does.Contain(".card.has-actions {\n    padding-block: var(--space-1);\n}"));
+            Assert.That(css, Does.Contain("margin-top: calc(-1 * var(--space-2));"));
+        });
+    }
+
     [Test]
     public void WithoutAnAside_ShowsNone()
     {

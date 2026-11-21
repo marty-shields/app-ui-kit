@@ -1,3 +1,4 @@
+@using Shields.UI.Components.Actions
 @using Shields.UI.Components.Feedback
 <div class="screen">
     @if (Title is not null)
@@ -13,7 +14,7 @@
         }
         else if (OnRetry.HasDelegate)
         {
-            <LoadFailed Message="@FailedMessage" TestId="startup" Plain OnRetry="OnRetry" />
+            <LoadFailed Message="@FailedMessage" TestId="startup" Plain RetryVariant="RetryVariant" OnRetry="OnRetry" />
         }
         else
         {
@@ -42,4 +43,8 @@
     /// <summary>Raised by Try again, which shows under the message. Unset shows the message alone.</summary>
     [Parameter]
     public EventCallback OnRetry { get; set; }
+
+    /// <summary>Visual weight of Try again. Used only when <see cref="OnRetry"/> is set.</summary>
+    [Parameter]
+    public ButtonVariant RetryVariant { get; set; } = ButtonVariant.Primary;
 }

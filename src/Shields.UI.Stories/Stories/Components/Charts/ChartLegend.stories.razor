@@ -8,6 +8,18 @@
         </Template>
     </Story>
 
+    <Story Name="Past and today">
+        <Template>
+            <ChartLegend Items="PastPrimaryToday" TestId="legend" />
+        </Template>
+    </Story>
+
+    <Story Name="Primary">
+        <Template>
+            <ChartLegend Items="PrimarySelected" TestId="legend" />
+        </Template>
+    </Story>
+
     <Story Name="Dot with a marker">
         <Template>
             <ChartLegend Items="WithMarker" TestId="legend" />
@@ -24,6 +36,7 @@
         <Template>
             <div class="themed" data-theme="light">
                 <ChartLegend Items="WithMarker" />
+                <ChartLegend Items="PastPrimaryToday" />
             </div>
         </Template>
     </Story>
@@ -32,6 +45,7 @@
         <Template>
             <div class="themed" data-theme="dark">
                 <ChartLegend Items="WithMarker" />
+                <ChartLegend Items="PastPrimaryToday" />
             </div>
         </Template>
     </Story>
@@ -46,6 +60,20 @@
         new(LegendSwatch.Outline, "Not logged"),
         new(LegendSwatch.Line, "Target"),
         new(LegendSwatch.Band, "Target range"),
+    ];
+
+    private static readonly IReadOnlyList<LegendItem> PastPrimaryToday =
+    [
+        new(LegendSwatch.Past, "Earlier weeks"),
+        new(LegendSwatch.Accent, "This week"),
+        new(LegendSwatch.Today, "Today"),
+        new(LegendSwatch.Outline, "Not logged"),
+    ];
+
+    private static readonly IReadOnlyList<LegendItem> PrimarySelected =
+    [
+        new(LegendSwatch.Primary, "Selected week"),
+        new(LegendSwatch.Chip, "Other weeks"),
     ];
 
     private static readonly IReadOnlyList<LegendItem> Long =

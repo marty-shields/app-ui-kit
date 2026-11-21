@@ -22,4 +22,13 @@ public enum LegendSwatch
     /// <c>--color-chart-band</c> with no fill, so the legend matches the chart.
     /// </summary>
     Band,
+
+    /// <summary>A filled dot in <c>--color-chart-past</c>, for bars of earlier periods next to the current one.</summary>
+    Past,
+
+    /// <summary>A filled dot in <c>--color-primary</c>.</summary>
+    Primary,
+
+    /// <summary>A solid ring in <c>--color-text</c>, the stroke of the month calendar's today ring.</summary>
+    Today,
 }

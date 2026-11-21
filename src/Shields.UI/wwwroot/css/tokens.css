@@ -29,6 +29,11 @@
     /* The stroke of a target band's top and bottom edges on a chart, and of its legend swatch. Never a fill, so the bars keep their
        contrast. A blue apart from the teal accent and the line and dot colours, at least 3:1 on the page and cards in both themes. */
     --color-chart-band: light-dark(#3f7fa6, #7fb8de);
+    /* Chart past: the bars of earlier periods beside the current one. A grey-teal at least 3:1 against --color-accent (the bar next to
+       it) and against the page and cards in both themes. In light the window is narrow, because the accent is dark and the page is
+       light: this is the only luminance that clears 3:1 on all three.
+       Tuned to sit beside the accent bar, not beside --color-primary (2.6:1 in light). */
+    --color-chart-past: light-dark(#8a9092, #6c7274);
     --color-focus: light-dark(#488286, #8cc4c1);
     --color-danger: light-dark(#a8231c, #f2b8b5);
     --color-on-danger: light-dark(#ffffff, #1e2324);

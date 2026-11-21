@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Shields.UI.Components.Charts;
 
 namespace Shields.UI.Tests.Components.Charts;
@@ -122,5 +123,18 @@ public class BarListTests : ComponentTestBase
         var cut = Context.Render<BarList>(p => p.Add(x => x.Items, [new BarListItem("A", 1)]));
 
         Assert.That(cut.FindAll("[data-testid]"), Is.Empty);
+    }
+
+    [Test]
+    public void Css_FillUsesTheArcToken_AndTrackTheRingTrack()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Charts", "BarList.razor.css");
+        string Rule(string selector) => Regex.Match(css, Regex.Escape(selector) + @"\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(Rule(".fill"), Does.Contain("background-color: var(--color-ring-arc);"));
+            Assert.That(Rule(".track"), Does.Contain("background-color: var(--color-ring-track);"));
+        });
     }
 }

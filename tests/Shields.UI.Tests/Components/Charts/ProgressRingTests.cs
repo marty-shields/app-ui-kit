@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Shields.UI.Components.Charts;
 
 namespace Shields.UI.Tests.Components.Charts;
@@ -198,6 +199,19 @@ public class ProgressRingTests : ComponentTestBase
         {
             Assert.That(cut.Find("[data-testid=ring-value]").TextContent, Is.EqualTo("5,000,000,000,000"));
             Assert.That(cut.Find("[data-testid=ring]").ClassList, Does.Contain("over"));
+        });
+    }
+
+    [Test]
+    public void Css_ArcUsesTheArcTokens_AndOverUsesTheOverToken()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Charts", "ProgressRing.razor.css");
+        string Rule(string selector) => Regex.Match(css, Regex.Escape(selector) + @"\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(Rule(".arc"), Does.Contain("var(--color-ring-arc)").And.Contain("var(--color-ring-track)"));
+            Assert.That(Rule(".over .arc"), Does.Contain("var(--color-ring-arc-over)"));
         });
     }
 }

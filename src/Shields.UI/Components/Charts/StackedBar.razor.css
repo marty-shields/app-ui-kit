@@ -9,8 +9,6 @@
     gap: var(--stacked-bar-gap);
     height: var(--stacked-bar-height);
     border-radius: var(--radius-sm);
-    /* The gaps between segments show this colour. */
-    background-color: var(--color-surface);
     overflow: hidden;
 }
 

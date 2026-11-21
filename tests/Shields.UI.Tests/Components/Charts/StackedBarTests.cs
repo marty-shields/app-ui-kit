@@ -143,14 +143,14 @@ public class StackedBarTests : ComponentTestBase
     }
 
     [Test]
-    public void Css_TrackUsesTheGapAndSurface_AndSegmentsKeepAMinimumWidth()
+    public void Css_TrackUsesTheGapAndStaysTransparent_AndSegmentsKeepAMinimumWidth()
     {
         var css = RepoFiles.Read("src", "Shields.UI", "Components", "Charts", "StackedBar.razor.css");
         string Rule(string selector) => Regex.Match(css, Regex.Escape(selector) + @"\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
 
         Assert.Multiple(() =>
         {
-            Assert.That(Rule(".track"), Does.Contain("gap: var(--stacked-bar-gap);").And.Contain("background-color: var(--color-surface);"));
+            Assert.That(Rule(".track"), Does.Contain("gap: var(--stacked-bar-gap);").And.Not.Contain("background-color"));
             Assert.That(Rule(".track.none"), Does.Contain("background-color: var(--color-ring-track);"));
             Assert.That(Rule(".segment"), Does.Contain("min-width: var(--stacked-bar-segment-min-width);"));
         });

@@ -21,7 +21,7 @@
 </ul>
 
 <h2><code>ProgressRing</code></h2>
-<p>A ring that fills as <code>Value</code> approaches <code>Max</code>, with the value in the middle. Above <code>Max</code> it turns <code>--color-error</code> and the number does too. <code>Compact</code> uses the smaller <code>--ring-size-compact</code>.</p>
+<p>A ring that fills as <code>Value</code> approaches <code>Max</code>, with the value in the middle. Above <code>Max</code> the arc turns <code>--color-ring-arc-over</code> and the number <code>--color-error</code>. <code>Compact</code> uses the smaller <code>--ring-size-compact</code>.</p>
 <ul>
     <li>With a zero or negative <code>Max</code> there is no maximum: the ring is full once <code>Value</code> is above zero, and never over.</li>
     <li><code>Caption</code> is a short line under the number; <code>ChildContent</code> replaces the number, for a figure such as what is left, in which case set <code>AriaLabel</code> to describe it.</li>
@@ -39,7 +39,7 @@
 </ul>
 
 <h2><code>StackedBar</code></h2>
-<p>One bar split into <code>StackedBarSegment</code>s, each sized by its share of the total and coloured by its <code>DataSeries</code>, with a label and value under the bar. Neighbouring data colours are under 3:1 against each other, so the segments are separated by a gap in the card colour (<code>--stacked-bar-gap</code>, drawn in <code>--color-surface</code>).</p>
+<p>One bar split into <code>StackedBarSegment</code>s, each sized by its share of the total and coloured by its <code>DataSeries</code>, with a label and value under the bar. Neighbouring data colours are under 3:1 against each other, so the segments are separated by a transparent gap (<code>--stacked-bar-gap</code>), so the page or card behind the bar shows through.</p>
 <ul>
     <li>A segment at zero, negative or not finite draws nothing but keeps its label, with 0 as its value. With every segment at zero the track is empty and the text alternative ends with <code>EmptyText</code>.</li>
     <li>The bar is one image named by its text alternative, which starts with <code>Label</code> and lists each segment's label, value (followed by <code>Unit</code>) and percentage; percentages are rounded so they add up to 100. <code>ShowLabels</code> hides the visible labels, not the text alternative.</li>

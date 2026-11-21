@@ -120,7 +120,7 @@
     --color-data-4: light-dark(#96812a, #f0d776);
     --color-data-5: light-dark(#673692, #d4b4f7);
 
-    /* BarList: the bar and its track; the accent fill keeps 3:1 against the track and the card surface. */
+    /* BarList: the bar and its track (the accent fill keeps 3:1 against the track and the card surface), and the widest the value column grows (a share of the row) before the value ellipsises. */
     --bar-list-bar-height: 0.75rem;
     --bar-list-value-max-width: 50%;
 }

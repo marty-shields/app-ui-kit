@@ -468,6 +468,120 @@ public class NumberFieldTests : ComponentTestBase
     }
 
     [Test]
+    public void Box_HasATestIdFromTheTestId()
+    {
+        var cut = Render();
+
+        Assert.That(cut.Find("[data-testid=num-box]").ClassList, Does.Contain("box").And.Contain("input-box"));
+    }
+
+    [Test]
+    public void WithoutATestId_TheBoxUsesTheDefault()
+    {
+        var cut = Context.Render<NumberField>(p => p.Add(x => x.Label, "Amount"));
+
+        Assert.That(cut.FindAll("[data-testid=number-field-box]"), Has.Count.EqualTo(1));
+    }
+
+    [Test]
+    public void Compact_AddsTheCompactBoxClassOnlyWhenSet()
+    {
+        var normal = Render();
+        var compact = Render(p => p.Add(x => x.Compact, true));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(normal.Find("[data-testid=num-box]").ClassList, Does.Not.Contain("input-box-compact"));
+            Assert.That(compact.Find("[data-testid=num-box]").ClassList, Does.Contain("input-box-compact"));
+        });
+    }
+
+    [Test]
+    public void Css_TheCompactBoxPadsOneSpaceUnitAndTheSharedBoxShowsTheFocusOutline()
+    {
+        var tokens = RepoFiles.Read("src", "Shields.UI", "wwwroot", "css", "tokens.css");
+        var shared = RepoFiles.Read("src", "Shields.UI", "wwwroot", "css", "base.css");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(tokens, Does.Contain("--input-box-padding-inline: var(--space-3);").And.Contain("--input-box-padding-inline-compact: var(--space-1);"));
+            Assert.That(shared.Split(".input-box-compact {")[1].Split('}')[0], Does.Contain("padding-inline: var(--input-box-padding-inline-compact)"));
+            Assert.That(shared.Split(".input-box:focus-within {")[1].Split('}')[0], Does.Contain("outline: var(--focus-width) solid var(--color-focus)").And.Contain("outline-offset: var(--focus-offset)"));
+        });
+    }
+
+    [Test]
+    public void Text_WhenSet_IsShownAsTypedInsteadOfTheValue()
+    {
+        var cut = Render(p => p.Add(x => x.Value, null).Add(x => x.Text, "22,75"));
+
+        Assert.That(cut.Find("input").GetAttribute("value"), Is.EqualTo("22,75"));
+    }
+
+    [TestCase("abc")]
+    [TestCase("007")]
+    public void Text_WinsOverAValueThatDiffers(string text)
+    {
+        var cut = Render(p => p.Add(x => x.Value, 5m).Add(x => x.Text, text));
+
+        Assert.That(cut.Find("input").GetAttribute("value"), Is.EqualTo(text));
+    }
+
+    [Test]
+    public void Text_WhenNull_ShowsTheValue()
+    {
+        var cut = Render(p => p.Add(x => x.Value, 7m));
+
+        Assert.That(cut.Find("input").GetAttribute("value"), Is.EqualTo("7"));
+    }
+
+    [Test]
+    public void Text_TypingRaisesTextChangedThenValueChanged()
+    {
+        var calls = new List<string>();
+        var cut = Render(p => p
+            .Add(x => x.Text, "")
+            .Add(x => x.TextChanged, t => calls.Add("text:" + t))
+            .Add(x => x.ValueChanged, v => calls.Add("value:" + v)));
+
+        cut.Find("input").Input("22,75");
+
+        Assert.That(calls, Is.EqualTo(new[] { "text:22,75", "value:22.75" }));
+    }
+
+    [Test]
+    public void Text_Stepper_RaisesTextChangedWithTheNewNumber()
+    {
+        var texts = new List<string>();
+        decimal? value = null;
+        var cut = Render(p => p
+            .Add(x => x.Stepper, true)
+            .Add(x => x.Value, 5m)
+            .Add(x => x.Text, "5")
+            .Add(x => x.TextChanged, t => texts.Add(t))
+            .Add(x => x.ValueChanged, v => value = v));
+
+        cut.Find("[data-testid=num-plus]").Click();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(texts, Is.EqualTo(new[] { "6" }));
+            Assert.That(value, Is.EqualTo(6m));
+        });
+    }
+
+    [Test]
+    public void Text_Stepper_WithoutText_DoesNotRaiseTextChanged()
+    {
+        var texts = new List<string>();
+        var cut = Render(p => p.Add(x => x.Stepper, true).Add(x => x.TextChanged, t => texts.Add(t)));
+
+        cut.Find("[data-testid=num-plus]").Click();
+
+        Assert.That(texts, Is.Empty);
+    }
+
+    [Test]
     public void Css_ShowsErrorsInTheErrorTone()
     {
         var number = RepoFiles.Read("src", "Shields.UI", "Components", "Inputs", "NumberField.razor.css");

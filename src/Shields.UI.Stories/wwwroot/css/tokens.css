@@ -1,6 +1,7 @@
 /* Values only the stories need: the stand-in phone, wallpapers and sheet layouts. Kept out of the kit's tokens.css,
    which holds only what apps share. Loaded after the kit's tokens.css in the story canvas (iframe.html). */
 :root {
+    --stories-number-row-width: 328px;
     --stories-phone-width: 412px;
     --stories-phone-height: 915px;
     --stories-phone-radius: 40px;

@@ -38,6 +38,18 @@
         </Template>
     </Story>
 
+    <Story Name="All zero, with text">
+        <Template>
+            <BarList Label="Sessions per group" AllZeroText="Nothing logged yet" Items="@([new BarListItem("Chest", 0), new BarListItem("Back", 0)])" TestId="list" />
+        </Template>
+    </Story>
+
+    <Story Name="Test ids by label">
+        <Template>
+            <BarList Label="Sessions per group" TestIdBy="BarListTestIdBy.Slug" Items="@([new BarListItem("Upper body", 8), new BarListItem("Legs & core", 5), new BarListItem("Legs & core", 2)])" TestId="list" />
+        </Template>
+    </Story>
+
     <Story Name="Inline, narrow label, months">
         <Template>
             <BarList Inline="true" LabelWidth="BarListLabelWidth.Narrow" ValueWidth="BarListValueWidth.Narrow" Unit="sessions" Label="Sessions per month" Items="@([new BarListItem("Sep", 12), new BarListItem("Oct", 9), new BarListItem("Nov", 15)])" TestId="list" />

@@ -37,11 +37,12 @@
 <p>Labelled horizontal bars, one per <code>BarListItem</code>, each with its value text at the end of the row. Bars are sized against the largest value, or against <code>Max</code> when it is a positive number. Negative and non-finite values fill no bar; the default value text shows a negative number as it is and a non-finite one as 0.</p>
 <ul>
     <li><code>ValueText</code> replaces the value shown, by default the number with thousands separators and no decimals. A long label is cut with an ellipsis.</li>
-    <li>With no items <code>EmptyText</code> is shown instead of the list.</li>
+    <li>With no items <code>EmptyText</code> is shown instead of the list. With <code>AllZeroText</code> set and every value zero, that text is shown instead of the bars, in the same style.</li>
     <li><code>Inline</code> puts label, bar and value on one line; <code>LabelWidth</code> (<code>Normal</code>, <code>Wide</code>, <code>Narrow</code>) and <code>ValueWidth</code> (<code>Normal</code>, <code>Narrow</code>) size the two columns (<code>--bar-list-label-width*</code>, <code>--bar-list-value-width*</code>). The bar height is <code>--bar-list-bar-height</code>.</li>
     <li><code>Unit</code> is read after each value by a screen reader and not shown. With <code>OnSelect</code> each row whose <code>Selectable</code> is not false is a button that raises its position.</li>
     <li>The list is named by <code>Label</code>; the bars are hidden from screen readers, so put what matters in the label and value text.</li>
-    <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>{TestId}-row-0</code>, <code>-select-0</code> (a tappable row's button), <code>-label-0</code>, <code>-value-0</code> and <code>-bar-0</code> by position, or <code>{TestId}-empty</code> with no items. None are rendered without <code>TestId</code>.</li>
+    <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>{TestId}-row-0</code>, <code>-select-0</code> (a tappable row's button), <code>-label-0</code>, <code>-value-0</code> and <code>-bar-0</code> by position, or <code>{TestId}-empty</code> with no items and <code>{TestId}-all-zero</code> for <code>AllZeroText</code>. None are rendered without <code>TestId</code>.</li>
+    <li><code>TestIdBy</code> is <code>Position</code> by default. <code>Slug</code> replaces the position in the row ids with the label as a slug (lowercase, other characters as one <code>-</code>, trimmed, "item" if nothing is left): <code>{TestId}-row-legs-core</code>. A repeated slug gets <code>-2</code>, <code>-3</code> in list order, so ids stay the same when rows are added or reordered only if the labels are unique.</li>
 </ul>
 
 <h2><code>StackedBar</code></h2>
@@ -67,6 +68,7 @@
 </table>
 <ul>
     <li>Without a target (or with zero) there is no line, no band and no status.</li>
+    <li><code>Max</code>, when a positive number, is the top of the y scale in both styles, so charts of different periods share one scale. The ticks keep the 1, 2, 5 steps up to it (a <code>Max</code> that is not a step has no tick of its own) and a bar above it is drawn at the top. A <code>Target</code> above it draws no target line, and a band edge above it is not drawn. Without it the scale fits the tallest bar.</li>
     <li>With <code>OnSelect</code> the bars are buttons: click, or Enter on focus, raises it with the bar's date. Without it they are images.</li>
     <li><code>Style</code> is <code>Status</code> by default. <code>PastAndCurrent</code> drops the target, band and markers: the bar whose <code>Current</code> is true is <code>--color-accent</code> and the others <code>--color-chart-past</code>, unless the chart is paired (see <code>Earlier</code>), when every bar's own column is accent and every earlier column past; <code>Current</code> then only bolds the axis label and adds "current" to the text alternative. There, <code>Labelled</code> prints a bar's value above it, and <code>Earlier</code> draws the period before as a second bar to the left of each, named in the text alternative with <code>EarlierLabel</code> ("last week"); add a <code>ChartLegend</code> to say which is which. <code>Current</code> also bolds the axis label in <code>Status</code>; the other two do nothing there.</li>
     <li>Each bar's text alternative is its date, value, <code>Unit</code>, status and <code>Note</code>; a bar with a <code>Note</code> is drawn faded. The chart is a group named by <code>Label</code>; with no values it shows <code>EmptyText</code>.</li>

@@ -8,10 +8,19 @@
     @if (!Past && TargetStatuses.ValidTarget(Target) is { } goal)
     {
         <g class="band" data-testid="@Id("band")">
-            <line class="band-edge" x1="@N(Left)" x2="@N(Right)" y1="@N(Y(goal * (1 + TargetStatuses.Tolerance)))" y2="@N(Y(goal * (1 + TargetStatuses.Tolerance)))" data-testid="@Id("band-top")" />
-            <line class="band-edge" x1="@N(Left)" x2="@N(Right)" y1="@N(Y(goal * (1 - TargetStatuses.Tolerance)))" y2="@N(Y(goal * (1 - TargetStatuses.Tolerance)))" data-testid="@Id("band-bottom")" />
+            @if (OnScale(goal * (1 + TargetStatuses.Tolerance)))
+            {
+                <line class="band-edge" x1="@N(Left)" x2="@N(Right)" y1="@N(Y(goal * (1 + TargetStatuses.Tolerance)))" y2="@N(Y(goal * (1 + TargetStatuses.Tolerance)))" data-testid="@Id("band-top")" />
+            }
+            @if (OnScale(goal * (1 - TargetStatuses.Tolerance)))
+            {
+                <line class="band-edge" x1="@N(Left)" x2="@N(Right)" y1="@N(Y(goal * (1 - TargetStatuses.Tolerance)))" y2="@N(Y(goal * (1 - TargetStatuses.Tolerance)))" data-testid="@Id("band-bottom")" />
+            }
         </g>
-        <line class="target" x1="@N(Left)" x2="@N(Right)" y1="@N(Y(goal))" y2="@N(Y(goal))" data-testid="@Id("target")" />
+        @if (OnScale(goal))
+        {
+            <line class="target" x1="@N(Left)" x2="@N(Right)" y1="@N(Y(goal))" y2="@N(Y(goal))" data-testid="@Id("target")" />
+        }
     }
     @if (!Bars.Any(Drawn))
     {
@@ -116,6 +125,13 @@
     [Parameter]
     public string? Unit { get; set; }
 
+    /// <summary>
+    /// The value at the top of the y scale, so charts of different periods share one scale. Ticks keep the 1, 2, 5 steps up to it and a bar above it is drawn at the top. The target line and each edge of the band that lie above it are not drawn.
+    /// Null, zero, negative or non-finite means a scale that fits the tallest bar and the band.
+    /// </summary>
+    [Parameter]
+    public double? Max { get; set; }
+
     /// <summary>The text shown in the chart when no bar has a value.</summary>
     [Parameter]
     public string EmptyText { get; set; } = "Nothing recorded yet";
@@ -159,7 +175,7 @@
     {
         get
         {
-            if (MaxValue <= 0)
+            if (Extent <= 0)
             {
                 return 1;
             }
@@ -170,7 +186,7 @@
                 foreach (var multiple in TickSteps)
                 {
                     step = multiple * Math.Pow(10, exponent);
-                    if (Math.Ceiling(MaxValue / step - 1e-9) <= MaxIntervals)
+                    if (Math.Ceiling(Extent / step - 1e-9) <= MaxIntervals)
                     {
                         return step;
                     }
@@ -181,12 +197,20 @@
         }
     }
 
-    private int Intervals => Math.Max(1, (int)Math.Ceiling(MaxValue / TickStep - 1e-9));
+    private double? FixedMax => Max is > 0 && double.IsFinite(Max.Value) ? Math.Min(Max.Value, MaxScale) : null;
 
-    /// <summary>The top of the y scale: the first tick at or above the tallest bar and the band. The space above it holds the tooltip, the value and the over marker.</summary>
-    private double Scale => Intervals * TickStep;
+    /// <summary>The number of intervals up to the top tick: the one at or above the tallest bar, or with <see cref="Max"/> the last one at or below it.</summary>
+    private int Intervals => FixedMax is null
+        ? Math.Max(1, (int)Math.Ceiling(Extent / TickStep - 1e-9))
+        : (int)Math.Floor(Extent / TickStep + 1e-9);
 
-    /// <summary>The tallest bar, the band's top and the per-bar targets, which the scale has to hold.</summary>
+    /// <summary>The top of the y scale: <see cref="Max"/> when set, else the first tick at or above the tallest bar and the band. The space above it holds the tooltip, the value and the over marker.</summary>
+    private double Scale => FixedMax ?? Intervals * TickStep;
+
+    /// <summary>The height the ticks are chosen for: <see cref="Max"/> when set, else the data.</summary>
+    private double Extent => FixedMax ?? MaxValue;
+
+    /// <summary>The tallest bar, the band's top and the per-bar targets, which an unset <see cref="Max"/> has to hold.</summary>
     private double MaxValue => Math.Min(
         MaxScale,
         Bars.Where(Drawn)
@@ -200,6 +224,9 @@
             .Max());
 
     private IEnumerable<double> Ticks => Enumerable.Range(0, Intervals + 1).Select(i => i * TickStep);
+
+    /// <summary>Whether the value is within the scale, so a line at it can be drawn.</summary>
+    private bool OnScale(double value) => value <= Scale * (1 + 1e-9);
 
     private double Y(double value) => Base - Math.Min(value, Scale) / Scale * (Base - Top);
 

@@ -8,7 +8,9 @@
     <li><code>Title</code>: a bold heading at the top. Null shows a plain card with no heading and no aside.</li>
     <li><code>Aside</code>: muted text at the right of the title, e.g. "1 this week". It stays on one line. Only shown with a title.</li>
     <li><code>Compact</code>: for cards that hold rows with their own bottom space: padding 16px, 16px, 0 and an 8px gap under the title (<code>--card-compact-padding</code>, <code>--card-compact-title-gap</code>).</li>
-    <li><code>data-testid</code>: <code>TestId</code>, and <code>{TestId}-aside</code> on the aside.</li>
+    <li><code>HeaderActions</code>: content at the end of the header row, after the title and aside, such as <code>IconButton</code>s: a name and its Done, Edit and Delete buttons share one row. The title stays the heading; the buttons keep their own 48px touch targets. Setting it draws the header row even without a title.</li>
+    <li><code>Error</code>: the border and an inset ring turn <code>--color-error</code> (at least 3:1 on both the page and the card). The ring is drawn inside the border, so the card keeps its size. The error text itself goes inside the card, e.g. in an <code>InlineAlert</code>.</li>
+    <li><code>data-testid</code>: <code>TestId</code>, <code>{TestId}-aside</code> on the aside and <code>{TestId}-actions</code> on the actions.</li>
 </ul>
 
 <p>Stories: <a href="./?path=/docs/components-layout-card--docs">Card</a></p>

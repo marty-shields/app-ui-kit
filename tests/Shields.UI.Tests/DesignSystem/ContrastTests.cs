@@ -81,6 +81,7 @@ public class ContrastTests
             .Select(selector => ("Layout/Text.razor.css", selector, "color", new[] { "--color-bg", "--color-surface" }, Text)),
         ("Feedback/InlineAlert.razor.css", ".error", "color", ["--color-surface"], Text),
         ("Feedback/InlineAlert.razor.css", ".error", "border-color", ["--color-bg", "--color-surface"], LargeTextOrControl),
+        ("Layout/Card.razor.css", ".card.error", "border-color", ["--color-bg", "--color-surface"], LargeTextOrControl),
         ("Feedback/Banner.razor.css", ".banner", "color", ["--color-selected"], Text),
     ];
 

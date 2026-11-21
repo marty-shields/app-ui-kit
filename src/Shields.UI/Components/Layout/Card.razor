@@ -1,11 +1,15 @@
 @if (Title is not null)
 {
-    <section class="card @(Compact ? "compact" : null)" data-testid="@TestId">
-        <div class="header">
+    <section class="card @(Compact ? "compact" : null) @(Error ? "error" : null)" data-testid="@TestId">
+        <div class="header @(HeaderActions is not null ? "with-actions" : null)">
             <h2 class="title" data-wrap-ok>@Title</h2>
             @if (Aside is not null)
             {
                 <span class="aside" data-testid="@(TestId is null ? null : $"{TestId}-aside")">@Aside</span>
+            }
+            @if (HeaderActions is not null)
+            {
+                <div class="actions" data-testid="@(TestId is null ? null : $"{TestId}-actions")">@HeaderActions</div>
             }
         </div>
         @ChildContent
@@ -13,7 +17,13 @@
 }
 else
 {
-    <div class="card @(Compact ? "compact" : null)" data-testid="@TestId">
+    <div class="card @(Compact ? "compact" : null) @(Error ? "error" : null)" data-testid="@TestId">
+        @if (HeaderActions is not null)
+        {
+            <div class="header with-actions">
+                <div class="actions" data-testid="@(TestId is null ? null : $"{TestId}-actions")">@HeaderActions</div>
+            </div>
+        }
         @ChildContent
     </div>
 }
@@ -23,9 +33,20 @@ else
     [Parameter]
     public string? Title { get; set; }
 
-    /// <summary>Muted text at the right of the title, e.g. 1 this week. Null shows none. Only shown with a title.</summary>
+    /// <summary>Muted text at the right of the title, e.g. 1 this week. Null shows none. Needs a <see cref="Title"/>: without one it is not shown.</summary>
     [Parameter]
     public string? Aside { get; set; }
+
+    /// <summary>
+    /// Content at the end of the header row, such as <c>IconButton</c>s, after the title and aside. Setting it draws the header row even without a title, but then the card is a plain card, not a titled section.
+    /// The title stays the card's heading, so a name and its buttons share one row. The actions keep their own touch-target size.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? HeaderActions { get; set; }
+
+    /// <summary>Draws the card's border and an inset ring in the error colour. The card keeps its size. The error text itself goes inside the card, e.g. in an <c>InlineAlert</c>.</summary>
+    [Parameter]
+    public bool Error { get; set; }
 
     /// <summary>What the card holds.</summary>
     [Parameter]
@@ -35,7 +56,7 @@ else
     [Parameter]
     public bool Compact { get; set; }
 
-    /// <summary>Value of the data-testid attribute, and <c>{TestId}-aside</c> on the aside.</summary>
+    /// <summary>Value of the data-testid attribute, <c>{TestId}-aside</c> on the aside and <c>{TestId}-actions</c> on the actions.</summary>
     [Parameter]
     public string? TestId { get; set; }
 }

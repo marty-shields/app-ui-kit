@@ -24,7 +24,7 @@
         <Template>
             <div class="card">
                 <TrendBarChart Bars="Week" Target="2000" Unit="pts" ShowOverMarker="false" TestId="chart" />
-                <ChartLegend Items="Legend" />
+                <ChartLegend Items="UnmarkedLegend" />
             </div>
         </Template>
     </Story>
@@ -138,6 +138,15 @@
         new(LegendSwatch.Chip, "Under"),
         new(LegendSwatch.Accent, "On target"),
         new(LegendSwatch.Error, "Over", "▲"),
+        new(LegendSwatch.Line, "Target"),
+        new(LegendSwatch.Band, "Target range"),
+    ];
+
+    private static readonly IReadOnlyList<LegendItem> UnmarkedLegend =
+    [
+        new(LegendSwatch.Chip, "Under"),
+        new(LegendSwatch.Accent, "On target"),
+        new(LegendSwatch.Error, "Over"),
         new(LegendSwatch.Line, "Target"),
         new(LegendSwatch.Band, "Target range"),
     ];

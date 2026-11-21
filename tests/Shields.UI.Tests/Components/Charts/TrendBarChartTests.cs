@@ -113,6 +113,19 @@ public class TrendBarChartTests : ComponentTestBase
     }
 
     [Test]
+    public void TargetStyle_KeepsItsDashesAndStrokeInScreenPixelsWhateverTheChartsWidth()
+    {
+        var css = Rule(".target");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(css, Does.Contain("stroke-width: var(--border-width-error);"));
+            Assert.That(css, Does.Contain("stroke-dasharray: var(--chart-dash);"));
+            Assert.That(css, Does.Contain("vector-effect: non-scaling-stroke;"), "the legend's Line swatch is a fixed size, so the chart's dashes must not scale with the card");
+        });
+    }
+
+    [Test]
     public void BandStyle_StrokesTheEdgesInTheBandColourAtTheBorderWidthWithNoFill()
     {
         var css = Rule(".band-edge");

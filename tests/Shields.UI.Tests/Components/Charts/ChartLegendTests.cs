@@ -93,18 +93,24 @@ public class ChartLegendTests : ComponentTestBase
         });
     }
 
-    [TestCase("check", "--color-accent", "--color-on-primary", "✓")]
-    [TestCase("triangle", "--color-error", "--color-on-danger", "▲")]
-    public void CalendarMarkSwatch_DrawsTheCalendarsGlyphOnTheCalendarsFill(string name, string fill, string glyphColour, string glyph)
+    [TestCase("check", "on", "✓")]
+    [TestCase("triangle", "over", "▲")]
+    public void CalendarMarkSwatch_DrawsTheCalendarsGlyphOnTheCalendarsFill(string name, string cell, string glyph)
     {
+        var cellRule = Rule("MonthCalendar.razor.css", $".cell.{cell}");
+        var fill = Regex.Match(cellRule, @"background-color:\s*[^;]+;").Value;
+        var glyphColour = Regex.Match(cellRule, @"(?<![-\w])color:\s*[^;]+;").Value;
+
         var swatch = Rule("ChartLegend.razor.css", $".swatch.{name}");
         var glyphRule = Rule("ChartLegend.razor.css", $".swatch.{name}::before");
         var calendar = RepoFiles.Read("src", "Shields.UI", "Components", "Charts", "MonthCalendar.razor");
 
         Assert.Multiple(() =>
         {
-            Assert.That(swatch, Does.Contain($"background-color: var({fill});"));
-            Assert.That(swatch, Does.Contain($"color: var({glyphColour});"));
+            Assert.That(fill, Is.Not.Empty);
+            Assert.That(glyphColour, Is.Not.Empty);
+            Assert.That(swatch, Does.Contain(fill));
+            Assert.That(swatch, Does.Contain(glyphColour));
             Assert.That(glyphRule, Does.Contain($"content: \"{glyph}\";"));
             Assert.That(calendar, Does.Contain($"\"{glyph}\""));
         });

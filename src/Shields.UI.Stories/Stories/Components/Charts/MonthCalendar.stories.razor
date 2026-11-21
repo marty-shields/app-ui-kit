@@ -74,6 +74,7 @@
         <Template>
             <div class="card">
                 <MonthCalendar Month="new DateOnly(2026, 11, 1)" Days="Month(2026, 11, Today)" Target="2000" Today="Today" ShowOverMarker="false" TestId="calendar" />
+                <ChartLegend Items="UnmarkedLegend" />
             </div>
         </Template>
     </Story>
@@ -110,6 +111,14 @@
         new(LegendSwatch.Chip, "Under"),
         new(LegendSwatch.Check, "On target"),
         new(LegendSwatch.Triangle, "Over"),
+        new(LegendSwatch.Outline, "Not recorded"),
+    ];
+
+    private static readonly IReadOnlyList<LegendItem> UnmarkedLegend =
+    [
+        new(LegendSwatch.Chip, "Under"),
+        new(LegendSwatch.Check, "On target"),
+        new(LegendSwatch.Error, "Over"),
         new(LegendSwatch.Outline, "Not recorded"),
     ];
 

@@ -36,6 +36,7 @@
     stroke: var(--color-text-muted);
     stroke-width: var(--border-width-error);
     stroke-dasharray: var(--chart-dash);
+    vector-effect: non-scaling-stroke;
 }
 
 .gap {

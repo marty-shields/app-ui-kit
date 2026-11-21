@@ -6,7 +6,7 @@ public static class KitNames
     /// <summary>Type names of the kit's components, without generic arity; <c>SegmentedControl</c> stands for <c>SegmentedControl&lt;T&gt;</c>.</summary>
     public static IReadOnlySet<string> Components { get; } = new HashSet<string>
     {
-        "AppButton", "AppErrorBoundary", "AppScreen", "BackHandler", "BottomNav", "Card", "ChartLegend", "ConfirmDialog",
+        "AppButton", "AppErrorBoundary", "AppScreen", "BackHandler", "BarList", "BottomNav", "Card", "ChartLegend", "ConfirmDialog",
         "DateStrip", "EmptyState", "ErrorView", "FieldInput", "FilterChips", "HostBridges", "Icon", "IconButton", "ListRow", "LoadFailed",
         "NumberField", "PeriodStepper", "ProgressRing", "RadioGroup", "SectionHeader", "SegmentedControl", "SelectField", "Snackbar", "Spinner", "StartupGate",
         "StartupView", "StatTile", "TextField",
@@ -18,7 +18,7 @@ public static class KitNames
     /// </summary>
     public static IReadOnlySet<string> Types { get; } = new HashSet<string>
     {
-        "AppLifecycle", "AppLifecycleBridge", "BackButton", "BackButtonBridge", "BottomNavItem",
+        "AppLifecycle", "AppLifecycleBridge", "BackButton", "BackButtonBridge", "BarListItem", "BottomNavItem",
         "ButtonVariant", "ChangeDirection", "DataSeries", "DataSeriesExtensions", "DayLabel", "IAppLifecycle", "IAppStart", "IBackButton", "IconButtonStyle",
         "IconName", "IconSize", "IconTone", "LegendItem", "LegendSwatch", "PeriodKind", "RadioOption",
         "ShieldsUiServiceCollectionExtensions", "SnackbarMessage", "SnackbarService", "StatChange",

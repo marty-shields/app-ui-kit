@@ -1,0 +1,52 @@
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) fit-content(var(--bar-list-value-max-width));
+    gap: var(--space-1) var(--space-3);
+}
+
+.name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.value {
+    color: var(--color-text-muted);
+    font-weight: var(--font-weight-bold);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.track {
+    grid-column: 1 / -1;
+    height: var(--bar-list-bar-height);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-ring-track);
+    overflow: hidden;
+}
+
+.fill {
+    /* Share of the track that is filled, 0 to 1; the markup sets it. */
+    --fill: 0;
+    display: block;
+    width: calc(var(--fill) * 100%);
+    height: 100%;
+    border-radius: var(--radius-sm);
+    background-color: var(--color-accent);
+}
+
+.none {
+    margin: 0;
+    color: var(--color-text-muted);
+}

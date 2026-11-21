@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Components;
 using Shields.UI.Components.Charts;
 
 namespace Shields.UI.Tests.Components.Charts;
@@ -135,6 +136,75 @@ public class BarListTests : ComponentTestBase
         {
             Assert.That(Rule(".fill"), Does.Contain("background-color: var(--color-ring-arc);"));
             Assert.That(Rule(".track"), Does.Contain("background-color: var(--color-ring-track);"));
+        });
+    }
+
+    [Test]
+    public void Render_ByDefault_IsStackedWithNormalColumnsAndNoButtons()
+    {
+        var cut = Render([new("A", 1)]);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find("ul").ClassList, Does.Not.Contain("inline").And.Not.Contain("label-wide").And.Not.Contain("label-narrow").And.Not.Contain("value-narrow"));
+            Assert.That(cut.FindAll("button"), Is.Empty);
+        });
+    }
+
+    [Test]
+    public void Render_Inline_AndTheColumnWidthsSetClasses()
+    {
+        var cut = Context.Render<BarList>(p => p.Add(x => x.Items, [new BarListItem("A", 1)]).Add(x => x.Inline, true)
+            .Add(x => x.LabelWidth, BarListLabelWidth.Wide).Add(x => x.ValueWidth, BarListValueWidth.Narrow));
+        var narrow = Context.Render<BarList>(p => p.Add(x => x.Items, [new BarListItem("A", 1)]).Add(x => x.LabelWidth, BarListLabelWidth.Narrow));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find("ul").ClassList, Does.Contain("inline").And.Contain("label-wide").And.Contain("value-narrow"));
+            Assert.That(narrow.Find("ul").ClassList, Does.Contain("label-narrow"));
+        });
+    }
+
+    [Test]
+    public void Render_Unit_FollowsEachValueForScreenReadersOnly()
+    {
+        var cut = Context.Render<BarList>(p => p.Add(x => x.Items, [new BarListItem("A", 5)]).Add(x => x.Unit, "sessions").Add(x => x.TestId, "list"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find("[data-testid=list-value-0]").TextContent.Trim(), Is.EqualTo("5 sessions"));
+            Assert.That(cut.Find("[data-testid=list-value-0] .visually-hidden").TextContent.Trim(), Is.EqualTo("sessions"));
+        });
+    }
+
+    [Test]
+    public void Render_WithOnSelect_SelectableRowsAreButtonsThatRaiseTheirPosition()
+    {
+        var selected = new List<int>();
+        var cut = Context.Render<BarList>(p => p.Add(x => x.Items, [new BarListItem("A", 3), new BarListItem("B", 2, Selectable: false), new BarListItem("C", 1)])
+            .Add(x => x.OnSelect, EventCallback.Factory.Create<int>(this, selected.Add)).Add(x => x.TestId, "list"));
+
+        cut.Find("[data-testid=list-select-2]").Click();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.FindAll("button"), Has.Count.EqualTo(2));
+            Assert.That(cut.FindAll("[data-testid=list-select-1]"), Is.Empty, "a row that is not selectable is plain");
+            Assert.That(selected, Is.EqualTo(new[] { 2 }));
+        });
+    }
+
+    [Test]
+    public void Css_InlineColumns_UseTheBarListWidthTokens()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Charts", "BarList.razor.css");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(css, Does.Contain("--label-width: var(--bar-list-label-width);"));
+            Assert.That(css, Does.Contain("--label-width: var(--bar-list-label-width-wide);"));
+            Assert.That(css, Does.Contain("--label-width: var(--bar-list-label-width-narrow);"));
+            Assert.That(css, Does.Contain("--value-width: var(--bar-list-value-width-narrow);"));
         });
     }
 }

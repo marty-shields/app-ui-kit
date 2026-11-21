@@ -6,14 +6,20 @@
 else
 {
     var full = FullBar();
-    <ul class="list" aria-label="@Label" data-testid="@TestId">
+    <ul class="list @(Inline ? "inline" : null) @LabelClass @ValueClass" aria-label="@Label" data-testid="@TestId">
         @for (var i = 0; i < Items.Count; i++)
         {
             var item = Items[i];
-            <li class="row" data-testid="@Id($"row-{i}")">
-                <span class="name" data-testid="@Id($"label-{i}")">@item.Label</span>
-                <span class="value" data-testid="@Id($"value-{i}")">@(item.ValueText ?? Number(item.Value))</span>
-                <span class="track" aria-hidden="true"><span class="fill" style="--fill: @Share(item, full)" data-testid="@Id($"bar-{i}")"></span></span>
+            var index = i;
+            <li class="item" data-testid="@Id($"row-{i}")">
+                @if (OnSelect.HasDelegate && item.Selectable)
+                {
+                    <button type="button" class="tap row" data-testid="@Id($"select-{i}")" @onclick="() => OnSelect.InvokeAsync(index)">@Cells(item, index, full)</button>
+                }
+                else
+                {
+                    <div class="row">@Cells(item, index, full)</div>
+                }
             </li>
         }
     </ul>
@@ -36,9 +42,40 @@ else
     [Parameter]
     public string EmptyText { get; set; } = "Nothing yet";
 
-    /// <summary>Value of the data-testid attribute, and the prefix of <c>-row-{n}</c>, <c>-label-{n}</c>, <c>-value-{n}</c> and <c>-bar-{n}</c> by position; <c>-empty</c> when there are no rows. None are rendered when unset.</summary>
+    /// <summary>Puts each row's label, bar and value on one line, with the label and value in columns of fixed width, instead of the bar under the label and value.</summary>
+    [Parameter]
+    public bool Inline { get; set; }
+
+    /// <summary>The width of the label column. Only applies to an <see cref="Inline"/> list.</summary>
+    [Parameter]
+    public BarListLabelWidth LabelWidth { get; set; }
+
+    /// <summary>The width of the value column. Only applies to an <see cref="Inline"/> list.</summary>
+    [Parameter]
+    public BarListValueWidth ValueWidth { get; set; }
+
+    /// <summary>Text read after each value by a screen reader and not shown, such as "sessions". Null for none.</summary>
+    [Parameter]
+    public string? Unit { get; set; }
+
+    /// <summary>Raised with the row's position when a row is tapped. Without a handler no row is tappable, and the rows that have <see cref="BarListItem.Selectable"/> false never are.</summary>
+    [Parameter]
+    public EventCallback<int> OnSelect { get; set; }
+
+    /// <summary>Value of the data-testid attribute, and the prefix of <c>-row-{n}</c>, <c>-label-{n}</c>, <c>-value-{n}</c> and <c>-bar-{n}</c> by position, and <c>-select-{n}</c> on the button of a tappable row; <c>-empty</c> when there are no rows. None are rendered when unset.</summary>
     [Parameter]
     public string? TestId { get; set; }
+
+    private RenderFragment Cells(BarListItem item, int index, double full) =>
+        @<text>
+            <span class="name" data-testid="@Id($"label-{index}")">@item.Label</span>
+            <span class="value" data-testid="@Id($"value-{index}")">@(item.ValueText ?? Number(item.Value))@if (Unit is not null) {<span class="visually-hidden">@($" {Unit}")</span>}</span>
+            <span class="track" aria-hidden="true"><span class="fill" style="--fill: @Share(item, full)" data-testid="@Id($"bar-{index}")"></span></span>
+        </text>;
+
+    private string? LabelClass => LabelWidth switch { BarListLabelWidth.Wide => "label-wide", BarListLabelWidth.Narrow => "label-narrow", _ => null };
+
+    private string? ValueClass => ValueWidth == BarListValueWidth.Narrow ? "value-narrow" : null;
 
     private static double Counted(double value) => double.IsFinite(value) ? Math.Max(value, 0) : 0;
 

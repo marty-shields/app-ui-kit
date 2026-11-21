@@ -91,7 +91,7 @@
     --add-button-lift: 1.5rem;
     --legend-swatch-size: 0.75rem;
 
-    /* ProgressRing: the track is 3:1 against the card and page, and the accent and error arcs keep 3:1 against it
+    /* ProgressRing: the track is 3:1 against the card surface, and the accent and error arcs keep 3:1 against it
        (accent is a darkened teal; error is darker in light and lighter in dark for that). The xs size is the compact caption. */
     --color-ring-track: light-dark(#829493, #667476);
     --font-size-xs: 0.75rem;

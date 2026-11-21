@@ -64,9 +64,9 @@ public class ProgressRingTests : ComponentTestBase
     [Test]
     public void Render_FractionalValue_RoundsForDisplay()
     {
-        var cut = Context.Render<ProgressRing>(p => p.Add(x => x.Value, 659.5).Add(x => x.Max, 2100).Add(x => x.TestId, "ring"));
+        var cut = Context.Render<ProgressRing>(p => p.Add(x => x.Value, 658.5).Add(x => x.Max, 2100).Add(x => x.TestId, "ring"));
 
-        Assert.That(cut.Find("[data-testid=ring-value]").TextContent, Is.EqualTo("660"));
+        Assert.That(cut.Find("[data-testid=ring-value]").TextContent, Is.EqualTo("659"));
     }
 
     [Test]
@@ -140,5 +140,64 @@ public class ProgressRingTests : ComponentTestBase
         var classes = cut.Find("[data-testid=ring-value]").ClassList.Where(c => c != "value" && !c.StartsWith("b-", StringComparison.Ordinal));
 
         Assert.That(string.Join(" ", classes), Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Render_WithoutTestId_RendersNoTestIds()
+    {
+        var cut = Context.Render<ProgressRing>(p => p.Add(x => x.Value, 1).Add(x => x.Caption, "steps"));
+
+        Assert.That(cut.FindAll("[data-testid]"), Is.Empty);
+    }
+
+    [Test]
+    public void Render_FractionAboveMaxThatRoundsToIt_IsNotOver()
+    {
+        var cut = Context.Render<ProgressRing>(p => p.Add(x => x.Value, 2100.3).Add(x => x.Max, 2100).Add(x => x.TestId, "ring"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find("[data-testid=ring]").ClassList, Does.Not.Contain("over"));
+            Assert.That(cut.Find("[data-testid=ring-value]").TextContent, Is.EqualTo("2,100"));
+        });
+    }
+
+    [Test]
+    public void Render_FractionThatRoundsToZeroWithoutMax_IsEmpty()
+    {
+        var cut = Context.Render<ProgressRing>(p => p.Add(x => x.Value, 0.3).Add(x => x.TestId, "ring"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find("[data-testid=ring-value]").TextContent, Is.EqualTo("0"));
+            Assert.That(cut.Find("[data-testid=ring]").GetAttribute("style"), Does.Contain("--fill: 0"));
+        });
+    }
+
+    [TestCase(double.NaN)]
+    [TestCase(double.PositiveInfinity)]
+    [TestCase(double.NegativeInfinity)]
+    public void Render_NonFiniteValue_CountsAsZero(double value)
+    {
+        var cut = Context.Render<ProgressRing>(p => p.Add(x => x.Value, value).Add(x => x.Max, 2100).Add(x => x.TestId, "ring"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find("[data-testid=ring-value]").TextContent, Is.EqualTo("0"));
+            Assert.That(cut.Find("[data-testid=ring]").GetAttribute("style"), Does.Contain("--fill: 0"));
+            Assert.That(cut.Find("[data-testid=ring]").ClassList, Does.Not.Contain("over"));
+        });
+    }
+
+    [Test]
+    public void Render_VeryLargeValue_ShowsItInFullAndIsOver()
+    {
+        var cut = Context.Render<ProgressRing>(p => p.Add(x => x.Value, 5e12).Add(x => x.Max, 2100).Add(x => x.TestId, "ring"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find("[data-testid=ring-value]").TextContent, Is.EqualTo("5,000,000,000,000"));
+            Assert.That(cut.Find("[data-testid=ring]").ClassList, Does.Contain("over"));
+        });
     }
 }

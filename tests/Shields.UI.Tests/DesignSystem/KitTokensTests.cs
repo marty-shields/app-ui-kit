@@ -29,11 +29,11 @@ public class KitTokensTests
     ];
 
     // Calorie Tracker's macro, target band, share bar and sheet tokens; Workout Log's bar-past, set, calendar and meter
-    // tokens; and the old name of the raised button.
+    // tokens; the old name of the raised button; and the ring names, of which only the kit's own are allowed.
     private static readonly string[] AppOnlyPrefixes =
     [
         "--color-protein", "--color-carbs", "--color-fat", "--color-target-band",
-        "--share-bar-", "--sheet-", "--color-bar-past", "--set-", "--calendar-", "--meter-", "--nav-new-",
+        "--share-bar-", "--sheet-", "--color-bar-past", "--set-", "--calendar-", "--meter-", "--nav-new-", "--ring-", "--color-ring-",
     ];
 
     [Test]
@@ -58,7 +58,7 @@ public class KitTokensTests
     [Test]
     public void Has_no_app_only_token()
     {
-        var forbidden = DesignTokens.Names.Where(n => AppOnlyPrefixes.Any(n.StartsWith));
+        var forbidden = DesignTokens.Names.Where(n => AppOnlyPrefixes.Any(n.StartsWith) && !KitComponents.Contains(n));
 
         Assert.That(forbidden, Is.Empty);
     }

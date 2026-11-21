@@ -16,16 +16,19 @@
 
 @code {
     private RenderFragment Content => @<text>
-        <span class="title" data-wrap-ok data-testid="@Id("title")">@Title</span>
-        @if (Badge is not null)
-        {
-            <span class="badge" data-testid="@Id("badge")">@Badge</span>
-        }
-        <span class="spacer"></span>
-        @if (!string.IsNullOrWhiteSpace(Hint))
-        {
-            <span class="hint" data-testid="@Id("hint")">@Hint</span>
-        }
+        <span class="lead">
+            <span class="name">
+                <span class="title" data-wrap-ok data-testid="@Id("title")">@Title</span>
+                @if (Badge is not null)
+                {
+                    <span class="badge" data-testid="@Id("badge")">@Badge</span>
+                }
+            </span>
+            @if (!string.IsNullOrWhiteSpace(Hint))
+            {
+                <span class="hint" data-testid="@Id("hint")">@Hint</span>
+            }
+        </span>
         @if (Total is not null)
         {
             <span class="total" data-testid="@Id("total")">@Total</span>

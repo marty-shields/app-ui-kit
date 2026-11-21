@@ -61,7 +61,7 @@ public class SectionHeaderTests : ComponentTestBase
         {
             Assert.That(hint.TextContent, Is.EqualTo("from 11:00"));
             Assert.That(hint.ClassList, Does.Contain("hint"));
-            Assert.That(hint.NextElementSibling!.GetAttribute("data-testid"), Is.EqualTo("head-total"));
+            Assert.That(hint.ParentElement!.NextElementSibling!.GetAttribute("data-testid"), Is.EqualTo("head-total"));
         });
     }
 
@@ -208,6 +208,20 @@ public class SectionHeaderTests : ComponentTestBase
         {
             Assert.That(cut.Find("[data-testid=head-title]").HasAttribute("data-wrap-ok"), Is.True);
             Assert.That(total, Does.Match(@"white-space\s*:\s*nowrap"));
+        });
+    }
+
+    [Test]
+    public void Css_LeadGroupWrapsSoTheHintDropsUnderTheTitleWhenNarrow()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Lists", "SectionHeader.razor.css");
+        var lead = Regex.Match(css, @"\.lead\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(lead, Does.Match(@"flex-wrap\s*:\s*wrap"));
+            Assert.That(lead, Does.Match(@"flex\s*:\s*1\s*;"));
+            Assert.That(lead, Does.Match(@"min-width\s*:\s*0"));
         });
     }
 

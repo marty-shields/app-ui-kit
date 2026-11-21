@@ -1,0 +1,47 @@
+@attribute [Stories("Components/Inputs/RangeCalendar")]
+
+<Stories TComponent="RangeCalendar" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Last 3 months">
+        <Template>
+            <RangeCalendar Min="Earliest" Max="Today" Today="Today" Dates="new DateRange(Today.AddMonths(-3), Today)" DayCounts="Counts" CountText="Entries" MarkedDayText="entry logged" ApplyLabel="Show entries" />
+        </Template>
+    </Story>
+
+    <Story Name="Dates picked">
+        <Template>
+            <RangeCalendar Min="Earliest" Max="Today" Today="Today" Dates="new DateRange(new DateOnly(2026, 10, 12), new DateOnly(2026, 10, 15))" DayCounts="Counts" CountText="Entries" MarkedDayText="entry logged" />
+        </Template>
+    </Story>
+
+    <Story Name="Month grid">
+        <Template>
+            <RangeCalendar Min="Earliest" Max="Today" Today="Today" Dates="new DateRange(new DateOnly(2026, 10, 12), new DateOnly(2026, 10, 15))" DayCounts="Counts" CountText="Entries" OpenOnMonths />
+        </Template>
+    </Story>
+
+    <Story Name="No counts">
+        <Template>
+            <RangeCalendar Min="Earliest" Max="Today" Today="Today" Dates="new DateRange(Today, Today)" />
+        </Template>
+    </Story>
+
+</Stories>
+
+@code {
+    private static readonly DateOnly Today = new(2026, 11, 15);
+    private static readonly DateOnly Earliest = new(2025, 3, 3);
+
+    private static readonly IReadOnlyDictionary<DateOnly, int> Counts = new Dictionary<DateOnly, int>
+    {
+        [new DateOnly(2026, 11, 12)] = 2,
+        [new DateOnly(2026, 11, 3)] = 1,
+        [new DateOnly(2026, 10, 14)] = 1,
+        [new DateOnly(2026, 10, 12)] = 1,
+        [new DateOnly(2026, 9, 21)] = 3,
+        [new DateOnly(2025, 3, 12)] = 2,
+        [new DateOnly(2025, 3, 3)] = 1,
+    };
+
+    private static string Entries(int count) => count == 1 ? "1 entry" : $"{count} entries";
+}

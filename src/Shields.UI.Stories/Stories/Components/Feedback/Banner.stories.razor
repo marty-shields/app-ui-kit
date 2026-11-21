@@ -1,0 +1,27 @@
+@attribute [Stories("Components/Feedback/Banner")]
+
+<Stories TComponent="Banner" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Selected">
+        <Template>
+            <Banner TestId="banner">Adding to Lunch</Banner>
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <Banner>Adding to Lunch</Banner>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <Banner>Adding to Lunch</Banner>
+            </div>
+        </Template>
+    </Story>
+
+</Stories>

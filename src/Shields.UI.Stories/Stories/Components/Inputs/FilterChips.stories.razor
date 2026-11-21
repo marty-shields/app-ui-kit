@@ -1,0 +1,41 @@
+@attribute [Stories("Components/Inputs/FilterChips")]
+
+<Stories TComponent="FilterChips<string>" Layout="typeof(ThemeLayout)">
+
+    <Story Name="First chosen">
+        <Template>
+            <FilterChips TValue="string" Label="Meal" Options="Options" Value="@("breakfast")" ValueChanged="(string _) => { }" TestId="example-filter" />
+        </Template>
+    </Story>
+
+    <Story Name="Last chosen">
+        <Template>
+            <FilterChips TValue="string" Label="Meal" Options="Options" Value="@("snacks")" ValueChanged="(string _) => { }" TestId="example-filter" />
+        </Template>
+    </Story>
+
+    <Story Name="None chosen">
+        <Template>
+            <FilterChips TValue="string" Label="Meal" Options="Options" Value="@("brunch")" ValueChanged="(string _) => { }" TestId="example-filter" />
+        </Template>
+    </Story>
+
+    <Story Name="Interactive">
+        <Template>
+            <FilterChips TValue="string" Label="Meal" Options="Options" @bind-Value="meal" TestId="example-filter" />
+        </Template>
+    </Story>
+
+</Stories>
+
+@code {
+    private string meal = "lunch";
+
+    private static readonly IReadOnlyList<RadioOption<string>> Options =
+    [
+        new("breakfast", "Breakfast", "example-filter-breakfast"),
+        new("lunch", "Lunch", "example-filter-lunch"),
+        new("dinner", "Dinner", "example-filter-dinner"),
+        new("snacks", "Snacks", "example-filter-snacks"),
+    ];
+}

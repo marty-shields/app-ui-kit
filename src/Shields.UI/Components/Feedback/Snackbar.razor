@@ -1,0 +1,291 @@
+@using Microsoft.Extensions.Logging
+@using Microsoft.JSInterop
+@implements IAsyncDisposable
+@inject SnackbarService Injected
+@inject TimeProvider Clock
+@inject ILogger<Snackbar> Logger
+@inject IJSRuntime JS
+
+@if (Showing is var (text, actionLabel))
+{
+    <div class="snackbar" data-testid="@TestId">
+        <p class="message" data-testid="@($"{TestId}-message")" data-wrap-ok>@text</p>
+        @if (actionLabel is not null)
+        {
+            <button @ref="action" type="button" class="action" data-testid="@($"{TestId}-action")" @onclick="OnActionAsync" @onfocus="OnFocusAsync" @onblur="OnBlur">@actionLabel</button>
+        }
+    </div>
+}
+
+@code {
+    /// <summary>How long a snackbar with a <see cref="Message"/> shows when <see cref="Duration"/> is unset. Material asks for 4 to 10 seconds; 10, its upper bound, gives a TalkBack user, who reaches the action by swiping and doesn't stop the timer, time to read the message and get there.</summary>
+    public static readonly TimeSpan DefaultDuration = TimeSpan.FromSeconds(10);
+
+    private ElementReference action;
+    private SnackbarService? subscribed;
+    private SnackbarMessage? posted;
+    private Task<IJSObjectReference>? module;
+    private CancellationTokenSource? timer;
+    private bool timedOut;
+    private bool focused;
+    private bool focusPending;
+    private string? timedMessage;
+
+    /// <summary>
+    /// What just happened, e.g. Barbell Back Squat set 2 deleted. When set, this snackbar shows it, for <see cref="Duration"/>,
+    /// and the caller removes it on <see cref="OnTimeout"/> or <see cref="OnAction"/>. When null, it shows the message of the
+    /// <see cref="Service"/> instead, which owns that message's duration and removal.
+    /// </summary>
+    [Parameter]
+    public string? Message { get; set; }
+
+    /// <summary>Text of the action button, e.g. Undo, for a <see cref="Message"/>. The button shows only when this and <see cref="OnAction"/> are set.</summary>
+    [Parameter]
+    public string? ActionLabel { get; set; }
+
+    /// <summary>Raised by the action button of a <see cref="Message"/>.</summary>
+    [Parameter]
+    public EventCallback OnAction { get; set; }
+
+    /// <summary>
+    /// Raised once, <see cref="Duration"/> after a <see cref="Message"/> first shows, unless it is removed first. The action holding keyboard
+    /// focus (<c>:focus-visible</c>) stops the timer, and focus leaving it starts a full <see cref="Duration"/> again. Focus moved there
+    /// by <see cref="TakeFocus"/> after a tap doesn't stop it.
+    /// </summary>
+    [Parameter]
+    public EventCallback OnTimeout { get; set; }
+
+    /// <summary><see cref="DefaultDuration"/> when null; <see cref="Timeout.InfiniteTimeSpan"/> keeps a <see cref="Message"/> until removed. A <see cref="Service"/> message has its own duration.</summary>
+    [Parameter]
+    public TimeSpan? Duration { get; set; }
+
+    /// <summary>Moves focus to the action of a <see cref="Message"/> when it first shows, for when what had focus, such as a trash, has just gone.</summary>
+    [Parameter]
+    public bool TakeFocus { get; set; }
+
+    /// <summary>The service whose message shows when <see cref="Message"/> is null. The host's own when unset; a story gives its own so stories don't share one.</summary>
+    [Parameter]
+    public SnackbarService? Service { get; set; }
+
+    /// <summary>Value of the data-testid attribute; also the prefix for <c>{TestId}-message</c> and <c>{TestId}-action</c>.</summary>
+    [Parameter]
+    public string TestId { get; set; } = "snackbar";
+
+    private SnackbarService Source => Service ?? Injected;
+
+    private bool Direct => Message is not null;
+
+    private (string Text, string? ActionLabel)? Showing
+    {
+        get
+        {
+            if (Direct)
+            {
+                return (Message!, HasAction ? ActionLabel : null);
+            }
+
+            posted = Source.Current;
+            return posted is null ? null : (posted.Text, posted.ActionLabel);
+        }
+    }
+
+    private bool HasAction => !string.IsNullOrWhiteSpace(ActionLabel) && OnAction.HasDelegate;
+
+    protected override void OnParametersSet()
+    {
+        if (Direct)
+        {
+            SnackbarService.ValidateDuration(Duration, nameof(Duration));
+        }
+
+        if (!string.Equals(Message, timedMessage, StringComparison.Ordinal))
+        {
+            // A new message gets a full duration and the focus again; none leaves nothing to time out.
+            timedMessage = Message;
+            StopTimer();
+            timedOut = false;
+            focused = false;
+            focusPending = TakeFocus && Direct;
+            if (Direct)
+            {
+                StartTimer();
+            }
+        }
+
+        var wanted = Direct ? null : Source;
+        if (ReferenceEquals(subscribed, wanted))
+        {
+            return;
+        }
+
+        if (subscribed is not null)
+        {
+            subscribed.Changed -= OnChanged;
+        }
+
+        subscribed = wanted;
+        if (subscribed is not null)
+        {
+            subscribed.Changed += OnChanged;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!focusPending || !Direct || !HasAction)
+        {
+            return;
+        }
+
+        focusPending = false;
+        try
+        {
+            await action.FocusAsync();
+        }
+        catch (JSDisconnectedException)
+        {
+            // The page is gone, and the button with it.
+        }
+        catch (Exception exception)
+        {
+            Log.ActionFocusFailed(Logger, exception);
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (subscribed is not null)
+        {
+            subscribed.Changed -= OnChanged;
+        }
+
+        StopTimer();
+        if (module is { IsCompletedSuccessfully: true })
+        {
+            try
+            {
+                await module.Result.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // The page is gone, and the module with it.
+            }
+        }
+    }
+
+    private void OnChanged() => _ = InvokeAsync(StateHasChanged);
+
+    private Task OnActionAsync()
+    {
+        if (!Direct)
+        {
+            return Source.InvokeActionAsync(posted!);
+        }
+
+        if (timedOut)
+        {
+            return Task.CompletedTask;
+        }
+
+        // The action settles the message: it must not time out on top of it.
+        StopTimer();
+        timedOut = true;
+        return OnAction.InvokeAsync();
+    }
+
+    private async Task OnFocusAsync()
+    {
+        if (!Direct)
+        {
+            return;
+        }
+
+        focused = true;
+        if (await KeyboardFocusedAsync() && focused)
+        {
+            StopTimer();
+        }
+    }
+
+    private void OnBlur()
+    {
+        focused = false;
+        if (Direct)
+        {
+            StartTimer();
+        }
+    }
+
+    /// <summary>Whether the action shows the keyboard focus ring. False when that can't be read, so the snackbar still times out.</summary>
+    private async Task<bool> KeyboardFocusedAsync()
+    {
+        try
+        {
+            module ??= JS.InvokeAsync<IJSObjectReference>("import", "./_content/Shields.UI/Components/Feedback/Snackbar.razor.js").AsTask();
+            return await (await module).InvokeAsync<bool>("isFocusVisible", action);
+        }
+        catch (JSDisconnectedException)
+        {
+            // The page is gone; the snackbar goes with it.
+            return false;
+        }
+        catch (Exception exception)
+        {
+            if (module is { IsFaulted: true })
+            {
+                module = null;
+            }
+
+            Log.FocusCheckFailed(Logger, exception);
+            return false;
+        }
+    }
+
+    private void StartTimer()
+    {
+        if (timer is null && !timedOut)
+        {
+            timer = new CancellationTokenSource();
+            _ = TimeOutAsync(Duration ?? DefaultDuration, timer.Token);
+        }
+    }
+
+    private void StopTimer()
+    {
+        timer?.Cancel();
+        timer?.Dispose();
+        timer = null;
+    }
+
+    // Not awaited by anyone, so a failure goes to the nearest error boundary, as an exception from a button click would.
+    private async Task TimeOutAsync(TimeSpan duration, CancellationToken stopped)
+    {
+        try
+        {
+            await Task.Delay(duration, Clock, stopped);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        await InvokeAsync(async () =>
+        {
+            // The delay can finish before the timer is stopped and this runs; a stop in between must win.
+            if (stopped.IsCancellationRequested)
+            {
+                return;
+            }
+
+            timedOut = true;
+            try
+            {
+                await OnTimeout.InvokeAsync();
+            }
+            catch (Exception exception)
+            {
+                await DispatchExceptionAsync(exception);
+            }
+        });
+    }
+}

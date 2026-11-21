@@ -1,0 +1,184 @@
+/* Design tokens shared by every app. Most colours are light-dark() pairs and follow the phone's theme.
+   The kit ships every token; apps keep none of their own. */
+:root {
+    color-scheme: light dark;
+
+    --color-bg: light-dark(#f4f8f8, #141819);
+    --color-surface: light-dark(#ffffff, #212829);
+    --color-border: light-dark(#b7d5d4, #364243);
+    --color-border-strong: light-dark(#77878b, #7f9093);
+    --color-text: light-dark(#373e40, #e4ecec);
+    --color-text-muted: light-dark(#5e6e72, #a3b1b3);
+    --color-bar: light-dark(#305252, #1b2526);
+    --color-on-bar: light-dark(#ffffff, #e4ecec);
+    --color-on-bar-muted: light-dark(#b7d5d4, #a3b1b3);
+    --color-primary: light-dark(#305252, #b7d5d4);
+    --color-on-primary: light-dark(#ffffff, #173535);
+    --color-secondary: light-dark(#b7d5d4, #2b4444);
+    --color-on-secondary: light-dark(#305252, #d4e8e7);
+    --color-selected: light-dark(#b7d5d4, #2b4444);
+    /* The filled icon button's chip and the icon on it. Its own token, not --color-selected or --color-secondary,
+       so retuning those does not change the chip. */
+    --color-chip: light-dark(#6a9594, #587a7a);
+    --color-on-chip: light-dark(#141819, #ffffff);
+    /* The secondary add chip is outlined: its border is --color-chip, which carries the 3:1 on the page, and its fill is
+       lighter than the chip in light and darker in dark, at least 1.5:1 from it, so Soft and Filled read as different. */
+    --color-chip-soft: light-dark(#d4e8e7, #2b4444);
+    --color-on-chip-soft: light-dark(#1a2b2b, #ffffff);
+    --color-accent: light-dark(#29494c, #acd5d2);
+    /* The stroke of a target band's top and bottom edges on a chart, and of its legend swatch. Never a fill, so the bars keep their
+       contrast. A blue apart from the teal accent and the line and dot colours, at least 3:1 on the page and cards in both themes. */
+    --color-chart-band: light-dark(#3f7fa6, #7fb8de);
+    /* Chart past: the bars of earlier periods beside the current one. A grey-teal at least 3:1 against --color-accent (the bar next to
+       it) and against the page and cards in both themes. In light the window is narrow, because the accent is dark and the page is
+       light: this is the only luminance that clears 3:1 on all three.
+       Tuned to sit beside the accent bar, not beside --color-primary (2.6:1 in light). */
+    --color-chart-past: light-dark(#8a9092, #6c7274);
+    --color-focus: light-dark(#488286, #8cc4c1);
+    --color-danger: light-dark(#a8231c, #f2b8b5);
+    --color-on-danger: light-dark(#ffffff, #1e2324);
+    --color-error: light-dark(#841c16, #f4c1be);
+    --color-success: light-dark(#2e7d32, #a5d6a7);
+    /* The inverse colours: dark on a light screen, light on a dark one, so it stands out from the cards under it. */
+    --color-inverse-surface: light-dark(#373e40, #e4ecec);
+    --color-on-inverse-surface: light-dark(#f4f8f8, #141819);
+    --color-inverse-primary: light-dark(#b7d5d4, #305252);
+    --color-scrim: light-dark(rgb(0 0 0 / 0.45), rgb(0 0 0 / 0.6));
+    --state-pressed: color-mix(in srgb, currentColor 12%, transparent);
+    /* light-dark() takes only colours, so the second layer is split in two and each theme hides the blur it doesn't use. */
+    --shadow-raised: 0 1px 2px light-dark(rgb(0 0 0 / 0.18), rgb(0 0 0 / 0.5)),
+        0 3px 8px light-dark(rgb(0 0 0 / 0.14), transparent),
+        0 3px 10px light-dark(transparent, rgb(0 0 0 / 0.45));
+
+    --font-family: system-ui, Roboto, sans-serif;
+    --font-size-sm: 0.875rem;
+    --font-size-md: 1rem;
+    --font-size-lg: 1.25rem;
+    --font-size-xl: 1.5rem;
+    --font-size-xxl: 2.25rem;
+    --font-size-input: 1.25rem;
+    --font-weight-regular: 400;
+    --font-weight-bold: 600;
+    --line-height: 1.4;
+    --line-height-tight: 1;
+    --letter-spacing-label: 0.08em;
+
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-6: 24px;
+    --space-8: 32px;
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    --radius-round: 50%;
+
+    --touch-target: 48px;
+    --touch-target-compact: 40px;
+    --border-width: 1px;
+    --border-width-error: 2px;
+    --focus-width: 2px;
+    --focus-offset: 2px;
+    --opacity-disabled: 0.5;
+    /* Thin: a mark that stays visible but steps back, such as a secondary line or an earlier period's bar. */
+    --opacity-thin: 0.55;
+    --spinner-size: 40px;
+    --spinner-width: 4px;
+    --spinner-size-small: 1.125rem;
+    --spinner-width-small: 2px;
+    --spinner-duration: 1s;
+    --pull-refresh-threshold: 64px;
+    --pull-refresh-return-duration: 200ms;
+    --snackbar-enter-duration: 150ms;
+    --dialog-max-width: 22rem;
+    --radio-size: 1.5rem;
+    --radio-dot-size: 0.75rem;
+    --nav-indicator-width: 4rem;
+    --nav-indicator-height: 2rem;
+    --add-button-size: 3.5rem;
+    --add-button-lift: 1.5rem;
+    --legend-swatch-size: 0.75rem;
+
+    /* The empty track of ProgressRing, BarList and StackedBar: at least 3:1 on the page and on cards in both themes. The arcs and
+       bar fills drawn on it have their own tokens, at least 3:1 against it: darker than --color-accent and --color-error in
+       light, lighter in dark, because the track sits between the page and the arc in lightness. The xs size is the compact caption. */
+    --color-ring-track: light-dark(#7d8f8e, #6a7a7c);
+    --color-ring-arc: light-dark(#1f3a3d, #c4e6e3);
+    --color-ring-arc-over: light-dark(#6b1812, #f9d9d6);
+    --font-size-xs: 0.75rem;
+    --ring-size: 8.75rem;
+    --ring-width: 0.875rem;
+    --ring-size-compact: 6rem;
+    --ring-width-compact: 0.625rem;
+    --snackbar-gap-bottom: var(--space-2);
+
+    /* Chart dash: the dash and gap of a dashed chart line (stroke-dasharray), 6px then 4px. The chart's target line strokes
+       --chart-dash and the legend's line swatch repeats the same two lengths, so they cannot drift apart. */
+    --chart-dash-on: calc(var(--space-1) * 1.5);
+    --chart-dash-off: var(--space-1);
+    --chart-dash: var(--chart-dash-on) var(--chart-dash-off);
+
+    /* Data palette: categorical series colours for charts and stacked bars. Use them in order, 1 to n, so a chart reads the same
+       everywhere. Indigo, clay, rose, gold and violet are spread around the hue wheel, so series differ by hue rather than by
+       shade. None is close to the red of --color-error, the green of --color-success, the blue of --color-chart-band or the
+       teal of --color-accent, so a series never reads as a status or a band. Each is at least 3:1 on the page and cards in both
+       themes, and every pair is at least 0.12 apart in OKLab, so a legend showing all five stays readable. */
+    --color-data-1: light-dark(#6561cb, #908ffd);
+    --color-data-2: light-dark(#964e2c, #ce9379);
+    --color-data-3: light-dark(#a36094, #da74c5);
+    --color-data-4: light-dark(#96812a, #f0d776);
+    --color-data-5: light-dark(#673692, #d4b4f7);
+
+    /* BarList: the bar and its track (the fill, --color-ring-arc, keeps 3:1 against the track), and the widest the value column grows (a share of the row) before the value ellipsises. */
+    --bar-list-bar-height: 0.75rem;
+    --bar-list-value-max-width: 50%;
+    /* BarList inline: the thinner bar, the label column (normal, wide, narrow) and the value column (normal, narrow). */
+    --bar-list-bar-height-inline: 0.625rem;
+    --bar-list-label-width: 5.5rem;
+    --bar-list-label-width-wide: 8rem;
+    --bar-list-label-width-narrow: 2.5rem;
+    --bar-list-value-width: 6rem;
+    --bar-list-value-width-narrow: 2rem;
+
+    /* Sheet and SheetAction: the bottom sheet's enter time, widest and tallest size, grab-bar size, and the action tile's height and icon. */
+    --sheet-enter-duration: 200ms;
+    --sheet-max-width: 32rem;
+    --sheet-max-height: 85dvh;
+    --sheet-handle-width: 3rem;
+    --sheet-handle-height: 0.375rem;
+    --sheet-tile-min-height: 6.5rem;
+    --sheet-tile-icon-size: 2rem;
+    /* Input box (the .input-box class in base.css): the padding either side of the input, and the smaller one of the compact box. */
+    --input-box-padding-inline: var(--space-3);
+    --input-box-padding-inline-compact: var(--space-1);
+    /* Rows of fields: the narrow index column before the fields and the narrow trailing column after them, so the fields line up row to row. */
+    --entry-grid-index-width: 2rem;
+    --entry-grid-aside-width: 3.5rem;
+    /* StackedBar: the bar's height, and the transparent gap between segments (neighbouring data colours are under 3:1 against each other, so the gap tells them apart). */
+    --stacked-bar-height: 0.75rem;
+    --stacked-bar-gap: 0.25rem;
+    /* StackedBar: the narrowest a drawn segment gets, so a tiny share stays visible. */
+    --stacked-bar-segment-min-width: 0.25rem;
+    /* AppScreen: extra room under the content when the bottom navigation bar's raised button overlaps its foot. */
+    --app-screen-nav-clearance: 0.75rem;
+    /* StatTile compact: the tile's padding and value size, so a row of small tiles stays short. */
+    --stat-tile-compact-padding: var(--space-3) var(--space-2);
+    --stat-tile-compact-value-size: var(--font-size-md);
+    /* Card compact: no bottom padding, because the rows it holds carry their own, and a short gap under the title. */
+    --card-compact-padding: var(--space-4) var(--space-4) 0;
+    --card-compact-title-gap: var(--space-2);
+    /* RangeCalendar: the round that holds a day's number, and the dot that marks a day with items. */
+    --calendar-day-size: 2.25rem;
+    --calendar-dot-size: 0.25rem;
+}
+
+/* Forces a theme on an element and its children. */
+[data-theme="light"] {
+    color-scheme: light;
+}
+
+[data-theme="dark"] {
+    color-scheme: dark;
+}

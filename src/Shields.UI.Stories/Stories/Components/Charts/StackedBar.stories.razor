@@ -1,0 +1,75 @@
+@attribute [Stories("Components/Charts/StackedBar")]
+
+<Stories TComponent="StackedBar" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Three segments">
+        <Template>
+            <div class="themed"><StackedBar Label="Sales by region" Unit="units" Segments="@([new StackedBarSegment("North", 420, DataSeries.One), new StackedBarSegment("South", 640, DataSeries.Two), new StackedBarSegment("East", 810, DataSeries.Three)])" TestId="bar" /></div>
+        </Template>
+    </Story>
+
+    <Story Name="All five series">
+        <Template>
+            <div class="themed"><StackedBar Label="Share by group" Segments="@([new StackedBarSegment("A", 30, DataSeries.One), new StackedBarSegment("B", 25, DataSeries.Two), new StackedBarSegment("C", 20, DataSeries.Three), new StackedBarSegment("D", 15, DataSeries.Four), new StackedBarSegment("E", 10, DataSeries.Five)])" TestId="bar" /></div>
+        </Template>
+    </Story>
+
+    <Story Name="Without labels">
+        <Template>
+            <div class="themed"><StackedBar Label="Sales by region" ShowLabels="false" Segments="@([new StackedBarSegment("North", 420, DataSeries.One), new StackedBarSegment("South", 640, DataSeries.Two), new StackedBarSegment("East", 810, DataSeries.Three)])" TestId="bar" /></div>
+        </Template>
+    </Story>
+
+    <Story Name="Sized by one unit, labelled in another">
+        <Template>
+            <div class="themed"><StackedBar Label="Macros by energy" Segments="@([new StackedBarSegment("Protein", 128, DataSeries.One, "32 g"), new StackedBarSegment("Carbs", 400, DataSeries.Two, "100 g"), new StackedBarSegment("Fat", 270, DataSeries.Three, "30 g")])" TestId="bar" /></div>
+        </Template>
+    </Story>
+
+    <Story Name="Single segment">
+        <Template>
+            <div class="themed"><StackedBar Label="Sales by region" Unit="units" Segments="@([new StackedBarSegment("North", 420, DataSeries.One)])" TestId="bar" /></div>
+        </Template>
+    </Story>
+
+    <Story Name="One tiny segment">
+        <Template>
+            <div class="themed"><StackedBar Label="Sales by region" Unit="units" Segments="@([new StackedBarSegment("North", 900, DataSeries.One), new StackedBarSegment("South", 1, DataSeries.Two)])" TestId="bar" /></div>
+        </Template>
+    </Story>
+
+    <Story Name="Long labels">
+        <Template>
+            <div class="themed narrow"><StackedBar Label="Sales by region" Unit="units" Segments="@([new StackedBarSegment("A very long region name that cannot fit", 420, DataSeries.One), new StackedBarSegment("Another similarly long region name", 640, DataSeries.Two)])" TestId="bar" /></div>
+        </Template>
+    </Story>
+
+    <Story Name="All zero">
+        <Template>
+            <div class="themed"><StackedBar Label="Sales by region" Unit="units" EmptyText="Nothing recorded yet" Segments="@([new StackedBarSegment("North", 0, DataSeries.One), new StackedBarSegment("South", 0, DataSeries.Two)])" TestId="bar" /></div>
+        </Template>
+    </Story>
+
+    <Story Name="All zero on the page">
+        <Template>
+            <StackedBar Label="Sales by region" Unit="units" EmptyText="Nothing recorded yet" Segments="@([new StackedBarSegment("North", 0, DataSeries.One), new StackedBarSegment("South", 0, DataSeries.Two)])" TestId="bar" />
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <StackedBar Label="Sales by region" Unit="units" Segments="@([new StackedBarSegment("North", 420, DataSeries.One), new StackedBarSegment("South", 640, DataSeries.Two), new StackedBarSegment("East", 810, DataSeries.Three), new StackedBarSegment("West", 0, DataSeries.Four)])" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <StackedBar Label="Sales by region" Unit="units" Segments="@([new StackedBarSegment("North", 420, DataSeries.One), new StackedBarSegment("South", 640, DataSeries.Two), new StackedBarSegment("East", 810, DataSeries.Three), new StackedBarSegment("West", 0, DataSeries.Four)])" />
+            </div>
+        </Template>
+    </Story>
+
+</Stories>

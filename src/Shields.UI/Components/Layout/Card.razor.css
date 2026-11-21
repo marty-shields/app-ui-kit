@@ -1,0 +1,67 @@
+.card {
+    padding: var(--space-4);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-surface);
+}
+
+.header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
+}
+
+/* With actions the row is as tall as their touch targets, so the title is centred on them. The row pulls up into the card's padding, as the targets' own padding already clears the edge. */
+.header.with-actions {
+    align-items: center;
+    margin-top: calc(-1 * var(--space-2));
+}
+
+.actions {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    margin-left: auto;
+    gap: var(--space-1);
+}
+
+.title {
+    min-width: 0;
+    margin: 0;
+    overflow-wrap: anywhere;
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-bold);
+}
+
+.aside {
+    flex-shrink: 0;
+    white-space: nowrap;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+}
+
+.compact {
+    padding: var(--card-compact-padding);
+}
+
+.compact .header {
+    margin-bottom: var(--card-compact-title-gap);
+}
+
+/* A card with only a header has no body to space from it. */
+.no-body .header {
+    margin: 0;
+}
+
+/* The action row's touch targets already clear the edges, so a header-only card with actions needs little padding. */
+.card.header-only-actions {
+    padding-block: var(--space-1);
+}
+
+/* The error state only recolours the border and adds an inset ring, so the card's box does not change size. */
+.card.error {
+    border-color: var(--color-error);
+    box-shadow: inset 0 0 0 var(--border-width) var(--color-error);
+}

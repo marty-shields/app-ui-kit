@@ -1,0 +1,73 @@
+<div class="header" data-testid="@TestId">
+    <h2 class="heading">
+        @if (ExpandedChanged.HasDelegate)
+        {
+            <button type="button" class="control toggle" aria-expanded="@(Expanded ? "true" : "false")" aria-controls="@(Expanded ? ControlsId : null)" data-testid="@Id("toggle")" @onclick="Toggle">
+                @Content
+                <Icon Name="@(Expanded ? IconName.Up : IconName.Down)" Tone="IconTone.Muted" />
+            </button>
+        }
+        else
+        {
+            <span class="toggle">@Content</span>
+        }
+    </h2>
+</div>
+
+@code {
+    private RenderFragment Content => @<text>
+        <span class="lead">
+            <span class="name">
+                <span class="title" data-wrap-ok data-testid="@Id("title")">@Title</span>
+                @if (Badge is not null)
+                {
+                    <span class="badge" data-testid="@Id("badge")">@Badge</span>
+                }
+            </span>
+            @if (!string.IsNullOrWhiteSpace(Hint))
+            {
+                <span class="hint" data-testid="@Id("hint")">@Hint</span>
+            }
+        </span>
+        @if (Total is not null)
+        {
+            <span class="total" data-testid="@Id("total")">@Total</span>
+        }
+    </text>;
+
+    /// <summary>Heading text of the section, shown small, bold and upper case.</summary>
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = "";
+
+    /// <summary>Text at the trailing edge, such as a count or a sum. Null shows none.</summary>
+    [Parameter]
+    public string? Total { get; set; }
+
+    /// <summary>Short text in a rounded chip after the title, such as "Now". Null shows no chip.</summary>
+    [Parameter]
+    public string? Badge { get; set; }
+
+    /// <summary>Smaller muted text before <see cref="Total"/>, such as "from 11:00". Null or blank shows none. In the collapsible header it sits inside the toggle button, so the button's accessible name includes it.</summary>
+    [Parameter]
+    public string? Hint { get; set; }
+
+    /// <summary>Whether the section below is open. Sets <c>aria-expanded</c> and the chevron direction; only used when <see cref="ExpandedChanged"/> is set.</summary>
+    [Parameter]
+    public bool Expanded { get; set; }
+
+    /// <summary>Raised with the new value when the header is tapped. Makes <see cref="Expanded"/> two-way bindable. The header is a button when set, and a plain heading when not.</summary>
+    [Parameter]
+    public EventCallback<bool> ExpandedChanged { get; set; }
+
+    /// <summary>The <c>id</c> of the element the header opens and closes, written to <c>aria-controls</c> on the button only while open, so a panel removed when closed is never referenced. Null writes none.</summary>
+    [Parameter]
+    public string? ControlsId { get; set; }
+
+    /// <summary>Value of the data-testid attribute, and the prefix of <c>-title</c>, <c>-badge</c>, <c>-hint</c>, <c>-total</c> and <c>-toggle</c>. None are rendered when unset.</summary>
+    [Parameter]
+    public string? TestId { get; set; }
+
+    private Task Toggle() => ExpandedChanged.InvokeAsync(!Expanded);
+
+    private string? Id(string part) => TestId is null ? null : $"{TestId}-{part}";
+}

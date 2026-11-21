@@ -1,0 +1,55 @@
+@using Microsoft.Extensions.Logging
+@using Microsoft.JSInterop
+@using Shields.UI.Components.Actions
+@inject ILogger<LoadFailed> Logger
+
+<div class="failed @(Plain ? "plain" : null)">
+    <p class="error" role="alert" data-testid="@($"{TestId}-error")">@Message</p>
+    <AppButton @ref="retry" FullWidth Variant="RetryVariant" TestId="@($"{TestId}-retry")" OnClick="OnRetry">Try again</AppButton>
+</div>
+
+@code {
+    /// <summary>Error text, e.g. Couldn't load the Dashboard</summary>
+    [Parameter, EditorRequired]
+    public string Message { get; set; } = "";
+
+    /// <summary>Raised by Try again.</summary>
+    [Parameter]
+    public EventCallback OnRetry { get; set; }
+
+    /// <summary>Visual weight of Try again.</summary>
+    [Parameter]
+    public ButtonVariant RetryVariant { get; set; } = ButtonVariant.Primary;
+
+    /// <summary>Shows the message centred and without the red border, for a failure that fills the screen.</summary>
+    [Parameter]
+    public bool Plain { get; set; }
+
+    /// <summary>Prefix of the data-testid attributes: <c>{TestId}-error</c> on the message and <c>{TestId}-retry</c> on Try again.</summary>
+    [Parameter, EditorRequired]
+    public string TestId { get; set; } = "";
+
+    private AppButton? retry;
+
+    /// <summary>Moves focus to Try again when the component first shows.</summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || retry is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await retry.FocusAsync();
+        }
+        catch (JSDisconnectedException)
+        {
+            // The page is gone, and the button with it.
+        }
+        catch (Exception exception)
+        {
+            Log.RetryFocusFailed(Logger, exception);
+        }
+    }
+}

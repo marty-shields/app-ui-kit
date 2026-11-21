@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <ItemGroup>
+    <PackageReference Include="bunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Shields.UI\Shields.UI.csproj" />
+    <ProjectReference Include="..\..\src\Shields.UI.Stories\Shields.UI.Stories.csproj" />
+    <ProjectReference Include="..\..\src\Shields.UI.Testing\Shields.UI.Testing.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Bunit" />
+    <Using Include="Shields.UI.Testing" />
+  </ItemGroup>
+
+</Project>

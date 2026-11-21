@@ -1,0 +1,29 @@
+@implements IDisposable
+@using Shields.UI.Lifecycle
+@using Shields.UI.Navigation
+@inject IBackButton BackButton
+@inject IServiceProvider Services
+@inject BackButtonBridge BackBridge
+@inject AppLifecycleBridge LifecycleBridge
+
+@code {
+    private IAppLifecycle? appLifecycle;
+
+    // Connecting clears handlers registered earlier in the scope, so the host puts this first in its root component, once per scope.
+    protected override void OnInitialized()
+    {
+        appLifecycle = Services.GetService(typeof(IAppLifecycle)) as IAppLifecycle
+            ?? throw new InvalidOperationException("HostBridges needs an IAppLifecycle. AddShieldsUi registers one only when the host registered neither IAppStart nor IAppLifecycle; register an IAppLifecycle that shares the instance behind your IAppStart.");
+        BackBridge.Connect(BackButton);
+        LifecycleBridge.Connect(appLifecycle);
+    }
+
+    public void Dispose()
+    {
+        BackBridge.Disconnect(BackButton);
+        if (appLifecycle is not null)
+        {
+            LifecycleBridge.Disconnect(appLifecycle);
+        }
+    }
+}

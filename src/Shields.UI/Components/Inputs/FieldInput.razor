@@ -1,0 +1,42 @@
+<div class="field">
+    <label class="label @(ShowLabel ? null : "visually-hidden")" for="@InputId" data-wrap-ok>@Label@if (Required){<span class="required" aria-hidden="true">&nbsp;*</span>}</label>
+    @ChildContent
+    @if (!string.IsNullOrEmpty(Message))
+    {
+        <p class="message" id="@MessageId" role="alert" data-testid="@MessageTestId" data-wrap-ok>@Message</p>
+    }
+</div>
+
+@code {
+    /// <summary>What the field is for, e.g. Reps or Weight (kg). Names the input for screen readers even when it is not shown.</summary>
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = "";
+
+    /// <summary>Shows the label above the input. When false it is kept for screen readers only.</summary>
+    [Parameter]
+    public bool ShowLabel { get; set; } = true;
+
+    /// <summary>Marks the label with an asterisk.</summary>
+    [Parameter]
+    public bool Required { get; set; }
+
+    /// <summary>The input the label names: its <c>id</c>.</summary>
+    [Parameter, EditorRequired]
+    public string InputId { get; set; } = "";
+
+    /// <summary>The input or inputs.</summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>Error shown under the input in the error tone and announced. Null or empty shows nothing.</summary>
+    [Parameter]
+    public string? Message { get; set; }
+
+    /// <summary><c>id</c> of the message, for the input's <c>aria-describedby</c>.</summary>
+    [Parameter]
+    public string? MessageId { get; set; }
+
+    /// <summary>Value of the message's data-testid attribute.</summary>
+    [Parameter]
+    public string? MessageTestId { get; set; }
+}

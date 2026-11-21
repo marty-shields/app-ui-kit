@@ -1,0 +1,9 @@
+@using static BlazingStory.Types.NavigationTreeOrderBuilder
+@using Shields.UI.Stories.Shared
+
+<BlazingStoryApp Title="Shields UI"
+                 Assemblies="[typeof(DefaultLayout).Assembly]"
+                 DefaultLayout="typeof(DefaultLayout)"
+                 NavigationTreeOrder="@N["Foundations", N["Introduction", "Tokens"],
+                                         "Components", N["Actions"]]">
+</BlazingStoryApp>

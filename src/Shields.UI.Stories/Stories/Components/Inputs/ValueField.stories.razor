@@ -1,0 +1,29 @@
+@attribute [Stories("Components/Inputs/ValueField")]
+
+<Stories TComponent="ValueField" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Whole">
+        <Template>
+            <ValueField Kind="ValueKind.Whole" Label="Reps" Required TestId="number" />
+        </Template>
+    </Story>
+
+    <Story Name="Fractional">
+        <Template>
+            <ValueField Kind="ValueKind.Fractional" Label="Weight (kg)" Required Value="62.5" TestId="decimal" />
+        </Template>
+    </Story>
+
+    <Story Name="Duration">
+        <Template>
+            <ValueField Kind="ValueKind.Duration" Label="Duration" Required Value="0:20:00" TestId="duration" />
+        </Template>
+    </Story>
+
+    <Story Name="Invalid">
+        <Template>
+            <ValueField Kind="ValueKind.Fractional" Label="Weight (kg)" Value="abc" InvalidMessage="Enter a number" TestId="invalid" />
+        </Template>
+    </Story>
+
+</Stories>

@@ -1,0 +1,235 @@
+@using System.Globalization
+@using Microsoft.Extensions.Logging
+@using Microsoft.JSInterop
+@inject IJSRuntime JS
+@inject ILogger<NumberField> Logger
+<FieldInput Label="@Label"
+            ShowLabel="ShowLabel"
+            Required="Required"
+            InputId="@inputId"
+            Message="@InvalidMessage"
+            MessageId="@messageId"
+            MessageTestId="@StepTestId("error")">
+    <div class="row">
+        @if (Stepper)
+        {
+            <button type="button"
+                    class="step"
+                    aria-label="@($"Decrease {Label}")"
+                    data-testid="@StepTestId("minus")"
+                    disabled="@(Disabled || AtMinimum)"
+                    @onclick="Decrease">
+                <Icon Name="IconName.Minus" />
+            </button>
+        }
+        <div class="box input-box @(Compact ? "input-box-compact" : null) @(IsInvalid ? "invalid" : null)" data-testid="@StepTestId("box")" @onclick="FocusFromBox">
+            <input @ref="input"
+                   id="@inputId"
+                   type="text"
+                   inputmode="@(AllowDecimal ? "decimal" : "numeric")"
+                   autocomplete="off"
+                   class="input"
+                   value="@text"
+                   disabled="@Disabled"
+                   aria-required="@(Required ? "true" : null)"
+                   aria-invalid="@(IsInvalid ? "true" : null)"
+                   aria-describedby="@(HasMessage ? messageId : null)"
+                   data-testid="@InputTestId"
+                   @oninput="OnInput"
+                   @onkeydown="OnKeyDown" />
+            @if (!string.IsNullOrEmpty(Unit))
+            {
+                <span class="unit" data-testid="@StepTestId("unit")">@Unit</span>
+            }
+        </div>
+        @if (Stepper)
+        {
+            <button type="button"
+                    class="step"
+                    aria-label="@($"Increase {Label}")"
+                    data-testid="@StepTestId("plus")"
+                    disabled="@Disabled"
+                    @onclick="Increase">
+                <Icon Name="IconName.Plus" />
+            </button>
+        }
+    </div>
+</FieldInput>
+
+@code {
+    private const int FocusAttempts = 30;
+    private readonly string inputId = $"number-field-{Guid.NewGuid():N}";
+    private readonly string messageId = $"number-field-message-{Guid.NewGuid():N}";
+    private ElementReference input;
+    private string text = "";
+    private decimal? lastValue;
+    private string? lastText;
+    private bool echoPending;
+    private bool HasMessage => !string.IsNullOrEmpty(InvalidMessage);
+    private bool IsInvalid => Invalid || HasMessage;
+    private bool AtMinimum => Minimum is { } min && Value is { } v && v <= min;
+    private string InputTestId => TestId ?? "number-field";
+    private string StepTestId(string part) => $"{InputTestId}-{part}";
+
+    protected override void OnParametersSet()
+    {
+        // Keep what the user is typing (such as "1.") unless the parent set a different number.
+        // A different Value from the parent also replaces text that is not a number, which Parse alone can't tell apart.
+        // Right after a keystroke the new Value is the parent taking what was typed, not a change of its own.
+        var parentChanged = Value != lastValue && !echoPending;
+        lastValue = Value;
+        // When the parent stops holding the text, what it held ("abc") must not stay on screen.
+        var textReleased = Text is null && lastText is not null;
+        lastText = Text;
+        if (Text is not null)
+        {
+            text = Text;
+        }
+        else if (textReleased || parentChanged || Parse(text) != Value)
+        {
+            text = Value is { } v ? v.ToString(CultureInfo.InvariantCulture) : "";
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        echoPending = false;
+        if (firstRender && AutoFocus && !Disabled)
+        {
+            try
+            {
+                await using var module = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/Shields.UI/Components/Inputs/NumberField.razor.js");
+                await module.InvokeVoidAsync("focusWhenReady", input, FocusAttempts);
+            }
+            catch (JSDisconnectedException)
+            {
+                // The page is gone, and the input with it.
+            }
+            catch (Exception exception)
+            {
+                Log.AutoFocusFailed(Logger, exception);
+            }
+        }
+    }
+
+    internal static decimal? Parse(string text) =>
+        decimal.TryParse(text.Trim().Replace(',', '.'), NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var number) ? number : null;
+
+    private async Task OnInput(ChangeEventArgs e)
+    {
+        var typed = e.Value?.ToString() ?? "";
+        text = typed;
+        echoPending = true;
+        await TextChanged.InvokeAsync(typed);
+        await ValueChanged.InvokeAsync(Parse(typed));
+    }
+
+    // Clicking the padding or the unit focuses the input, as the box did when it was a label. Keyboard and screen readers use the input itself.
+    private Task FocusFromBox() => Disabled ? Task.CompletedTask : input.FocusAsync().AsTask();
+
+    private Task OnKeyDown(KeyboardEventArgs e) => e.Key == "Enter" ? OnEnter.InvokeAsync() : Task.CompletedTask;
+
+    private Task Decrease() => StepBy(-Math.Abs(Step));
+
+    private Task Increase() => StepBy(Math.Abs(Step));
+
+    // The parent's value is shown through OnParametersSet, so a parent that doesn't take it keeps the field as it was.
+    private async Task StepBy(decimal delta)
+    {
+        var from = Value ?? Minimum ?? 0;
+        var next = delta > 0 && from > decimal.MaxValue - delta ? decimal.MaxValue
+            : delta < 0 && from < decimal.MinValue - delta ? decimal.MinValue
+            : from + delta;
+        var stepped = Minimum is { } min && next < min ? min : next;
+        // A parent that holds the raw text must get the stepped number as text too, or the text would win and the step would not show.
+        if (Text is not null)
+        {
+            await TextChanged.InvokeAsync(stepped.ToString(CultureInfo.InvariantCulture));
+        }
+
+        await ValueChanged.InvokeAsync(stepped);
+    }
+
+    /// <summary>Moves focus to the input.</summary>
+    public ValueTask FocusAsync() => input.FocusAsync();
+
+    /// <summary>What the number measures, e.g. Amount or Weight (kg). Names the field for screen readers.</summary>
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = "";
+
+    /// <summary>Shows the label above the field. When false (the default) it is kept for screen readers only.</summary>
+    [Parameter]
+    public bool ShowLabel { get; set; }
+
+    /// <summary>Marks the field as required: an asterisk on the label and <c>aria-required</c> on the input.</summary>
+    [Parameter]
+    public bool Required { get; set; }
+
+    /// <summary>The number. Null when empty or when the typed text is not a number.</summary>
+    [Parameter]
+    public decimal? Value { get; set; }
+
+    /// <summary>Raised on every keystroke with the typed number (null when it isn't one), and by the stepper with the new value.</summary>
+    [Parameter]
+    public EventCallback<decimal?> ValueChanged { get; set; }
+
+    /// <summary>
+    /// The text shown in the input, as typed. Bind it (<c>@bind-Text</c>) to show a value that is not a clean number, such as "abc", "22,75" or "007", exactly as it was typed.
+    /// When not null it wins over <see cref="Value"/> for what is shown, and the parent must update both together; <see cref="Value"/> is still what is parsed from it (a comma is a decimal point).
+    /// When null (the default) the field shows <see cref="Value"/> and behaves as it does without this parameter.
+    /// </summary>
+    [Parameter]
+    public string? Text { get; set; }
+
+    /// <summary>Raised on every keystroke with the typed text ("" when empty), just before <see cref="ValueChanged"/>. Lets a parent tell an empty field from text that isn't a number, which both give a null value. Raised by the stepper (with the new number as text) only when <see cref="Text"/> is set.</summary>
+    [Parameter]
+    public EventCallback<string> TextChanged { get; set; }
+
+    /// <summary>Raised when Enter is pressed in the input. Unset: Enter does nothing.</summary>
+    [Parameter]
+    public EventCallback OnEnter { get; set; }
+
+    /// <summary>Shown after the number, e.g. g or kcal.</summary>
+    [Parameter]
+    public string? Unit { get; set; }
+
+    /// <summary>Uses the decimal keyboard. When false the numeric one, for whole numbers. Only the keyboard changes: the parent must validate that the number is whole.</summary>
+    [Parameter]
+    public bool AllowDecimal { get; set; } = true;
+
+    /// <summary>Shows the − and + buttons.</summary>
+    [Parameter]
+    public bool Stepper { get; set; }
+
+    /// <summary>How far − and + move the number. Its absolute value is used, so a negative step does not reverse the buttons; 0 leaves the number where it is.</summary>
+    [Parameter]
+    public decimal Step { get; set; } = 1;
+
+    /// <summary>Lowest number the stepper gives. The − button is off at it. Typing below it is allowed; the parent decides if that is invalid. Null means no lowest.</summary>
+    [Parameter]
+    public decimal? Minimum { get; set; }
+
+    /// <summary>Shows the field as failing validation, without a message. <see cref="InvalidMessage"/> does this too.</summary>
+    [Parameter]
+    public bool Invalid { get; set; }
+
+    /// <summary>Error shown under the field in the error tone and announced. Null or empty means no message.</summary>
+    [Parameter]
+    public string? InvalidMessage { get; set; }
+
+    /// <summary>Less padding either side of the number, so a long one such as 62.5 fits a narrow cell (three fields in a 328px row). The height stays the touch target.</summary>
+    [Parameter]
+    public bool Compact { get; set; }
+
+    /// <summary>Greys out the input and both buttons.</summary>
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    /// <summary>Puts the cursor in the field when it first appears.</summary>
+    [Parameter]
+    public bool AutoFocus { get; set; }
+
+    /// <summary>Value of the data-testid attribute on the input. The buttons, unit, message and the bordered box around the input add -minus, -plus, -unit, -error and -box.</summary>
+    [Parameter]
+    public string? TestId { get; set; }
+}

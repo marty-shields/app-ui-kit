@@ -102,7 +102,7 @@ ol.steps { margin: 0; padding-left: 1.3rem; display: flex; flex-direction: colum
     <h2>Short version</h2>
     <ul>
       <li>The two UI libraries started as copies and have drifted. Of 64 files at the same path in both, 25 are still identical.</li>
-      <li>The plan is a third repo, the kit, holding the tokens, the general components, the stories shell and the design tests. It publishes NuGet packages that both apps install. Screens and app-only components stay in each app.</li>
+      <li>The plan is a third repo, the kit, holding the tokens, the general components, the stories shell and the design tests. It publishes NuGet packages that both apps install. Screens stay in each app, which keeps no tokens or general components of its own.</li>
       <li>The kit repo also builds one stories site from all three repos: Foundations, Components, Calorie Tracker, Workout Log.</li>
       <li>Nothing found blocks this. The general components do not use either app's Core, and the log event ids they share already match in both apps.</li>
       <li>All the design and set-up decisions are made (Part 3). Three technical risks still need a small trial before the full build.</li>
@@ -205,7 +205,7 @@ ol.steps { margin: 0; padding-left: 1.3rem; display: flex; flex-direction: colum
         <h3>calorie-tracker-app</h3>
         <ul>
           <li>Core, the MAUI app, E2E tests</li>
-          <li>Its screens and app-only components (calorie ring, Add sheet, meal headers)</li>
+          <li>Its screens, models and routes. No tokens or general components: the ring, charts, sheets and section headers live in the kit</li>
           <li>Its stories, and its own stories site for PR checks and README screenshots</li>
           <li>Installs the kit packages</li>
         </ul>
@@ -253,7 +253,7 @@ ol.steps { margin: 0; padding-left: 1.3rem; display: flex; flex-direction: colum
           <tr><th>Drifted <span class="tag mid">Agree, then move</span></th><td><code>tokens.css</code>, <code>Icon</code> and <code>IconName</code>, <code>IconButton</code>, <code>Snackbar</code>, <code>NumberField</code>, <code>FilterChips</code>, <code>AppScreen</code>, <code>StartupGate</code>, the bottom bar, <code>StatTile</code>, the card, the period stepper, the chart legend</td><td>One version of each, from your decisions in Part 3.</td></tr>
           <tr><th>General, in one app only <span class="tag mid">Move when wanted</span></th><td>From Workout Log: <code>RadioGroup</code>, <code>ConfirmDialog</code>, <code>FieldInput</code>. From Calorie Tracker: <code>TextField</code>, <code>SelectField</code>, <code>DateStrip</code>.</td><td>Move as is. The other app gains them.</td></tr>
           <tr><th>Stories shell <span class="tag good">Move</span></th><td><code>PhoneFrame</code>, <code>PhoneLayout</code>, <code>ThemeLayout</code>, <code>ThemeSwitch</code>, <code>HoldPull</code>, <code>TokenSheet</code>, <code>AppIconSheet</code>, <code>blazor-ui.css</code>, the host's <code>index.html</code> and <code>iframe.html</code></td><td>All identical today.</td></tr>
-          <tr><th>Stays in each app <span class="tag code">Stay</span></th><td>Every screen page and view, models, routes, charts (<code>TrendBarChart</code>, <code>TrendBars</code>, <code>MonthCalendar</code>, <code>CalorieRing</code>), <code>AddSheet</code>, <code>MealHeader</code>, the workout and week components</td><td>They install the kit and build on it.</td></tr>
+          <tr><th>Stays in each app <span class="tag code">Stay</span></th><td>Every screen page and view, models, routes, and the components that only make sense for one app's data (the workout and week components)</td><td>They install the kit and build on it. Owner decision 2026-11-21: the apps keep no tokens or general components. The kit has <code>ProgressRing</code>, <code>StackedBar</code>, <code>Sheet</code>, <code>SectionHeader</code>, <code>TrendBarChart</code>, <code>MonthCalendar</code> and <code>BarList</code>, some still being built.</td></tr>
         </tbody>
       </table>
     </div>
@@ -269,8 +269,8 @@ ol.steps { margin: 0; padding-left: 1.3rem; display: flex; flex-direction: colum
           <tr><th>Bottom bar and <code>AppScreen</code></th><td>They use each app's own list of tabs (<code>NavDestinations</code>, <code>MainTab</code>).</td><td>The bar takes a list of items, the current one, and the raised button's label and icon. Each app passes its own.</td></tr>
           <tr><th><code>Icon</code></th><td>A fixed list of icon names that differs between the apps (Scan and Star in one, Record and Note in the other).</td><td>The kit holds every icon either app uses. A new icon is a kit change.</td></tr>
           <tr><th><code>theme.js</code></th><td>The storage key and script name contain the app's name. The upgrade tests check that a saved theme survives.</td><td>The key is read from an attribute on the script tag, so each app keeps its current key. Both apps' content security policy allows this.</td></tr>
-          <tr><th>Log event ids</th><td>Each app has its own <code>UiEvent</code> list. Ids never change once logged.</td><td>The kit gets its own list. The shared ids already match in both apps (2001–2002, 2101, 2201–2203, 3301, 3403–3405), so they keep their numbers.</td></tr>
-          <tr><th><code>tokens.css</code></th><td>One file holding shared and app-only tokens.</td><td>The kit ships the shared tokens. Each app keeps a small file for its own (ring and macro colours; meter and calendar sizes).</td></tr>
+          <tr><th>Log event ids</th><td>Each app has its own <code>UiEvent</code> list. Ids never change once logged.</td><td>The kit gets its own list. The shared ids already match in both apps (2001–2002, 2101, 2201–2203, 3301, 3403–3405); the owner then gave the kit its own range, 9000–9999.</td></tr>
+          <tr><th><code>tokens.css</code></th><td>One file holding shared and app-only tokens.</td><td>The kit ships every token, including the chart, ring and calendar ones. Apps keep none of their own.</td></tr>
         </tbody>
       </table>
     </div>
@@ -331,7 +331,7 @@ ol.steps { margin: 0; padding-left: 1.3rem; display: flex; flex-direction: colum
         <thead><tr><th>Check</th><th>Kit</th><th>Each app</th></tr></thead>
         <tbody>
           <tr><th>Tokens only, no literal colours or sizes</th><td>For the kit's CSS</td><td>For the app's CSS, using the kit's token list from the testing package</td></tr>
-          <tr><th>Contrast and touch targets</th><td>For shared tokens and components</td><td>Only for app-only tokens and components</td></tr>
+          <tr><th>Contrast and touch targets</th><td>For every token and kit component</td><td>Only for its own screens</td></tr>
           <tr><th>Component tests (bUnit)</th><td>For moved components</td><td>For app components and screens</td></tr>
           <tr><th>Story for every component and view</th><td>For kit components</td><td>For app components and views</td></tr>
           <tr><th>Story layout (clipping, overflow)</th><td>Kit stories; optionally the combined site</td><td>Unchanged, on the app's own site</td></tr>

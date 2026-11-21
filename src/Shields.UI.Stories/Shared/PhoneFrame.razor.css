@@ -1,0 +1,65 @@
+.frame {
+    margin: var(--space-4) auto;
+    width: fit-content;
+}
+
+.phone {
+    --inset-top: var(--stories-phone-inset);
+    --inset-bottom: var(--stories-phone-inset);
+    position: relative;
+    box-sizing: content-box;
+    width: var(--stories-phone-width);
+    height: var(--stories-phone-height);
+    overflow: hidden;
+    border: var(--stories-bezel-width) solid var(--stories-bezel-colour);
+    border-radius: var(--stories-phone-radius);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    transform: translateZ(0);
+}
+
+.viewport {
+    position: absolute;
+    inset: 0;
+    /* Lets a story fill the frame with 100cqh, as a screen fills the viewport in an app. */
+    container-type: size;
+}
+
+.status-bar,
+.nav-bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+    background-color: var(--stories-phone-bar-tint);
+    font-size: var(--stories-phone-bar-font-size);
+}
+
+.status-bar {
+    top: 0;
+    height: var(--inset-top);
+    padding: 0 var(--stories-phone-bar-padding);
+    background-color: var(--color-bar);
+    color: var(--color-on-bar);
+}
+
+.nav-bar {
+    bottom: 0;
+    height: var(--inset-bottom);
+    justify-content: center;
+}
+
+.handle {
+    width: var(--stories-handle-width);
+    height: var(--stories-handle-height);
+    border-radius: var(--stories-handle-radius);
+    background-color: currentColor;
+}
+
+/* Hides scrollbars inside the phone, as on Android. */
+.viewport ::deep * {
+    scrollbar-width: none;
+}

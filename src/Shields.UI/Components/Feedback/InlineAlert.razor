@@ -1,0 +1,31 @@
+@if (!string.IsNullOrEmpty(Message) || ChildContent is not null)
+{
+    <div class="alert @ToneClass" role="alert" data-testid="@TestId">
+        @Message
+        @ChildContent
+    </div>
+}
+
+@code {
+    /// <summary>Text of the alert. With no message and no content nothing is rendered. Shown before <see cref="ChildContent"/>.</summary>
+    [Parameter]
+    public string? Message { get; set; }
+
+    /// <summary>Markup after the message, for an alert that holds more than plain text.</summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>Colour of the border and text.</summary>
+    [Parameter]
+    public AlertTone Tone { get; set; }
+
+    /// <summary>Value of the data-testid attribute.</summary>
+    [Parameter]
+    public string? TestId { get; set; }
+
+    private string ToneClass => Tone switch
+    {
+        AlertTone.Error => "error",
+        _ => "error",
+    };
+}

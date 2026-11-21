@@ -1,0 +1,74 @@
+.stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.track {
+    display: flex;
+    gap: var(--stacked-bar-gap);
+    height: var(--stacked-bar-height);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+
+.track.none {
+    background-color: var(--color-ring-track);
+}
+
+.segment {
+    flex-basis: 0;
+    /* Keeps a tiny share visible. */
+    min-width: var(--stacked-bar-segment-min-width);
+}
+
+.labels {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-1) var(--space-2);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+}
+
+.label {
+    display: flex;
+    align-items: center;
+    max-width: 100%;
+    min-width: 0;
+    white-space: nowrap;
+}
+
+/* Only the text shrinks, so the value always stays visible. */
+.label-text {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.label strong {
+    flex-shrink: 0;
+    margin-left: var(--space-1);
+    color: var(--color-text);
+    font-weight: var(--font-weight-bold);
+}
+
+.label::before {
+    content: "";
+    display: inline-block;
+    width: var(--legend-swatch-size);
+    height: var(--legend-swatch-size);
+    flex-shrink: 0;
+    margin-right: var(--space-1);
+    border-radius: var(--radius-round);
+}
+
+.series-1 { --series: var(--color-data-1); }
+.series-2 { --series: var(--color-data-2); }
+.series-3 { --series: var(--color-data-3); }
+.series-4 { --series: var(--color-data-4); }
+.series-5 { --series: var(--color-data-5); }
+
+.segment, .label::before {
+    background-color: var(--series);
+}

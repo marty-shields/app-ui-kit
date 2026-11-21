@@ -1,0 +1,333 @@
+@using System.Globalization
+<svg class="chart" viewBox="0 0 @N(Width) @N(Height)" role="group" aria-label="@Label" data-testid="@TestId">
+    @foreach (var tick in Ticks)
+    {
+        <line class="grid" x1="@N(Left)" x2="@N(Right)" y1="@N(Y(tick))" y2="@N(Y(tick))" data-testid="@Id($"grid-{N(tick)}")" />
+        @Text("tick", Left - 6, Y(tick) + 4, "end", TickText(tick), Id($"tick-{N(tick)}"))
+    }
+    @if (!Past && TargetStatuses.ValidTarget(Target) is { } goal)
+    {
+        <g class="band" data-testid="@Id("band")">
+            @if (OnScale(goal * (1 + TargetStatuses.Tolerance)))
+            {
+                <line class="band-edge" x1="@N(Left)" x2="@N(Right)" y1="@N(Y(goal * (1 + TargetStatuses.Tolerance)))" y2="@N(Y(goal * (1 + TargetStatuses.Tolerance)))" data-testid="@Id("band-top")" />
+            }
+            @if (OnScale(goal * (1 - TargetStatuses.Tolerance)))
+            {
+                <line class="band-edge" x1="@N(Left)" x2="@N(Right)" y1="@N(Y(goal * (1 - TargetStatuses.Tolerance)))" y2="@N(Y(goal * (1 - TargetStatuses.Tolerance)))" data-testid="@Id("band-bottom")" />
+            }
+        </g>
+        @if (OnScale(goal))
+        {
+            <line class="target" x1="@N(Left)" x2="@N(Right)" y1="@N(Y(goal))" y2="@N(Y(goal))" data-testid="@Id("target")" />
+        }
+    }
+    @if (!Bars.Any(Drawn))
+    {
+        @Text("empty", (Left + Right) / 2, (Top + Base) / 2, "middle", EmptyText, Id("empty"))
+    }
+    @for (var i = 0; i < Bars.Count; i++)
+    {
+        var bar = Bars[i];
+        var selectable = OnSelect.HasDelegate && bar.Selectable;
+        var slotX = Left + i * Slot;
+        var centre = slotX + Slot / 2;
+        @Text(bar.Current ? "axis-label current" : "axis-label", centre, Height - 8, "middle", Short(bar.Label), hidden: true)
+        if (Drawn(bar))
+        {
+            var recorded = TargetStatuses.IsRecorded(bar.Value);
+            var value = recorded ? bar.Value!.Value : 0;
+            var status = Past || !recorded ? TargetStatus.None : TargetStatuses.Of(value, TargetStatuses.ValidTarget(bar.Target) ?? Target);
+            var top = Y(value);
+            var height = Base - top;
+            var width = paired ? Slot * PairedWidth : Slot * 0.6;
+            var left = paired ? centre + Slot * PairedGap / 2 : centre - width / 2;
+            var name = Name(bar, status);
+            <g class="@BarClass(bar, status, selectable)" role="@(selectable ? "button" : "img")" tabindex="@(selectable ? "0" : null)" aria-label="@name" data-testid="@Id($"bar-{Day(bar)}")"
+               @onclick="() => Select(bar)" @onkeydown="e => OnKey(e, bar)">
+                <rect class="hit" x="@N(slotX)" y="@N(Top)" width="@N(Slot)" height="@N(Base - Top)" />
+                @if (paired && TargetStatuses.IsRecorded(bar.Earlier))
+                {
+                    var earlierTop = Y(bar.Earlier!.Value);
+                    <path class="column earlier" d="@Column(centre - Slot * PairedGap / 2 - width, width, earlierTop, Base - earlierTop)" data-height="@N(Base - earlierTop)" data-testid="@Id($"earlier-{Day(bar)}")" />
+                }
+                @if (recorded)
+                {
+                    <path class="column" d="@Column(left, width, top, height)" data-height="@N(height)" data-testid="@Id($"column-{Day(bar)}")" />
+                }
+                @if (status == TargetStatus.Over && ShowOverMarker)
+                {
+                    <path class="marker" d="M @N(centre - 4) @N(top - 4) L @N(centre + 4) @N(top - 4) L @N(centre) @N(top - 11) Z" data-testid="@Id($"marker-{Day(bar)}")" />
+                }
+                @if (recorded && (Past ? bar.Labelled : bar == highest))
+                {
+                    var labelTop = paired && TargetStatuses.IsRecorded(bar.Earlier) ? Math.Min(top, Y(bar.Earlier!.Value)) : top;
+                    @Text("value-label", left + width / 2, labelTop - (status == TargetStatus.Over && ShowOverMarker ? 15 : 6), "middle", TargetStatuses.Number(value), Id(Past ? $"value-label-{Day(bar)}" : "value-label"))
+                }
+                @{ var tip = Tip(bar); }
+                @Text("tip", TipX(centre, tip), 12, "middle", tip, hidden: true)
+            </g>
+        }
+        else
+        {
+            <rect class="gap" x="@N(slotX)" y="@N(Top)" width="@N(Slot)" height="@N(Base - Top)" data-testid="@Id($"gap-{Day(bar)}")" />
+        }
+    }
+    <line class="baseline" x1="@N(Left)" x2="@N(Right)" y1="@N(Base)" y2="@N(Base)" data-testid="@Id("baseline")" />
+</svg>
+
+@code {
+    private const double Width = 320;
+    private const double Height = 200;
+    private const double Left = 34;
+    private const double Right = 312;
+    private const double Top = 44;
+    private const double Base = 176;
+    private const double TipMargin = 4;
+
+    /// <summary>Width of one character of the bold tooltip text in viewBox units, rounded up.</summary>
+    private const double TipCharWidth = 9;
+
+    /// <summary>The scale never has more intervals than this.</summary>
+    private const int MaxIntervals = 4;
+
+    /// <summary>The step search runs from 10^-6 up to this power of ten.</summary>
+    private const int MaxExponent = 15;
+
+    private const int MinExponent = -6;
+
+    /// <summary>The tallest value the scale draws; larger ones are drawn at this height. Four intervals of the largest step.</summary>
+    private const double MaxScale = 2e16;
+
+    private static readonly double[] TickSteps = [1, 2, 5];
+
+    /// <summary>The bars, left to right.</summary>
+    [Parameter]
+    public IReadOnlyList<TrendBarPoint> Bars { get; set; } = [];
+
+    /// <summary>The target. Draws the dashed target line and the outline of the band 10% either side of it, and sets each bar's status. Null or zero draws neither.</summary>
+    [Parameter]
+    public double? Target { get; set; }
+
+    /// <summary>Raised with the bar's date when a bar is clicked, or has focus and gets Enter or Space. Without a handler the bars are not buttons and cannot be focused, nor are those whose <see cref="TrendBarPoint.Selectable"/> is false.</summary>
+    [Parameter]
+    public EventCallback<DateOnly> OnSelect { get; set; }
+
+    /// <summary>Format of the bar's date in its text alternative and tooltip.</summary>
+    [Parameter]
+    public string DateFormat { get; set; } = "ddd d MMM";
+
+    /// <summary>The text alternative of the whole chart.</summary>
+    [Parameter]
+    public string Label { get; set; } = "Values by day";
+
+    /// <summary>The unit that follows each value in a bar's text alternative and tooltip, such as "steps". Null for none.</summary>
+    [Parameter]
+    public string? Unit { get; set; }
+
+    /// <summary>
+    /// The value at the top of the y scale, so charts of different periods share one scale. Ticks keep the 1, 2, 5 steps up to it and a bar above it is drawn at the top. The target line and each edge of the band that lie above it are not drawn.
+    /// Null, zero, negative or non-finite means a scale that fits the tallest bar and the band.
+    /// </summary>
+    [Parameter]
+    public double? Max { get; set; }
+
+    /// <summary>The text shown in the chart when no bar has a value.</summary>
+    [Parameter]
+    public string EmptyText { get; set; } = "Nothing recorded yet";
+
+    /// <summary>Value of the data-testid attribute, and the prefix of the parts: <c>-band</c> (with <c>-band-top</c> and <c>-band-bottom</c>), <c>-target</c>, <c>-baseline</c>, <c>-tick-{value}</c> and <c>-grid-{value}</c> (the value in invariant "0.##" form), <c>-bar-{date}</c>, <c>-column-{date}</c>, <c>-marker-{date}</c>, <c>-gap-{date}</c>, <c>-value-label</c> (<c>-value-label-{date}</c> with <see cref="TrendBarStyle.PastAndCurrent"/>), <c>-earlier-{date}</c>, <c>-empty</c>.</summary>
+    [Parameter]
+    public string? TestId { get; set; }
+
+    /// <summary>
+    /// Whether an Over bar gets a ▲. True by default. With false, Over is shown by colour alone on screen (the accessible name still says "over target"), so keep another cue, such as a <see cref="ChartLegend"/> entry or text. The value label above an Over bar then sits as close as above any other.
+    /// </summary>
+    [Parameter]
+    public bool ShowOverMarker { get; set; } = true;
+
+    /// <summary>How the bars are coloured. <see cref="TrendBarStyle.Status"/> by default.</summary>
+    [Parameter]
+    public TrendBarStyle Style { get; set; }
+
+    /// <summary>Words before a bar's <see cref="TrendBarPoint.Earlier"/> value in its text alternative, such as "last week".</summary>
+    [Parameter]
+    public string EarlierLabel { get; set; } = "earlier";
+
+    /// <summary>Slot share of one bar of a pair, and of the gap between them.</summary>
+    private const double PairedWidth = 0.32;
+
+    private const double PairedGap = 0.04;
+
+    private TrendBarPoint? highest;
+
+    private bool paired;
+
+    private bool Past => Style == TrendBarStyle.PastAndCurrent;
+
+    protected override void OnParametersSet()
+    {
+        highest = Bars.Where(b => TargetStatuses.IsRecorded(b.Value)).MaxBy(b => b.Value);
+        paired = Past && Bars.Any(b => TargetStatuses.IsRecorded(b.Earlier));
+    }
+
+    /// <summary>Whether the bar has something to draw: a value, or in a paired chart an earlier value.</summary>
+    private bool Drawn(TrendBarPoint bar) => TargetStatuses.IsRecorded(bar.Value) || (Past && TargetStatuses.IsRecorded(bar.Earlier));
+
+    private double Slot => (Right - Left) / Math.Max(Bars.Count, 1);
+
+    /// <summary>The smallest of 1, 2, 5 times a power of ten (which may be below one) that puts the tallest bar and the band within four intervals of the scale. 1 when nothing is drawn.</summary>
+    private double TickStep
+    {
+        get
+        {
+            if (Extent <= 0)
+            {
+                return 1;
+            }
+
+            var step = 1.0;
+            for (var exponent = MinExponent; exponent <= MaxExponent; exponent++)
+            {
+                foreach (var multiple in TickSteps)
+                {
+                    step = multiple * Math.Pow(10, exponent);
+                    if (Math.Ceiling(Extent / step - 1e-9) <= MaxIntervals)
+                    {
+                        return step;
+                    }
+                }
+            }
+
+            return step;
+        }
+    }
+
+    private double? FixedMax => Max is > 0 && double.IsFinite(Max.Value) ? Math.Min(Max.Value, MaxScale) : null;
+
+    /// <summary>The number of intervals up to the top tick: the one at or above the tallest bar, or with <see cref="Max"/> the last one at or below it.</summary>
+    private int Intervals => FixedMax is null
+        ? Math.Max(1, (int)Math.Ceiling(Extent / TickStep - 1e-9))
+        : (int)Math.Floor(Extent / TickStep + 1e-9);
+
+    /// <summary>The top of the y scale: <see cref="Max"/> when set, else the first tick at or above the tallest bar and the band. The space above it holds the tooltip, the value and the over marker.</summary>
+    private double Scale => FixedMax ?? Intervals * TickStep;
+
+    /// <summary>The height the ticks are chosen for: <see cref="Max"/> when set, else the data.</summary>
+    private double Extent => FixedMax ?? MaxValue;
+
+    /// <summary>The tallest bar, the band's top and the per-bar targets, which an unset <see cref="Max"/> has to hold.</summary>
+    private double MaxValue => Math.Min(
+        MaxScale,
+        Bars.Where(Drawn)
+            .SelectMany(b => new[]
+            {
+                TargetStatuses.IsRecorded(b.Value) ? b.Value!.Value : 0,
+                TargetStatuses.IsRecorded(b.Earlier) && Past ? b.Earlier!.Value : 0,
+                !Past && TargetStatuses.ValidTarget(b.Target) is { } own ? own * (1 + TargetStatuses.Tolerance) : 0,
+            })
+            .Append(!Past && TargetStatuses.ValidTarget(Target) is { } target ? target * (1 + TargetStatuses.Tolerance) : 0)
+            .Max());
+
+    private IEnumerable<double> Ticks => Enumerable.Range(0, Intervals + 1).Select(i => i * TickStep);
+
+    /// <summary>Whether the value is within the scale, so a line at it can be drawn.</summary>
+    private bool OnScale(double value) => value <= Scale * (1 + 1e-9);
+
+    private double Y(double value) => Base - Math.Min(value, Scale) / Scale * (Base - Top);
+
+    private string Column(double x, double width, double top, double height)
+    {
+        var r = Math.Min(4, Math.Min(width / 2, height));
+        return $"M {N(x)} {N(Base)} V {N(top + r)} A {N(r)} {N(r)} 0 0 1 {N(x + r)} {N(top)} H {N(x + width - r)} A {N(r)} {N(r)} 0 0 1 {N(x + width)} {N(top + r)} V {N(Base)} Z";
+    }
+
+    private string Name(TrendBarPoint bar, TargetStatus status) =>
+        $"{Tip(bar)}" + (status == TargetStatus.None ? "" : $", {TargetStatuses.Word(status)}") + (bar.Note is null ? "" : $", {bar.Note}")
+        + (Past && bar.Current ? ", current" : "");
+
+    private string UnitSuffix => Unit is null ? "" : $" {Unit}";
+
+    /// <summary>The date and value, and in a paired chart the earlier value; the status is in the colour and the marker.</summary>
+    private string Tip(TrendBarPoint bar) => bar.Date.ToString(DateFormat, CultureInfo.InvariantCulture)
+        + (TargetStatuses.IsRecorded(bar.Value) ? $", {TargetStatuses.Number(bar.Value!.Value)}{UnitSuffix}" : "")
+        + (paired && TargetStatuses.IsRecorded(bar.Earlier) ? $", {EarlierLabel} {TargetStatuses.Number(bar.Earlier!.Value)}{UnitSuffix}" : "");
+
+    private string BarClass(TrendBarPoint bar, TargetStatus status, bool selectable) =>
+        $"bar {(Past ? (bar.Current || paired ? "now" : "past") : TargetStatuses.Class(status))}" + (selectable ? " selectable" : "") + (bar.Note is not null ? " thin" : "");
+
+    private static string Day(TrendBarPoint bar) => bar.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+
+    /// <summary>The tooltip's centre, kept far enough from both ends of the chart for the whole text to show.</summary>
+    private static double TipX(double centre, string tip)
+    {
+        var half = tip.Length * TipCharWidth / 2 + TipMargin;
+        if (half >= Width / 2)
+        {
+            return Width / 2;
+        }
+
+        return Math.Clamp(centre, half, Width - half);
+    }
+
+    /// <summary>The label cut to what fits under its slot: about three characters for a week of bars, one letter for a year. A number is never cut, as "12" would read as "1".</summary>
+    private string Short(string label)
+    {
+        if (label.All(char.IsDigit))
+        {
+            return label;
+        }
+
+        var fit = Math.Max((int)(Slot / 12), 1);
+        return label.Length <= fit ? label : fit == 1 ? label[..1] : label[..(fit - 1)] + "…";
+    }
+
+    private static string TickText(double tick) => tick switch
+    {
+        < 1e3 => N(tick),
+        < 1e6 => $"{(tick / 1e3).ToString("0.#", CultureInfo.InvariantCulture)}k",
+        < 1e9 => $"{(tick / 1e6).ToString("0.#", CultureInfo.InvariantCulture)}M",
+        _ => $"{(tick / 1e9).ToString("0.#", CultureInfo.InvariantCulture)}B",
+    };
+
+    private async Task Select(TrendBarPoint bar)
+    {
+        if (bar.Selectable)
+        {
+            await OnSelect.InvokeAsync(bar.Date);
+        }
+    }
+
+    private async Task OnKey(KeyboardEventArgs e, TrendBarPoint bar)
+    {
+        if (e.Key is "Enter" or " ")
+        {
+            await Select(bar);
+        }
+    }
+
+    private RenderFragment Text(string cssClass, double x, double y, string anchor, string content, string? testId = null, bool hidden = false) => builder =>
+    {
+        builder.OpenElement(0, "text");
+        builder.AddAttribute(1, "class", cssClass);
+        builder.AddAttribute(2, "x", N(x));
+        builder.AddAttribute(3, "y", N(y));
+        builder.AddAttribute(4, "text-anchor", anchor);
+        if (hidden)
+        {
+            builder.AddAttribute(5, "aria-hidden", "true");
+        }
+
+        if (testId is not null)
+        {
+            builder.AddAttribute(6, "data-testid", testId);
+        }
+
+        builder.AddContent(7, content);
+        builder.CloseElement();
+    };
+
+    private string? Id(string part) => TestId is null ? null : $"{TestId}-{part}";
+
+    private static string N(double value) => value.ToString("0.##", CultureInfo.InvariantCulture);
+}

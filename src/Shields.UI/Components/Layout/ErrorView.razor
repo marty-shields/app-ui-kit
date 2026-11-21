@@ -1,0 +1,26 @@
+<div class="screen">
+    @if (Title is not null)
+    {
+        <header class="top-bar" data-testid="error-top-bar">
+            <h1 class="title">@Title</h1>
+        </header>
+    }
+    <div class="centre">
+        <p class="message" role="alert" data-testid="error-message">Something went wrong</p>
+    </div>
+    <footer class="bottom">
+        <div class="bottom-bar" data-testid="error-bottom-bar">
+            <AppButton FullWidth TestId="error-restart" OnClick="OnRestart">Restart</AppButton>
+        </div>
+    </footer>
+</div>
+
+@code {
+    /// <summary>App name shown at the top. Null shows no title.</summary>
+    [Parameter]
+    public string? Title { get; set; }
+
+    /// <summary>Raised by Restart.</summary>
+    [Parameter]
+    public EventCallback OnRestart { get; set; }
+}

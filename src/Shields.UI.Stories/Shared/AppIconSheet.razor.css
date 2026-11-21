@@ -1,0 +1,107 @@
+.sheet {
+    padding: var(--space-4);
+    font-family: var(--font-family);
+}
+
+section + section {
+    margin-top: var(--stories-section-gap);
+}
+
+.heading {
+    margin: 0 0 var(--space-2);
+    font-size: var(--font-size-lg);
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--space-6);
+}
+
+.icon {
+    margin: 0;
+    text-align: center;
+}
+
+.icon figcaption {
+    margin-top: var(--space-1);
+    font-size: var(--stories-caption-font-size);
+}
+
+/* The launcher shows the central 72 of the 108-unit canvas. */
+.mask {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+}
+
+.size-48 {
+    width: var(--stories-icon-size-small);
+    height: var(--stories-icon-size-small);
+}
+
+.size-192 {
+    width: var(--stories-icon-size-large);
+    height: var(--stories-icon-size-large);
+}
+
+.layer {
+    position: absolute;
+    top: var(--stories-layer-offset);
+    left: var(--stories-layer-offset);
+    width: var(--stories-layer-size);
+    height: var(--stories-layer-size);
+}
+
+.circle {
+    border-radius: var(--radius-round);
+}
+
+.squircle {
+    border-radius: var(--stories-squircle-radius);
+}
+
+/* Android tints the monochrome layer's shape; these stand in for wallpaper tones. */
+.silhouette {
+    mask-size: 100% 100%;
+}
+
+.light-wallpaper {
+    background-color: var(--stories-wallpaper-light);
+}
+
+.light-wallpaper .silhouette {
+    background-color: var(--stories-silhouette-on-light);
+}
+
+.dark-wallpaper {
+    background-color: var(--stories-wallpaper-dark);
+}
+
+.dark-wallpaper .silhouette {
+    background-color: var(--stories-silhouette-on-dark);
+}
+
+/* A 412 × 915 phone at half size, with the splash canvas at about the size Android 12+ shows it. */
+.splash {
+    display: grid;
+    place-items: center;
+    width: var(--stories-splash-width);
+    height: var(--stories-splash-height);
+    border: var(--stories-splash-border-width) solid var(--stories-bezel-colour);
+    border-radius: var(--stories-splash-radius);
+}
+
+.splash.light {
+    background-color: var(--stories-splash-light);
+}
+
+.splash.dark {
+    background-color: var(--stories-splash-dark);
+}
+
+.splash-image {
+    width: var(--stories-splash-image-size);
+    height: var(--stories-splash-image-size);
+}

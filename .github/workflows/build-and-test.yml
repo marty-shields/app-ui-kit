@@ -1,0 +1,60 @@
+# Builds and tests the kit on every PR to main or into an epic branch (epic/**, see docs/epics.md) and on every push to main, and runs the CI script checks.
+# A push to main reports after the merge and does not stop it.
+name: Build and test
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [main, "epic/**"]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-and-test-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build-and-test:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Test the CI scripts
+        run: .github/scripts/tests/run.sh
+
+      - name: Lint the CI scripts and workflows
+        run: .github/scripts/lint-ci.sh
+
+      # Fails on an XML doc comment that only restates the name of its member.
+      - name: Check for filler doc comments
+        run: python3 -I .github/scripts/check-filler-comments.py
+
+      # Fails on a broken relative link or #anchor in a tracked Markdown file.
+      - name: Check the docs
+        run: python3 -I .github/scripts/check-docs.py
+
+      # CI is set on the runner, so the restore is locked: it fails when a packages.lock.json would change.
+      - name: Restore
+        run: dotnet restore Shields.UI.slnx
+
+      - name: Build
+        run: dotnet build Shields.UI.slnx --no-restore
+
+      # Fails on a file that breaks .editorconfig, such as import order, braces or private field names.
+      - name: Check code style
+        run: dotnet format Shields.UI.slnx --verify-no-changes --no-restore
+
+      - name: Test
+        timeout-minutes: 10
+        run: dotnet test tests/Shields.UI.Tests --no-build

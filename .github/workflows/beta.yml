@@ -1,0 +1,112 @@
+# Publishes prerelease packages of a PR into main that has the publish-beta label (docs/release.md), so an app can try a
+# kit change before it merges: Shields.UI, Shields.UI.Stories and Shields.UI.Testing at <next release>-pr.<PR>.<run number>,
+# pushed to nuget.org with Trusted Publishing (no API key is stored). A PR without the label, or from a fork, publishes nothing.
+# It uses pull_request, never pull_request_target, so a fork's code never runs with the publishing token. The pack job runs
+# the PR's own code and has no id-token permission; only the publish job, bound to the beta environment (whose reviewer
+# must approve), can get a nuget.org token, and it runs no PR code.
+name: Beta packages
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, labeled]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: beta-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  pack:
+    # Labelling a PR with anything but publish-beta publishes nothing.
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository
+      && contains(github.event.pull_request.labels.*.name, 'publish-beta')
+      && (github.event.action != 'labeled' || github.event.label.name == 'publish-beta')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      # The version the PR's merge would release, with the PR's own semver label counted, from main as it is now.
+      - name: Next version
+        id: next
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PENDING_LABELS: ${{ join(github.event.pull_request.labels.*.name, ' ') }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: .github/scripts/next-version.sh v "$BASE_SHA"
+
+      # A run number only grows, so each push to the PR gets a higher version; a re-run of a run keeps its number.
+      - name: Pack
+        env:
+          NEXT_VERSION: ${{ steps.next.outputs.version }}
+          RELEASE: ${{ steps.next.outputs.release }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          if [[ "$RELEASE" != "true" || -z "$NEXT_VERSION" ]]; then
+            echo "::error title=Beta::No next release version was worked out (release=${RELEASE:-unset}, version=${NEXT_VERSION:-empty})."
+            exit 1
+          fi
+          VERSION="$NEXT_VERSION-pr.$PR_NUMBER.$RUN_NUMBER"
+          echo "Beta version $VERSION"
+          for project in Shields.UI Shields.UI.Stories Shields.UI.Testing; do
+            dotnet pack "src/$project" -c Release -p:Version="$VERSION" -o "$RUNNER_TEMP/packages"
+          done
+          test "$(find "$RUNNER_TEMP/packages" -name "*.$VERSION.nupkg" | wc -l)" -eq 3
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: packages
+          path: ${{ runner.temp }}/packages/*.nupkg
+          if-no-files-found: error
+          retention-days: 1
+
+  # Runs none of the PR's code: it only downloads the packages and pushes them. The beta environment makes the token
+  # exchange need the environment's approval, and the nuget.org policy only accepts a token issued for that environment.
+  publish:
+    needs: pack
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: beta
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: NuGet user set
+        env:
+          NUGET_USER: ${{ vars.NUGET_USER }}
+        run: |
+          if [[ -z "$NUGET_USER" ]]; then
+            echo "::error title=Beta::The repo variable NUGET_USER is empty: set it to the nuget.org user name (docs/release.md)."
+            exit 1
+          fi
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: packages
+          path: ${{ runner.temp }}/packages
+
+      - name: NuGet login
+        id: login
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
+        with:
+          user: ${{ vars.NUGET_USER }}
+
+      - name: Push to nuget.org
+        env:
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+        run: dotnet nuget push "$RUNNER_TEMP/packages/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY" --skip-duplicate

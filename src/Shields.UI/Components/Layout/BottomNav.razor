@@ -1,0 +1,66 @@
+<nav class="bottom-nav" aria-label="Main" data-testid="bottom-nav">
+    <div class="side">
+        @foreach (var item in Items.Take(Split))
+        {
+            @Tab(item)
+        }
+    </div>
+    <button type="button" class="add" @attributes="AddButtonAttributes" data-testid="add-button" aria-haspopup="@AddHasPopup" @onclick="OnAdd">
+        <span class="fab"><Icon Name="AddIcon" /></span>
+        <span class="label">@AddLabel</span>
+    </button>
+    <div class="side">
+        @foreach (var item in Items.Skip(Split))
+        {
+            @Tab(item)
+        }
+    </div>
+</nav>
+
+@code {
+    private RenderFragment Tab(BottomNavItem item) => @<button type="button"
+                class="item @(item == Current ? "current" : null)"
+                aria-current="@(item == Current ? "page" : null)"
+                data-testid="@item.TestId"
+                @onclick="() => Navigate(item)">
+            <span class="indicator"><Icon Name="item.Icon" /></span>
+            <span class="label">@item.Label</span>
+        </button>;
+
+    /// <summary>The tabs, in order; each must be a distinct value, as the current one is found by equality. The raised button sits after the first half, one more going left of it when the count is odd.</summary>
+    [Parameter, EditorRequired]
+    public IReadOnlyList<BottomNavItem> Items { get; set; } = [];
+
+    /// <summary>The tab of the screen showing, marked as the current page. One of <see cref="Items"/>, matched by value equality, so no two items may be equal; null marks none.</summary>
+    [Parameter]
+    public BottomNavItem? Current { get; set; }
+
+    /// <summary>The words under the raised button.</summary>
+    [Parameter, EditorRequired]
+    public string AddLabel { get; set; } = "";
+
+    /// <summary>The icon in the raised button.</summary>
+    [Parameter, EditorRequired]
+    public IconName AddIcon { get; set; }
+
+    /// <summary>Value of the raised button's aria-haspopup, e.g. <c>dialog</c> when it opens one. Null leaves the attribute off.</summary>
+    [Parameter]
+    public string? AddHasPopup { get; set; }
+
+    /// <summary>Extra attributes for the raised button, e.g. <c>data-sheet-opener</c> so a sheet can return focus to it. Applied first, so they never replace its data-testid, aria-haspopup or click handling.</summary>
+    [Parameter]
+    public IReadOnlyDictionary<string, object>? AddButtonAttributes { get; set; }
+
+    /// <summary>Raised with the tapped tab. Not raised for the current one.</summary>
+    [Parameter]
+    public EventCallback<BottomNavItem> OnNavigate { get; set; }
+
+    /// <summary>Raised by the raised button, which is an action and never shows as the current tab.</summary>
+    [Parameter]
+    public EventCallback OnAdd { get; set; }
+
+    private int Split => (Items.Count + 1) / 2;
+
+    private Task Navigate(BottomNavItem item) =>
+        item == Current ? Task.CompletedTask : OnNavigate.InvokeAsync(item);
+}

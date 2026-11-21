@@ -1,0 +1,303 @@
+using System.Text.RegularExpressions;
+using Shields.UI.Components.Layout;
+
+namespace Shields.UI.Tests.Components.Layout;
+
+public class CardTests : ComponentTestBase
+{
+    [Test]
+    public void ShowsTheTitleAsAHeadingWithTheAsideAndContent()
+    {
+        var cut = Context.Render<Card>(p => p
+            .Add(x => x.Title, "Records")
+            .Add(x => x.Aside, "1 this week")
+            .Add(x => x.ChildContent, "<p class=\"inside\">Hello</p>")
+            .Add(x => x.TestId, "card"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find("h2").TextContent, Is.EqualTo("Records"));
+            Assert.That(cut.Find("[data-testid=card-aside]").TextContent, Is.EqualTo("1 this week"));
+            Assert.That(cut.Find(".inside").TextContent, Is.EqualTo("Hello"));
+        });
+    }
+
+    [TestCase("Records", "section")]
+    [TestCase(null, "div")]
+    public void Compact_AddsTheCompactClass_WithAndWithoutATitle(string? title, string tag)
+    {
+        var compact = Context.Render<Card>(p => p.Add(x => x.Title, title).Add(x => x.Compact, true));
+        var normal = Context.Render<Card>(p => p.Add(x => x.Title, title));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(compact.Find(tag + ".card").ClassList, Does.Contain("compact"));
+            Assert.That(normal.Find(tag + ".card").ClassList, Does.Not.Contain("compact"));
+        });
+    }
+
+    [Test]
+    public void Css_Compact_UsesTheCompactTokens()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Layout", "Card.razor.css");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(css, Does.Contain("padding: var(--card-compact-padding);"));
+            Assert.That(css, Does.Contain("margin-bottom: var(--card-compact-title-gap);"));
+            Assert.That(KitCss.Tokens, Does.Contain("--card-compact-padding: var(--space-4) var(--space-4) 0;"));
+            Assert.That(KitCss.Tokens, Does.Contain("--card-compact-title-gap: var(--space-2);"));
+        });
+    }
+
+    [TestCase("Done", true, true)]
+    [TestCase(null, true, true)]
+    [TestCase("Done", false, false)]
+    public void WithoutContent_MarksTheCardNoBody_AndTrimsItOnlyWithActions(string? title, bool withActions, bool trimmed)
+    {
+        var cut = Context.Render<Card>(p =>
+        {
+            p.Add(x => x.Title, title);
+            if (withActions)
+            {
+                p.Add(x => x.HeaderActions, "<button>Edit</button>");
+            }
+            else
+            {
+                p.Add(x => x.Aside, "1");
+            }
+        });
+
+        var card = cut.Find(".card");
+        Assert.Multiple(() =>
+        {
+            Assert.That(card.ClassList, Does.Contain("no-body"));
+            Assert.That(card.ClassList.Contains("header-only-actions"), Is.EqualTo(trimmed));
+        });
+    }
+
+    [TestCase("Open")]
+    [TestCase(null)]
+    public void WithContent_HasNoNoBodyClass(string? title)
+    {
+        var cut = Context.Render<Card>(p => p
+            .Add(x => x.Title, title)
+            .Add(x => x.HeaderActions, "<button>Edit</button>")
+            .Add(x => x.ChildContent, "<p>Body</p>"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find(".card").ClassList, Does.Not.Contain("no-body"));
+            Assert.That(cut.Find(".card").ClassList, Does.Not.Contain("header-only-actions"));
+        });
+    }
+
+    [Test]
+    public void Css_NoBody_DropsTheHeaderGapAndTrimsPaddingWithActions()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Layout", "Card.razor.css");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(css, Does.Contain(".no-body .header {\n    margin: 0;\n}"));
+            Assert.That(css, Does.Contain(".card.header-only-actions {\n    padding-block: var(--space-1);\n}"));
+            Assert.That(css, Does.Contain("margin-top: calc(-1 * var(--space-2));"));
+        });
+    }
+
+    [Test]
+    public void WithoutAnAside_ShowsNone()
+    {
+        var cut = Context.Render<Card>(p => p.Add(x => x.Title, "Weeks").Add(x => x.TestId, "card"));
+
+        Assert.That(cut.FindAll("[data-testid=card-aside]"), Is.Empty);
+    }
+
+    [Test]
+    public void WithoutATitle_ShowsOnlyTheContent()
+    {
+        var cut = Context.Render<Card>(p => p
+            .Add(x => x.Aside, "ignored")
+            .AddChildContent("<span>Eaten 659</span>")
+            .Add(x => x.TestId, "card"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find("[data-testid=card] span").TextContent, Is.EqualTo("Eaten 659"));
+            Assert.That(cut.FindAll("h2, .header, .aside"), Is.Empty);
+        });
+    }
+
+    [Test]
+    public void WithATitle_IsASection_AndWithoutOneADiv()
+    {
+        var titled = Context.Render<Card>(p => p.Add(x => x.Title, "Weeks"));
+        var plain = Context.Render<Card>(p => p.AddChildContent("<span>x</span>"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(titled.Find(".card").TagName, Is.EqualTo("SECTION"));
+            Assert.That(plain.Find(".card").TagName, Is.EqualTo("DIV"));
+        });
+    }
+
+    [Test]
+    public void Css_TakesSurfaceBorderAndRadiusFromTokens()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Layout", "Card.razor.css");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(Rule(css, ".card"), Does.Contain("background-color: var(--color-surface);"));
+            Assert.That(Rule(css, ".card"), Does.Contain("border: var(--border-width) solid var(--color-border);"));
+            Assert.That(Rule(css, ".card"), Does.Contain("border-radius: var(--radius-lg);"));
+        });
+    }
+
+    [Test]
+    public void Title_IsBoldAndTheMdSize_Which16px()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Layout", "Card.razor.css");
+        var tokens = RepoFiles.Read("src", "Shields.UI", "wwwroot", "css", "tokens.css");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(Rule(css, ".title"), Does.Contain("font-size: var(--font-size-md);"));
+            Assert.That(Rule(css, ".title"), Does.Contain("font-weight: var(--font-weight-bold);"));
+            Assert.That(tokens, Does.Contain("--font-size-md: 1rem;"));
+        });
+    }
+
+    [Test]
+    public void Title_Wraps_WhileTheAsideStaysOnOneLine()
+    {
+        var cut = Context.Render<Card>(p => p.Add(x => x.Title, "Records").Add(x => x.Aside, "1 this week"));
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Layout", "Card.razor.css");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find("h2").HasAttribute("data-wrap-ok"), Is.True);
+            Assert.That(Rule(css, ".title"), Does.Contain("overflow-wrap: anywhere;"));
+            Assert.That(Rule(css, ".title"), Does.Contain("min-width: 0;"));
+            Assert.That(Rule(css, ".aside"), Does.Contain("flex-shrink: 0;"));
+            Assert.That(Rule(css, ".aside"), Does.Contain("white-space: nowrap;"));
+        });
+    }
+
+    [Test]
+    public void HeaderActions_SitInTheHeaderRowAfterTheTitleAndAside()
+    {
+        var cut = Context.Render<Card>(p => p
+            .Add(x => x.Title, "Bench press")
+            .Add(x => x.Aside, "3 sets")
+            .Add(x => x.HeaderActions, "<button class=\"done\">Done</button><button class=\"edit\">Edit</button>")
+            .AddChildContent("<p class=\"inside\">Hello</p>")
+            .Add(x => x.TestId, "card"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find(".header h2").TextContent, Is.EqualTo("Bench press"));
+            Assert.That(cut.FindAll("[data-testid=card-actions] button").Select(b => b.ClassName), Is.EqualTo(new[] { "done", "edit" }));
+            Assert.That(cut.Find(".header").LastElementChild!.GetAttribute("data-testid"), Is.EqualTo("card-actions"));
+            Assert.That(cut.Find(".header").ClassList, Does.Contain("with-actions"));
+            Assert.That(cut.Find("[data-testid=card-aside]").TextContent, Is.EqualTo("3 sets"));
+            Assert.That(cut.Find(".inside").TextContent, Is.EqualTo("Hello"));
+        });
+    }
+
+    [Test]
+    public void HeaderActions_WithoutATitle_StillDrawTheHeaderRow()
+    {
+        var cut = Context.Render<Card>(p => p
+            .Add(x => x.HeaderActions, "<button>Edit</button>")
+            .Add(x => x.TestId, "card"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find(".card").TagName, Is.EqualTo("DIV"));
+            Assert.That(cut.FindAll("h2"), Is.Empty);
+            Assert.That(cut.Find(".header [data-testid=card-actions] button").TextContent, Is.EqualTo("Edit"));
+        });
+    }
+
+    [Test]
+    public void HeaderActions_WithoutATitle_AreAPlainCardNotASection()
+    {
+        var cut = Context.Render<Card>(p => p.Add(x => x.HeaderActions, "<button>Edit</button>"));
+
+        Assert.That(cut.FindAll("section"), Is.Empty);
+    }
+
+    [Test]
+    public void Aside_WithoutATitle_IsNotShown()
+    {
+        var cut = Context.Render<Card>(p => p
+            .Add(x => x.HeaderActions, "<button>Edit</button>")
+            .Add(x => x.Aside, "ignored")
+            .Add(x => x.TestId, "card"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.FindAll("[data-testid=card-aside]"), Is.Empty);
+            Assert.That(cut.FindAll(".aside"), Is.Empty);
+        });
+    }
+
+    [Test]
+    public void WithoutHeaderActions_ShowsNoActionsBox()
+    {
+        var cut = Context.Render<Card>(p => p.Add(x => x.Title, "Weeks").Add(x => x.TestId, "card"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.FindAll(".actions"), Is.Empty);
+            Assert.That(cut.Find(".header").ClassList, Does.Not.Contain("with-actions"));
+        });
+    }
+
+    [Test]
+    public void Css_ActionsStayAtTheEndAndDoNotShrink()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Layout", "Card.razor.css");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(Rule(css, ".actions"), Does.Contain("flex-shrink: 0;"));
+            Assert.That(Rule(css, ".actions"), Does.Contain("margin-left: auto;"));
+            Assert.That(Rule(css, ".header.with-actions"), Does.Contain("align-items: center;"));
+            Assert.That(Rule(css, ".actions"), Does.Not.Contain("max-height").And.Not.Contain("overflow"));
+        });
+    }
+
+    [TestCase("Records", "section")]
+    [TestCase(null, "div")]
+    public void Error_AddsTheErrorClass_WithAndWithoutATitle(string? title, string tag)
+    {
+        var failed = Context.Render<Card>(p => p.Add(x => x.Title, title).Add(x => x.Error, true));
+        var normal = Context.Render<Card>(p => p.Add(x => x.Title, title));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(failed.Find(tag + ".card").ClassList, Does.Contain("error"));
+            Assert.That(normal.Find(tag + ".card").ClassList, Does.Not.Contain("error"));
+        });
+    }
+
+    [Test]
+    public void Css_Error_ColoursTheBorderAndAnInsetRingWithoutChangingTheCardSize()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Layout", "Card.razor.css");
+        var error = Rule(css, ".card.error");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(error, Does.Contain("border-color: var(--color-error);"));
+            Assert.That(error, Does.Contain("box-shadow: inset 0 0 0 var(--border-width) var(--color-error);"));
+            Assert.That(error, Does.Not.Match(@"(^|\s)(border|border-width|padding|margin|outline|outline-offset|width|height|min-height)\s*:"));
+            Assert.That(Rule(css, ".card"), Does.Contain("border: var(--border-width) solid var(--color-border);"));
+        });
+    }
+
+    private static string Rule(string css, string selector) =>
+        Regex.Match(css, Regex.Escape(selector) + @"\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
+}

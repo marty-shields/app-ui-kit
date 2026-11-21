@@ -1,0 +1,197 @@
+@attribute [Stories("Components/Layout/AppScreen")]
+
+<Stories TComponent="AppScreen" Layout="typeof(PhoneLayout)">
+
+    <Story Name="Back arrow">
+        <Template>
+            <AppScreen Title="Screen title" Subtitle="Subtitle" OnBack="() => { }">
+                <p>Scrolling content.</p>
+            </AppScreen>
+        </Template>
+    </Story>
+
+    <Story Name="Bottom bar">
+        <Template>
+            <AppScreen Title="Screen title">
+                <ChildContent>
+                    <p>Scrolling content.</p>
+                </ChildContent>
+                <BottomBar>
+                    <AppButton FullWidth>Main action</AppButton>
+                </BottomBar>
+            </AppScreen>
+        </Template>
+    </Story>
+
+    <Story Name="Bottom bar above the navigation bar">
+        <Template>
+            <AppScreen Title="Today" NavItems="Tabs" Current="Tabs[0]" AddLabel="Add" AddIcon="IconName.Plus" OnNavigate="(BottomNavItem _) => { }" OnAdd="() => { }">
+                <ChildContent>
+                    <p>Scrolling content.</p>
+                </ChildContent>
+                <BottomBar>
+                    <AppButton FullWidth>Main action</AppButton>
+                </BottomBar>
+            </AppScreen>
+        </Template>
+    </Story>
+
+    <Story Name="Navigation bar">
+        <Template>
+            <AppScreen Title="Today" NavItems="Tabs" Current="Tabs[0]" AddLabel="Add" AddIcon="IconName.Plus" OnNavigate="(BottomNavItem _) => { }" OnAdd="() => { }">
+                <p>Scrolling content.</p>
+            </AppScreen>
+        </Template>
+    </Story>
+
+    <Story Name="Status above the raised button">
+        <Template>
+            <AppScreen Title="Today" NavItems="Tabs" Current="Tabs[0]" AddLabel="Add" AddIcon="IconName.Plus" OnNavigate="(BottomNavItem _) => { }" OnAdd="() => { }">
+                <ChildContent>
+                    <p>Scrolling content.</p>
+                </ChildContent>
+                <Status>
+                    <Snackbar Message="Entry deleted" ActionLabel="Undo" OnAction="@(() => { })" Duration="Timeout.InfiniteTimeSpan" />
+                </Status>
+            </AppScreen>
+        </Template>
+    </Story>
+
+    <Story Name="Long page">
+        <Template>
+            <AppScreen Title="Today" NavItems="Tabs" Current="Tabs[0]" AddLabel="Add" AddIcon="IconName.Plus" OnNavigate="(BottomNavItem _) => { }" OnAdd="() => { }">
+                @for (var row = 1; row <= 20; row++)
+                {
+                    <p>Row @row</p>
+                }
+                <AppButton FullWidth TestId="last-control">Last control</AppButton>
+            </AppScreen>
+        </Template>
+    </Story>
+
+    <Story Name="Pulling">
+        <Template>
+            <AppScreen Title="Screen title" NavItems="Tabs" Current="Tabs[0]" AddLabel="Add" AddIcon="IconName.Plus" OnNavigate="(BottomNavItem _) => { }" OnAdd="() => { }" OnRefresh="() => { }">
+                <p>Scrolling content.</p>
+                <HoldPull />
+            </AppScreen>
+        </Template>
+    </Story>
+
+    <Story Name="Back arrow, light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <AppScreen Title="Screen title" Subtitle="Subtitle" OnBack="() => { }">
+                    <p>Scrolling content.</p>
+                </AppScreen>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Back arrow, dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <AppScreen Title="Screen title" Subtitle="Subtitle" OnBack="() => { }">
+                    <p>Scrolling content.</p>
+                </AppScreen>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Bottom bar, light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <AppScreen Title="Screen title">
+                    <ChildContent>
+                        <p>Scrolling content.</p>
+                    </ChildContent>
+                    <BottomBar>
+                        <AppButton FullWidth>Main action</AppButton>
+                    </BottomBar>
+                </AppScreen>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Bottom bar, dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <AppScreen Title="Screen title">
+                    <ChildContent>
+                        <p>Scrolling content.</p>
+                    </ChildContent>
+                    <BottomBar>
+                        <AppButton FullWidth>Main action</AppButton>
+                    </BottomBar>
+                </AppScreen>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Status above the raised button, light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <AppScreen Title="Today" NavItems="Tabs" Current="Tabs[0]" AddLabel="Add" AddIcon="IconName.Plus" OnNavigate="(BottomNavItem _) => { }" OnAdd="() => { }">
+                    <ChildContent>
+                        <p>Scrolling content.</p>
+                    </ChildContent>
+                    <Status>
+                        <Snackbar Message="Entry deleted" ActionLabel="Undo" OnAction="@(() => { })" Duration="Timeout.InfiniteTimeSpan" />
+                    </Status>
+                </AppScreen>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Status above the raised button, dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <AppScreen Title="Today" NavItems="Tabs" Current="Tabs[0]" AddLabel="Add" AddIcon="IconName.Plus" OnNavigate="(BottomNavItem _) => { }" OnAdd="() => { }">
+                    <ChildContent>
+                        <p>Scrolling content.</p>
+                    </ChildContent>
+                    <Status>
+                        <Snackbar Message="Entry deleted" ActionLabel="Undo" OnAction="@(() => { })" Duration="Timeout.InfiniteTimeSpan" />
+                    </Status>
+                </AppScreen>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Long page, light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <AppScreen Title="Today" NavItems="Tabs" Current="Tabs[0]" AddLabel="Add" AddIcon="IconName.Plus" OnNavigate="(BottomNavItem _) => { }" OnAdd="() => { }">
+                    @for (var row = 1; row <= 20; row++)
+                    {
+                        <p>Row @row</p>
+                    }
+                    <AppButton FullWidth TestId="last-control">Last control</AppButton>
+                </AppScreen>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Long page, dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <AppScreen Title="Today" NavItems="Tabs" Current="Tabs[0]" AddLabel="Add" AddIcon="IconName.Plus" OnNavigate="(BottomNavItem _) => { }" OnAdd="() => { }">
+                    @for (var row = 1; row <= 20; row++)
+                    {
+                        <p>Row @row</p>
+                    }
+                    <AppButton FullWidth TestId="last-control">Last control</AppButton>
+                </AppScreen>
+            </div>
+        </Template>
+    </Story>
+
+</Stories>
+
+@code {
+    private static readonly IReadOnlyList<BottomNavItem> Tabs =
+    [
+        new("Today", IconName.Today, "today-link"),
+        new("Trends", IconName.BarChart, "trends-link"),
+    ];
+}

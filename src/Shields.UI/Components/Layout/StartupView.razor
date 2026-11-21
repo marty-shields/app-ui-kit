@@ -1,0 +1,49 @@
+@using Shields.UI.Components.Feedback
+<div class="screen">
+    @if (Title is not null)
+    {
+        <header class="top-bar" data-testid="startup-top-bar">
+            <h1 class="title">@Title</h1>
+        </header>
+    }
+    <div class="centre" data-testid="@(Failed ? "startup-failed" : null)">
+        @if (!Failed)
+        {
+            <Spinner Label="@LoadingLabel" TestId="startup-loading" />
+        }
+        else if (OnRetry.HasDelegate)
+        {
+            <LoadFailed Message="@FailedMessage" TestId="startup" Plain RetryVariant="RetryVariant" OnRetry="OnRetry" />
+        }
+        else
+        {
+            <p class="message" role="alert" data-testid="startup-error">@FailedMessage</p>
+        }
+    </div>
+</div>
+
+@code {
+    /// <summary>App name shown at the top. Null shows no title.</summary>
+    [Parameter]
+    public string? Title { get; set; }
+
+    /// <summary>Text under the spinner while starting.</summary>
+    [Parameter]
+    public string LoadingLabel { get; set; } = "Loading…";
+
+    /// <summary>Shows <see cref="FailedMessage"/> instead of the spinner, and marks the view <c>startup-failed</c> with or without <see cref="OnRetry"/>.</summary>
+    [Parameter]
+    public bool Failed { get; set; }
+
+    /// <summary>Text shown when <see cref="Failed"/>, e.g. Couldn't open the database</summary>
+    [Parameter, EditorRequired]
+    public string FailedMessage { get; set; } = "";
+
+    /// <summary>Raised by Try again, which shows under the message. Unset shows the message alone.</summary>
+    [Parameter]
+    public EventCallback OnRetry { get; set; }
+
+    /// <summary>Visual weight of Try again. Used only when <see cref="OnRetry"/> is set.</summary>
+    [Parameter]
+    public ButtonVariant RetryVariant { get; set; } = ButtonVariant.Primary;
+}

@@ -7,7 +7,7 @@ public static class KitNames
     public static IReadOnlySet<string> Components { get; } = new HashSet<string>
     {
         "AppButton", "AppErrorBoundary", "AppScreen", "BackHandler", "Banner", "BarList", "BottomNav", "Card", "ChartLegend", "ChangeIndicator", "CollapsibleNote", "ConfirmDialog", "CountBars",
-        "DateRangeField", "DateStrip", "Divider", "DurationField", "EmptyState", "EntryGridRow", "ErrorView", "FieldInput", "FilterChips", "HostBridges", "Icon", "IconButton", "InlineAlert", "LineChart", "ListRow", "LoadFailed",
+        "DateRangeField", "DateStrip", "DayStrip", "Divider", "DurationField", "EmptyState", "EntryGridRow", "ErrorView", "FieldInput", "FilterChips", "HostBridges", "Icon", "IconButton", "InlineAlert", "LineChart", "ListRow", "LoadFailed",
         "MonthCalendar", "NoteField", "NumberField", "PeriodStepper", "ProgressRing", "RadioGroup", "RangeCalendar", "SearchField", "SectionHeader", "SegmentedControl", "SelectField", "Sheet", "SheetAction", "Snackbar", "Spinner", "StackedBar", "StartupGate",
         "StartupView", "StatTile", "SuccessBadge", "TextField", "TrendBarChart", "Typography", "ValueField",
     };
@@ -19,7 +19,7 @@ public static class KitNames
     public static IReadOnlySet<string> Types { get; } = new HashSet<string>
     {
         "AlertTone", "AppLifecycle", "AppLifecycleBridge", "BackButton", "BackButtonBridge", "BannerTone", "BarListItem", "BarListLabelWidth", "BarListTestIdBy", "BarListValueWidth", "BottomNavItem",
-        "ButtonVariant", "CalendarDay", "CalendarStyle", "ChangeDirection", "DataSeries", "DataSeriesExtensions", "DateRange", "DayLabel", "IAppLifecycle", "IAppStart", "IBackButton", "IconButtonStyle",
+        "ButtonVariant", "CalendarDay", "CalendarStyle", "ChangeDirection", "DataSeries", "DataSeriesExtensions", "DateRange", "DateRangeDisplay", "DayLabel", "EntryGridAsideWidth", "IAppLifecycle", "IAppStart", "IBackButton", "IconButtonStyle",
         "IconName", "IconSize", "IconTone", "KitEvent", "LegendItem", "LegendSwatch", "LineChartPoint", "ListRowLayout", "PeriodKind", "RadioOption",
         "ShieldsUiServiceCollectionExtensions", "SnackbarMessage", "SnackbarService", "StackedBarSegment", "StatChange",
         "SystemBarInsetWriter", "TargetStatus", "TargetStatuses", "TextElement", "TextVariant", "ThemePreference", "ThemeService", "TrendBarPoint", "TrendBarStyle", "ValueKind"

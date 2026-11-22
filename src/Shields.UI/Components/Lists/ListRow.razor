@@ -1,13 +1,13 @@
 @if (OnClick.HasDelegate)
 {
-    <button type="button" class="row clickable @Modifiers" data-testid="@TestId" @onclick="OnClick">
+    <button @attributes="AdditionalAttributes" type="button" class="row clickable @Modifiers" data-testid="@TestId" @onclick="OnClick">
         @Body
         <span class="chevron"><Icon Name="IconName.Chevron" Tone="IconTone.Muted" /></span>
     </button>
 }
 else
 {
-    <div class="row @Modifiers" data-testid="@TestId">
+    <div @attributes="AdditionalAttributes" class="row @Modifiers" data-testid="@TestId">
         @Body
     </div>
 }
@@ -49,9 +49,28 @@ else
     [Parameter]
     public RenderFragment? Trailing { get; set; }
 
+    /// <summary>
+    /// Makes <see cref="Text"/> a heading of this level, 2 to 6 (<c>role="heading"</c> with <c>aria-level</c>), so screen reader users can jump between rows that start a section. Null, the default, leaves it plain text.
+    /// The look does not change. In a tappable row the heading is inside a button, where screen readers read the button's name instead, so use it on rows without <see cref="OnClick"/>.
+    /// </summary>
+    [Parameter]
+    public int? HeadingLevel { get; set; }
+
     /// <summary>Value of the data-testid attribute.</summary>
     [Parameter]
     public string? TestId { get; set; }
+
+    /// <summary>Other attributes for the row's root element (the button of a tappable row), such as <c>data-*</c> attributes. <c>type</c>, <c>class</c> and <c>data-testid</c> are the row's own and win.</summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (HeadingLevel is < 2 or > 6)
+        {
+            throw new ArgumentOutOfRangeException(nameof(HeadingLevel), HeadingLevel, "HeadingLevel is 2 to 6, or null.");
+        }
+    }
 
     private string Modifiers => string.Join(' ', new[]
     {
@@ -83,7 +102,7 @@ else
 
     private RenderFragment Texts =>
         @<span class="texts">
-            <span class="text" data-wrap-ok>@Text</span>
+            <span class="text" role="@(HeadingLevel is null ? null : "heading")" aria-level="@HeadingLevel" data-wrap-ok>@Text</span>
             @if (Detail is not null)
             {
                 <span class="detail" data-wrap-ok>@Detail</span>

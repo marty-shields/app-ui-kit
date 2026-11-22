@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.Extensions.DependencyInjection;
 using Shields.UI.Components.Inputs;
 using Shields.UI.Navigation;
@@ -145,6 +146,75 @@ public class DateRangeFieldTests : ComponentTestBase
         Render(new DateRange(Today, Today));
 
         Assert.That(BackButton.HasHandler, Is.False);
+    }
+
+    [TestCase(2026, 8, 6, 2026, 11, 6, "6 Aug – 6 Nov 2026")]
+    [TestCase(2025, 11, 6, 2026, 11, 6, "6 Nov 2025 – 6 Nov 2026")]
+    [TestCase(2025, 3, 12, 2025, 3, 12, "Wed 12 Mar 2025")]
+    public void SharedYear_WritesASharedYearOnce_AndOneDayWithItsWeekday(int fromYear, int fromMonth, int fromDay, int toYear, int toMonth, int toDay, string text)
+    {
+        var cut = Render(new DateRange(new(fromYear, fromMonth, fromDay), new(toYear, toMonth, toDay)), count: 1,
+            more: p => p.Add(x => x.Display, DateRangeDisplay.SharedYear).Add(x => x.Culture, CultureInfo.GetCultureInfo("en-GB")));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find("[data-testid=dates-dates]").TextContent.Replace('\u00A0', ' '), Is.EqualTo(text));
+            Assert.That(cut.Find("[data-testid=dates]").GetAttribute("aria-label"), Is.EqualTo($"Dates shown: {text}. 1"));
+        });
+    }
+
+    [Test]
+    public void SharedYear_KeepsEachDateWhole_AndWrapsOnlyAtTheDash()
+    {
+        var cut = Render(new DateRange(new(2025, 11, 6), Today), more: p => p.Add(x => x.Display, DateRangeDisplay.SharedYear));
+        var dates = cut.Find("[data-testid=dates-dates]");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(dates.TextContent, Is.EqualTo("6\u00A0Nov\u00A02025 – 6\u00A0Nov\u00A02026"));
+            Assert.That(dates.ClassList, Does.Contain("kept-whole"));
+            Assert.That(dates.HasAttribute("data-wrap-ok"), Is.True);
+        });
+    }
+
+    [Test]
+    public void SharedYear_IgnoresDateFormat_AndFollowsTheCulture()
+    {
+        var cut = Render(new DateRange(new(2025, 3, 12), new(2025, 3, 12)),
+            more: p => p.Add(x => x.Display, DateRangeDisplay.SharedYear).Add(x => x.DateFormat, "yyyy-MM-dd").Add(x => x.Culture, CultureInfo.GetCultureInfo("fr-FR")));
+
+        Assert.That(cut.Find("[data-testid=dates-dates]").TextContent.Replace('\u00A0', ' '), Is.EqualTo("mer. 12 mars 2025"));
+    }
+
+    [Test]
+    public void Default_IsEachEndInTheInvariantCulture_WithPlainSpacesOnOneLine()
+    {
+        var saved = CultureInfo.CurrentCulture;
+        try
+        {
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("fr-FR");
+            var cut = Render(new DateRange(new(2026, 8, 6), Today));
+            var dates = cut.Find("[data-testid=dates-dates]");
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(dates.TextContent, Is.EqualTo("6 Aug 2026 – 6 Nov 2026"));
+                Assert.That(dates.ClassList, Does.Not.Contain("kept-whole"));
+                Assert.That(dates.HasAttribute("data-wrap-ok"), Is.False);
+            });
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = saved;
+        }
+    }
+
+    [Test]
+    public void EachEnd_UsesTheCultureWhenSet()
+    {
+        var cut = Render(new DateRange(new(2026, 8, 6), new(2026, 8, 6)), more: p => p.Add(x => x.Culture, CultureInfo.GetCultureInfo("de-DE")).Add(x => x.DateFormat, "d MMMM yyyy"));
+
+        Assert.That(cut.Find("[data-testid=dates-dates]").TextContent, Is.EqualTo("6 August 2026"));
     }
 
     private IRenderedComponent<DateRangeField> Render(

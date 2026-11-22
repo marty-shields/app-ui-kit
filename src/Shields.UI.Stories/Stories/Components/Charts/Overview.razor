@@ -116,6 +116,15 @@
     <li><code>Label</code> (required) names the chart. <code>data-testid</code>: <code>TestId</code>, <code>{TestId}-values</code> and <code>{TestId}-none</code>.</li>
 </ul>
 
+<h2><code>DayStrip</code></h2>
+<p>A read-only strip of days, one column each, such as a week from Monday to Sunday: each day's short name over a circle with its date. A day in <code>Done</code> is a solid <code>--color-primary</code> circle with a tick in place of the date, a day not done is a dashed circle, <code>Today</code> gets a <code>--color-text</code> ring and <code>aria-current="date"</code>, and the days after it are dimmed. The circle is <code>--calendar-day-size</code>, as in <code>MonthCalendar</code>'s <code>Marks</code>. It has no card of its own; put it in a <code>Card</code>.</p>
+<ul>
+    <li><code>Days</code> (required) are the dates, in order; <code>Done</code> the days marked done. <code>Today</code> null means today by the clock.</li>
+    <li>The strip is a list named by <code>Label</code> ("Days" by default). Each day's text alternative is its full date, then <code>DoneText</code>, <code>EmptyText</code> or <code>FutureText</code> ("done", "not done", "coming up" by default), then <code>TodayText</code> for the current day, so the state is never only a colour or a mark (<em>Wednesday 18 November, done, today</em>).</li>
+    <li><code>Culture</code> sets the day names; null means the invariant culture.</li>
+    <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>-{date}</code> on each day, the date as yyyy-MM-dd.</li>
+</ul>
+
 <p>Week rows with a proportional bar need no new part: <code>BarList</code> with <code>Inline</code>, <code>ValueText</code> and <code>OnSelect</code> draws them.</p>
 
-<p>Stories: <a href="./?path=/docs/components-charts-chartlegend--docs">ChartLegend</a>, <a href="./?path=/docs/components-charts-progressring--docs">ProgressRing</a>, <a href="./?path=/docs/components-charts-barlist--docs">BarList</a>, <a href="./?path=/docs/components-charts-stackedbar--docs">StackedBar</a>, <a href="./?path=/docs/components-charts-trendbarchart--docs">TrendBarChart</a>, <a href="./?path=/docs/components-charts-monthcalendar--docs">MonthCalendar</a>, <a href="./?path=/docs/components-charts-linechart--docs">LineChart</a>, <a href="./?path=/docs/components-charts-countbars--docs">CountBars</a></p>
+<p>Stories: <a href="./?path=/docs/components-charts-chartlegend--docs">ChartLegend</a>, <a href="./?path=/docs/components-charts-progressring--docs">ProgressRing</a>, <a href="./?path=/docs/components-charts-barlist--docs">BarList</a>, <a href="./?path=/docs/components-charts-stackedbar--docs">StackedBar</a>, <a href="./?path=/docs/components-charts-trendbarchart--docs">TrendBarChart</a>, <a href="./?path=/docs/components-charts-monthcalendar--docs">MonthCalendar</a>, <a href="./?path=/docs/components-charts-linechart--docs">LineChart</a>, <a href="./?path=/docs/components-charts-countbars--docs">CountBars</a>, <a href="./?path=/docs/components-charts-daystrip--docs">DayStrip</a></p>

@@ -91,12 +91,13 @@
 <p>A collapsed date-range field: a button with a calendar <code>Icon</code>, the dates, an optional <code>Count</code> and a chevron. Tapping it raises <code>ExpandedChanged</code>; while <code>Expanded</code> it shows a <code>RangeCalendar</code> under it and Android back closes it. Apply closes the calendar and raises <code>DatesChanged</code>; Cancel only closes it.</p>
 <ul>
     <li><code>Dates</code>, <code>DateFormat</code> (default <code>d MMM yyyy</code>) and <code>Label</code> (the start of the button's accessible name, "Dates shown" by default; the count follows, worded by <code>CountText</code>).</li>
+    <li><code>Display</code>: <code>DateRangeDisplay.EachEnd</code> (default) writes each end in <code>DateFormat</code> on one line that ellipsises. <code>SharedYear</code> writes a shared year once (<em>6 Aug – 6 Nov 2026</em>), each year across years (<em>6 Nov 2025 – 6 Nov 2026</em>) and one day with its weekday (<em>Wed 12 Mar 2025</em>), and keeps each date whole with no-break spaces, so a narrow field wraps at the dash. <code>Culture</code> sets the month and day names; null means the invariant culture.</li>
     <li><code>Min</code>, <code>Max</code>, <code>Today</code>, <code>DayCounts</code>, <code>MarkedDayText</code>, <code>ApplyLabel</code> and <code>OpenOnMonths</code> go to the calendar.</li>
     <li><code>data-testid</code>: <code>TestId</code>, <code>{TestId}-dates</code>, <code>{TestId}-count</code>, and the calendar's under <code>{TestId}-calendar</code>.</li>
 </ul>
 
 <h2><code>EntryGridRow</code></h2>
-<p>One row of a grid of entry fields, so the fields of every row line up: a narrow <code>Index</code> column (<code>--entry-grid-index-width</code>), an optional <code>Aside</code> column (<code>--entry-grid-aside-width</code>, for last time's value), <code>FieldCount</code> equal columns for <code>Fields</code>, and an optional <code>Actions</code> column one touch target wide. <code>Header</code> makes a row of column titles, muted, small and hidden from screen readers. Give each field cell its own accessible name, as the header is not read out.</p>
+<p>One row of a grid of entry fields, so the fields of every row line up: a narrow <code>Index</code> column (<code>--entry-grid-index-width</code>), an optional <code>Aside</code> column (for last time's value; <code>AsideWidth</code> is <code>EntryGridAsideWidth.Normal</code>, <code>--entry-grid-aside-width</code>, by default, or <code>Wide</code>, <code>--entry-grid-aside-width-wide</code>, for a text such as 57.25kg×12; give the header and every row the same value), <code>FieldCount</code> equal columns for <code>Fields</code>, and an optional <code>Actions</code> column one touch target wide. <code>Header</code> makes a row of column titles, muted, small and hidden from screen readers. Give each field cell its own accessible name, as the header is not read out.</p>
 <ul>
     <li><code>data-testid</code>: <code>TestId</code>.</li>
 </ul>

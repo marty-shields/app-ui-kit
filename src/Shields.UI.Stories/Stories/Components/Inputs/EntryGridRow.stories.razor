@@ -73,4 +73,50 @@
         </Template>
     </Story>
 
+    <Story Name="Wide last-time column">
+        <Template>
+            <div class="themed" data-theme="light">
+                <EntryGridRow Header FieldCount="2" AsideWidth="EntryGridAsideWidth.Wide">
+                    <Index>#</Index>
+                    <Aside>Last</Aside>
+                    <Fields><span>Weight</span><span>Reps</span></Fields>
+                </EntryGridRow>
+                <div class="rows">
+                    <EntryGridRow FieldCount="2" AsideWidth="EntryGridAsideWidth.Wide" TestId="wide-row">
+                        <Index>1</Index>
+                        <Aside>57.25kg×12</Aside>
+                        <Fields>
+                            <ValueField Kind="ValueKind.Fractional" Label="Weight (kg), set 1" ShowLabel="false" Compact Value="60" />
+                            <ValueField Kind="ValueKind.Whole" Label="Reps, set 1" ShowLabel="false" Compact />
+                        </Fields>
+                        <Actions><IconButton Icon="IconName.Close" AriaLabel="Remove set 1" Muted Size="IconSize.Small" /></Actions>
+                    </EntryGridRow>
+                </div>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Wide last-time column, dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <EntryGridRow Header FieldCount="2" AsideWidth="EntryGridAsideWidth.Wide">
+                    <Index>#</Index>
+                    <Aside>Last</Aside>
+                    <Fields><span>Weight</span><span>Reps</span></Fields>
+                </EntryGridRow>
+                <div class="rows">
+                    <EntryGridRow FieldCount="2" AsideWidth="EntryGridAsideWidth.Wide" TestId="wide-row">
+                        <Index>1</Index>
+                        <Aside>57.25kg×12</Aside>
+                        <Fields>
+                            <ValueField Kind="ValueKind.Fractional" Label="Weight (kg), set 1" ShowLabel="false" Compact Value="60" />
+                            <ValueField Kind="ValueKind.Whole" Label="Reps, set 1" ShowLabel="false" Compact />
+                        </Fields>
+                        <Actions><IconButton Icon="IconName.Close" AriaLabel="Remove set 1" Muted Size="IconSize.Small" /></Actions>
+                    </EntryGridRow>
+                </div>
+            </div>
+        </Template>
+    </Story>
+
 </Stories>

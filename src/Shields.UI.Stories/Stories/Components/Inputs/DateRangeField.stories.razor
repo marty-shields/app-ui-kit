@@ -21,6 +21,26 @@
         </Template>
     </Story>
 
+    <Story Name="Shared year">
+        <Template>
+            <div class="themed" data-theme="light">
+                <DateRangeField Dates="new DateRange(new DateOnly(2026, 8, 6), Today)" Count="38" Min="Earliest" Max="Today" Today="Today" Display="DateRangeDisplay.SharedYear" TestId="shared-year" />
+                <DateRangeField Dates="new DateRange(Earliest, Today)" Count="120" Min="Earliest" Max="Today" Today="Today" Display="DateRangeDisplay.SharedYear" />
+                <DateRangeField Dates="new DateRange(Earliest, Earliest)" Count="1" Min="Earliest" Max="Today" Today="Today" Display="DateRangeDisplay.SharedYear" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Shared year, dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <DateRangeField Dates="new DateRange(new DateOnly(2026, 8, 6), Today)" Count="38" Min="Earliest" Max="Today" Today="Today" Display="DateRangeDisplay.SharedYear" />
+                <DateRangeField Dates="new DateRange(Earliest, Today)" Count="120" Min="Earliest" Max="Today" Today="Today" Display="DateRangeDisplay.SharedYear" />
+                <DateRangeField Dates="new DateRange(Earliest, Earliest)" Count="1" Min="Earliest" Max="Today" Today="Today" Display="DateRangeDisplay.SharedYear" />
+            </div>
+        </Template>
+    </Story>
+
     <Story Name="Light">
         <Template>
             <div class="themed" data-theme="light">

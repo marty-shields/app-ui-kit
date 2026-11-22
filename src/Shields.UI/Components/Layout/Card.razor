@@ -1,6 +1,6 @@
 @if (Title is not null)
 {
-    <section class="@CardClass"" data-testid="@TestId">
+    <section class="@CardClass" data-testid="@TestId">
         <div class="header @(HeaderActions is not null ? "with-actions" : null)">
             <h2 class="title" data-wrap-ok>@Title</h2>
             @if (Aside is not null)
@@ -17,7 +17,7 @@
 }
 else
 {
-    <div class="@CardClass"" data-testid="@TestId">
+    <div class="@CardClass" data-testid="@TestId">
         @if (HeaderActions is not null)
         {
             <div class="header with-actions">

@@ -8,3 +8,9 @@
 .narrow {
     max-width: var(--stories-narrow-card-width);
 }
+
+.phone-card {
+    box-sizing: border-box;
+    width: var(--stories-phone-width);
+    max-width: 100%;
+}

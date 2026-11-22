@@ -113,6 +113,7 @@
     --ring-size-compact: 6rem;
     --ring-width-compact: 0.625rem;
     --snackbar-gap-bottom: var(--space-2);
+    --snackbar-gap-inline: var(--space-4);
 
     /* Chart dash: the dash and gap of a dashed chart line (stroke-dasharray), 6px then 4px. The chart's target line strokes
        --chart-dash and the legend's line swatch repeats the same two lengths, so they cannot drift apart. */

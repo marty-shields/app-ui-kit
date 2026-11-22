@@ -49,7 +49,12 @@
 }
 
 .swatch.outline {
-    border: calc(var(--border-width-error) * 1.5) dashed var(--color-border-strong);
+    /* Six even dashes: a CSS border style breaks into uneven pieces on a circle this small, so a ring is cut by a conic mask instead. */
+    background-color: var(--color-border-strong);
+    mask-image:
+        radial-gradient(closest-side, transparent calc(100% - var(--border-width-error) * 1.5), var(--color-text) 0),
+        repeating-conic-gradient(var(--color-text) 0 30deg, transparent 30deg 60deg);
+    mask-composite: intersect;
 }
 
 .swatch.line {

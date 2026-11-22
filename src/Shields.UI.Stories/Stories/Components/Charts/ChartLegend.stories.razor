@@ -14,6 +14,17 @@
         </Template>
     </Story>
 
+    <Story Name="Outline swatch">
+        <Template>
+            @foreach (var theme in new[] { "light", "dark" })
+            {
+                <div class="themed" data-theme="@theme">
+                    <ChartLegend Items="OutlineAndToday" TestId="@($"legend-{theme}")" />
+                </div>
+            }
+        </Template>
+    </Story>
+
     <Story Name="Primary">
         <Template>
             <ChartLegend Items="PrimarySelected" TestId="legend" />
@@ -74,6 +85,12 @@
         new(LegendSwatch.Accent, "This week"),
         new(LegendSwatch.Today, "Today"),
         new(LegendSwatch.Outline, "Not logged"),
+    ];
+
+    private static readonly IReadOnlyList<LegendItem> OutlineAndToday =
+    [
+        new(LegendSwatch.Outline, "Not logged"),
+        new(LegendSwatch.Today, "Today"),
     ];
 
     private static readonly IReadOnlyList<LegendItem> PrimarySelected =

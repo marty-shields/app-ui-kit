@@ -289,4 +289,19 @@ public class StackedBarTests : ComponentTestBase
 
         Assert.That(cut.FindAll("[data-testid]"), Is.Empty);
     }
+
+    [Test]
+    public void Legend_UsesTheSmallestGapAndItemsMayShrink_SoThreeFitOnOneLineOnAPhone()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Charts", "StackedBar.razor.css");
+        var labels = Regex.Match(css, @"\.labels\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
+        var label = Regex.Match(css, @"\.label\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(labels, Does.Contain("gap: var(--space-1);"));
+            Assert.That(label, Does.Contain("flex: 0 1 auto;"));
+            Assert.That(label, Does.Contain("min-width: 0;"));
+        });
+    }
 }

@@ -1,0 +1,63 @@
+@attribute [Stories("Components/Charts/LineChart")]
+
+<Stories TComponent="LineChart" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Progress">
+        <Template>
+            <LineChart Points="Progress" Format="Kg" Label="Top set, last 3 months" TestId="chart" />
+        </Template>
+    </Story>
+
+    <Story Name="Lower is better">
+        <Template>
+            <LineChart Points="Weigh" Format="Kg" LowerIsBetter Label="Body weight, last 6 weeks" />
+        </Template>
+    </Story>
+
+    <Story Name="Times">
+        <Template>
+            <LineChart Points="Times" Format="Seconds" TimeScale Label="Plank, last 6 weeks" />
+        </Template>
+    </Story>
+
+    <Story Name="One point">
+        <Template>
+            <LineChart Points='new LineChartPoint[] { new("5 Oct", 14, "×10") }' Format="Kg" Label="Top set" />
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <LineChart Points="Progress" Format="Kg" Label="Top set, last 3 months" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <LineChart Points="Progress" Format="Kg" Label="Top set, last 3 months" />
+            </div>
+        </Template>
+    </Story>
+
+</Stories>
+
+@code {
+    private static readonly IReadOnlyList<LineChartPoint> Progress =
+    [
+        new("18 Aug", 60, "×8"), new("25 Aug", 62.5m, "×6"), new("1 Sep", 62.5m, "×8"), new("8 Sep", 65, "×5"), new("15 Sep", 65, "×6"), new("22 Sep", 67.5m, "×4"),
+        new("29 Sep", 67.5m, "×5"), new("6 Oct", null), new("13 Oct", 70, "×3"), new("20 Oct", 70, "×4"),
+    ];
+
+    private static readonly IReadOnlyList<LineChartPoint> Weigh =
+        [new("1 Oct", 84.2m), new("8 Oct", 83.6m), new("15 Oct", 83.9m), new("22 Oct", 82.8m), new("29 Oct", 82.3m), new("5 Nov", 82.5m)];
+
+    private static readonly IReadOnlyList<LineChartPoint> Times =
+        [new("1 Oct", 60), new("8 Oct", 75), new("15 Oct", 90), new("22 Oct", 85), new("29 Oct", 105), new("5 Nov", 110)];
+
+    private static string Kg(decimal value) => $"{value:0.##}kg";
+
+    private static string Seconds(decimal value) => $"{(int)value / 60}:{(int)value % 60:00}";
+}

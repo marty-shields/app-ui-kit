@@ -170,6 +170,12 @@
     /* Card compact: no bottom padding, because the rows it holds carry their own, and a short gap under the title. */
     --card-compact-padding: var(--space-4) var(--space-4) 0;
     --card-compact-title-gap: var(--space-2);
+    /* Card selected: the tint of the open or chosen card. Text, muted text, error text and success text keep 4.5:1 on it in both themes. */
+    --color-card-selected: light-dark(#ecf4f3, #2b4444);
+    /* LineChart: the width of the line and of the point rings. */
+    --chart-line-width: 2px;
+    /* SectionHeader sticky: the top offset that cancels AppScreen's content padding, so rows never show through above a stuck header. */
+    --section-header-sticky-top: calc(-1 * var(--space-4));
     /* RangeCalendar: the round that holds a day's number, and the dot that marks a day with items. */
     --calendar-day-size: 2.25rem;
     --calendar-dot-size: 0.25rem;

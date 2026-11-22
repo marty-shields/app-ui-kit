@@ -1,0 +1,134 @@
+@{ textBoxShown = Editing; }
+@if (Visible)
+{
+    <div class="note-field" data-testid="@TestId">
+        @if (Editing)
+        {
+            <label class="field">
+                <span class="heading">
+                    <span class="label">@Label</span>
+                    <span class="count @(Over ? "over" : null)" data-testid="@Id("count")">@(Value?.Length ?? 0)@(MaxLength is { } max ? $"/{max}" : null)</span>
+                </span>
+                <textarea @ref="input"
+                          rows="3"
+                          class="input @(Error is not null ? "invalid" : null)"
+                          aria-invalid="@(Error is not null || Over ? "true" : null)"
+                          aria-describedby="@(Error is not null ? ErrorId : null)"
+                          data-testid="@Id("input")"
+                          value="@Value"
+                          @oninput="OnInput"
+                          @onblur="OnBlur"></textarea>
+            </label>
+        }
+        else
+        {
+            <button type="button" class="summary @(Error is not null ? "invalid" : null)" aria-describedby="@(Error is not null ? ErrorId : null)" data-testid="@Id("open")" @onclick="OpenAsync">
+                <span class="visually-hidden">Edit @Label: </span>
+                <span class="text">@Value</span>
+            </button>
+        }
+        @if (Error is not null)
+        {
+            <p class="error" id="@ErrorId" role="alert" data-testid="@Id("error")">@Error</p>
+        }
+    </div>
+}
+
+@code {
+    /// <summary>Name of the note, shown above the text box and read out for the collapsed line. With no note and the text box closed, the field shows nothing.</summary>
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = "";
+
+    /// <summary>The note, or null when there is none.</summary>
+    [Parameter]
+    public string? Value { get; set; }
+
+    /// <summary>Raised on each keystroke with the text, or null when blank, and when the field collapses with the text trimmed.</summary>
+    [Parameter]
+    public EventCallback<string?> ValueChanged { get; set; }
+
+    /// <summary>Shows the text box. A parent sets it from its own button; the field sets it when the collapsed line is tapped and when focus leaves.</summary>
+    [Parameter]
+    public bool Editing { get; set; }
+
+    /// <summary>Raised when the field opens or collapses.</summary>
+    [Parameter]
+    public EventCallback<bool> EditingChanged { get; set; }
+
+    /// <summary>The most characters the note may have, shown after the count as "12/500". Longer text is not cut: the count turns bold in the error colour and the box is marked invalid, and the parent validates. Null shows the count alone.</summary>
+    [Parameter]
+    public int? MaxLength { get; set; }
+
+    /// <summary>Validation message. Shows under the text box or the collapsed line, which gets an error outline, and is announced.</summary>
+    [Parameter]
+    public string? Error { get; set; }
+
+    /// <summary>Value of the data-testid attribute, and the prefix of <c>-count</c>, <c>-input</c>, <c>-open</c> (the collapsed line) and <c>-error</c>. None of the parts are rendered with a test id when unset.</summary>
+    [Parameter]
+    public string? TestId { get; set; }
+
+    private ElementReference input;
+    private bool textBoxShown;
+    private bool wasShown;
+    private bool focusRequested;
+
+    private string ErrorId => $"{TestId ?? "note"}-error";
+
+    private bool Visible => Editing || !string.IsNullOrWhiteSpace(Value);
+
+    private bool Over => MaxLength is { } max && Value?.Length > max;
+
+    /// <summary>Opens the text box and moves focus into it. For callers outside this field's event handlers, so it renders itself.</summary>
+    public async Task FocusAsync()
+    {
+        await OpenAsync();
+        StateHasChanged();
+    }
+
+    private async Task OpenAsync()
+    {
+        focusRequested = true;
+        if (!Editing)
+        {
+            await SetEditingAsync(true);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var opened = textBoxShown && !wasShown && !firstRender;
+        wasShown = textBoxShown;
+        if (textBoxShown && (opened || focusRequested))
+        {
+            focusRequested = false;
+            await input.FocusAsync();
+        }
+    }
+
+    private async Task SetEditingAsync(bool editing)
+    {
+        Editing = editing;
+        await EditingChanged.InvokeAsync(editing);
+    }
+
+    private Task OnInput(ChangeEventArgs e)
+    {
+        var text = e.Value as string;
+        Value = string.IsNullOrWhiteSpace(text) ? null : text;
+        return ValueChanged.InvokeAsync(Value);
+    }
+
+    private async Task OnBlur()
+    {
+        var trimmed = Value?.Trim();
+        if (trimmed != Value)
+        {
+            Value = trimmed;
+            await ValueChanged.InvokeAsync(trimmed);
+        }
+
+        await SetEditingAsync(false);
+    }
+
+    private string? Id(string part) => TestId is null ? null : $"{TestId}-{part}";
+}

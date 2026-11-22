@@ -66,6 +66,7 @@
 <h2><code>ValueField</code></h2>
 <p>One field that picks its control by <code>Kind</code>: <code>Whole</code> and <code>Fractional</code> show a <code>NumberField</code> (whole-number or decimal keyboard), <code>Duration</code> shows a <code>DurationField</code>, all with the label and error message of the kit. <code>Value</code> is the text as typed, so a parent that validates a form never loses what the user typed (<em>1.</em>, <em>abc</em>); an empty field is null. It is named for what it holds, not for any screen that uses it.</p>
 <ul>
+    <li><code>Compact</code> goes to both controls: the tighter number box, and for a duration the tighter boxes of <code>DurationField.Compact</code>. False by default for both.</li>
     <li><code>data-testid</code>: <code>TestId</code> as on <code>NumberField</code> or <code>DurationField</code>, by kind.</li>
 </ul>
 
@@ -75,6 +76,29 @@
     <li><code>Value</code> and <code>ValueChanged</code>: the text; <code>ValueChanged</code> fires on every keystroke. <code>OnEnter</code> fires when Enter is pressed.</li>
     <li><code>Placeholder</code> and <code>AriaLabel</code>: the hint, and the name for screen readers. The field has no visible label, so <code>AriaLabel</code> is required.</li>
     <li><code>data-testid</code>: <code>TestId</code>, on the input itself and not on the box, so a test types into it directly.</li>
+    <li><code>ResultText</code>: a muted line under the box, such as "12 results", in a polite live region (<code>role="status"</code>) so screen readers announce it when it changes. Null shows no line; an empty string shows an empty line that is already in the page, so set it from the start when results can appear later. <code>data-testid</code>: <code>{TestId}-results</code>.</li>
+    <li><code>MaxLength</code> limits the input; <code>FocusOnShow</code> moves focus into it when the field first shows.</li>
 </ul>
 
-<p>Stories: <a href="./?path=/docs/components-inputs-segmentedcontrol--docs">SegmentedControl</a>, <a href="./?path=/docs/components-inputs-filterchips--docs">FilterChips</a>, <a href="./?path=/docs/components-inputs-fieldinput--docs">FieldInput</a>, <a href="./?path=/docs/components-inputs-numberfield--docs">NumberField</a>, <a href="./?path=/docs/components-inputs-radiogroup--docs">RadioGroup</a>, <a href="./?path=/docs/components-inputs-textfield--docs">TextField</a>, <a href="./?path=/docs/components-inputs-selectfield--docs">SelectField</a>, <a href="./?path=/docs/components-inputs-datestrip--docs">DateStrip</a>, <a href="./?path=/docs/components-inputs-rangecalendar--docs">RangeCalendar</a>, <a href="./?path=/docs/components-inputs-durationfield--docs">DurationField</a>, <a href="./?path=/docs/components-inputs-valuefield--docs">ValueField</a>, <a href="./?path=/docs/components-inputs-searchfield--docs">SearchField</a></p>
+<h2><code>NoteField</code></h2>
+<p>A multi-line note that collapses to one line. While <code>Editing</code> it shows <code>Label</code>, a character count (with <code>MaxLength</code> as "12/500") and a text box; the count turns bold in the error colour over the limit, and an <code>Error</code> draws the box with a <code>--border-width-error</code> error outline and the message under it, announced as an alert. When focus leaves, the note is trimmed and collapses to one line (with the same outline for an error); tapping the line opens the box with focus. With no note and the box closed nothing shows.</p>
+<ul>
+    <li><code>Value</code> and <code>ValueChanged</code>: the note, null when blank. <code>Editing</code> and <code>EditingChanged</code>: whether the box shows. <code>FocusAsync()</code> opens it and focuses it.</li>
+    <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>-count</code>, <code>-input</code>, <code>-open</code> (the collapsed line) and <code>-error</code>.</li>
+</ul>
+
+<h2><code>DateRangeField</code></h2>
+<p>A collapsed date-range field: a button with a calendar <code>Icon</code>, the dates, an optional <code>Count</code> and a chevron. Tapping it raises <code>ExpandedChanged</code>; while <code>Expanded</code> it shows a <code>RangeCalendar</code> under it and Android back closes it. Apply closes the calendar and raises <code>DatesChanged</code>; Cancel only closes it.</p>
+<ul>
+    <li><code>Dates</code>, <code>DateFormat</code> (default <code>d MMM yyyy</code>) and <code>Label</code> (the start of the button's accessible name, "Dates shown" by default; the count follows, worded by <code>CountText</code>).</li>
+    <li><code>Min</code>, <code>Max</code>, <code>Today</code>, <code>DayCounts</code>, <code>MarkedDayText</code>, <code>ApplyLabel</code> and <code>OpenOnMonths</code> go to the calendar.</li>
+    <li><code>data-testid</code>: <code>TestId</code>, <code>{TestId}-dates</code>, <code>{TestId}-count</code>, and the calendar's under <code>{TestId}-calendar</code>.</li>
+</ul>
+
+<h2><code>EntryGridRow</code></h2>
+<p>One row of a grid of entry fields, so the fields of every row line up: a narrow <code>Index</code> column (<code>--entry-grid-index-width</code>), an optional <code>Aside</code> column (<code>--entry-grid-aside-width</code>, for last time's value), <code>FieldCount</code> equal columns for <code>Fields</code>, and an optional <code>Actions</code> column one touch target wide. <code>Header</code> makes a row of column titles, muted, small and hidden from screen readers. Give each field cell its own accessible name, as the header is not read out.</p>
+<ul>
+    <li><code>data-testid</code>: <code>TestId</code>.</li>
+</ul>
+
+<p>Stories: <a href="./?path=/docs/components-inputs-segmentedcontrol--docs">SegmentedControl</a>, <a href="./?path=/docs/components-inputs-filterchips--docs">FilterChips</a>, <a href="./?path=/docs/components-inputs-fieldinput--docs">FieldInput</a>, <a href="./?path=/docs/components-inputs-numberfield--docs">NumberField</a>, <a href="./?path=/docs/components-inputs-radiogroup--docs">RadioGroup</a>, <a href="./?path=/docs/components-inputs-textfield--docs">TextField</a>, <a href="./?path=/docs/components-inputs-selectfield--docs">SelectField</a>, <a href="./?path=/docs/components-inputs-datestrip--docs">DateStrip</a>, <a href="./?path=/docs/components-inputs-rangecalendar--docs">RangeCalendar</a>, <a href="./?path=/docs/components-inputs-durationfield--docs">DurationField</a>, <a href="./?path=/docs/components-inputs-valuefield--docs">ValueField</a>, <a href="./?path=/docs/components-inputs-searchfield--docs">SearchField</a>, <a href="./?path=/docs/components-inputs-notefield--docs">NoteField</a>, <a href="./?path=/docs/components-inputs-daterangefield--docs">DateRangeField</a>, <a href="./?path=/docs/components-inputs-entrygridrow--docs">EntryGridRow</a></p>

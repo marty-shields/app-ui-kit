@@ -1,0 +1,43 @@
+@attribute [Stories("Components/Lists/CollapsibleNote")]
+
+<Stories TComponent="CollapsibleNote" Layout="typeof(ThemeLayout)">
+
+    <Story Name="One line">
+        <Template>
+            <CollapsibleNote Label="Last note" Text="@Long" TestId="note" />
+        </Template>
+    </Story>
+
+    <Story Name="Expanded">
+        <Template>
+            <CollapsibleNote Label="Last note" Text="@Long" Expanded TestId="note" />
+        </Template>
+    </Story>
+
+    <Story Name="Short note">
+        <Template>
+            <CollapsibleNote Label="Last note" Text="Belt on from set 3" />
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <CollapsibleNote Label="Last note" Text="@Long" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <CollapsibleNote Label="Last note" Text="@Long" />
+            </div>
+        </Template>
+    </Story>
+
+</Stories>
+
+@code {
+    private const string Long = "Belt on from set 3, left knee felt tight on the last rep, go lighter next time and add a warm-up set.";
+}

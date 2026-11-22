@@ -160,5 +160,64 @@ public class SearchFieldTests : ComponentTestBase
         Assert.That(cut.Find("input").GetAttribute("value"), Is.EqualTo("abcd"));
     }
 
+    [Test]
+    public void ResultText_ShowsAPoliteLiveLineUnderTheBox()
+    {
+        var cut = Context.Render<SearchField>(p => p
+            .Add(x => x.AriaLabel, "Search")
+            .Add(x => x.ResultText, "12 results")
+            .Add(x => x.TestId, "search"));
+
+        var line = cut.Find("[data-testid=search-results]");
+        Assert.Multiple(() =>
+        {
+            Assert.That(line.TextContent, Is.EqualTo("12 results"));
+            Assert.That(line.GetAttribute("aria-live"), Is.EqualTo("polite"));
+            Assert.That(line.GetAttribute("role"), Is.EqualTo("status"));
+        });
+    }
+
+    [Test]
+    public void ResultText_Empty_KeepsAnEmptyLiveLine_AndNullShowsNone()
+    {
+        var empty = Context.Render<SearchField>(p => p.Add(x => x.AriaLabel, "Search").Add(x => x.ResultText, ""));
+        var none = Context.Render<SearchField>(p => p.Add(x => x.AriaLabel, "Search"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(empty.Find(".results").TextContent, Is.Empty);
+            Assert.That(none.FindAll(".results"), Is.Empty);
+        });
+    }
+
+    [Test]
+    public void MaxLength_SetsTheInputLimit_AndNullLeavesItOff()
+    {
+        var limited = Context.Render<SearchField>(p => p.Add(x => x.AriaLabel, "Search").Add(x => x.MaxLength, 60));
+        var open = Context.Render<SearchField>(p => p.Add(x => x.AriaLabel, "Search"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(limited.Find("input").GetAttribute("maxlength"), Is.EqualTo("60"));
+            Assert.That(open.Find("input").HasAttribute("maxlength"), Is.False);
+        });
+    }
+
+    [Test]
+    public void FocusOnShow_FocusesTheInputOnFirstRenderOnly()
+    {
+        Context.JSInterop.Mode = JSRuntimeMode.Loose;
+
+        Context.Render<SearchField>(p => p.Add(x => x.AriaLabel, "Search").Add(x => x.FocusOnShow, true));
+        var calls = FocusCalls();
+        Context.Render<SearchField>(p => p.Add(x => x.AriaLabel, "Search"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(calls, Is.EqualTo(1));
+            Assert.That(FocusCalls(), Is.EqualTo(1));
+        });
+    }
+
     private int FocusCalls() => Context.JSInterop.Invocations.Count(i => i.Identifier == "Blazor._internal.domWrapper.focus");
 }

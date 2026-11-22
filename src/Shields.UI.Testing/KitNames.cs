@@ -6,10 +6,10 @@ public static class KitNames
     /// <summary>Type names of the kit's components, without generic arity; <c>SegmentedControl</c> stands for <c>SegmentedControl&lt;T&gt;</c>.</summary>
     public static IReadOnlySet<string> Components { get; } = new HashSet<string>
     {
-        "AppButton", "AppErrorBoundary", "AppScreen", "BackHandler", "Banner", "BarList", "BottomNav", "Card", "ChartLegend", "ConfirmDialog",
-        "DateStrip", "Divider", "DurationField", "EmptyState", "ErrorView", "FieldInput", "FilterChips", "HostBridges", "Icon", "IconButton", "InlineAlert", "ListRow", "LoadFailed",
-        "MonthCalendar", "NumberField", "PeriodStepper", "ProgressRing", "RadioGroup", "RangeCalendar", "SearchField", "SectionHeader", "SegmentedControl", "SelectField", "Sheet", "SheetAction", "Snackbar", "Spinner", "StackedBar", "StartupGate",
-        "StartupView", "StatTile", "TextField", "TrendBarChart", "Typography", "ValueField",
+        "AppButton", "AppErrorBoundary", "AppScreen", "BackHandler", "Banner", "BarList", "BottomNav", "Card", "ChartLegend", "CollapsibleNote", "ConfirmDialog", "CountBars",
+        "DateRangeField", "DateStrip", "Divider", "DurationField", "EmptyState", "EntryGridRow", "ErrorView", "FieldInput", "FilterChips", "HostBridges", "Icon", "IconButton", "InlineAlert", "LineChart", "ListRow", "LoadFailed",
+        "MonthCalendar", "NoteField", "NumberField", "PeriodStepper", "ProgressRing", "RadioGroup", "RangeCalendar", "SearchField", "SectionHeader", "SegmentedControl", "SelectField", "Sheet", "SheetAction", "Snackbar", "Spinner", "StackedBar", "StartupGate",
+        "StartupView", "StatTile", "SuccessBadge", "TextField", "TrendBarChart", "Typography", "ValueField",
     };
 
     /// <summary>
@@ -20,7 +20,7 @@ public static class KitNames
     {
         "AlertTone", "AppLifecycle", "AppLifecycleBridge", "BackButton", "BackButtonBridge", "BannerTone", "BarListItem", "BarListLabelWidth", "BarListTestIdBy", "BarListValueWidth", "BottomNavItem",
         "ButtonVariant", "CalendarDay", "CalendarStyle", "ChangeDirection", "DataSeries", "DataSeriesExtensions", "DateRange", "DayLabel", "IAppLifecycle", "IAppStart", "IBackButton", "IconButtonStyle",
-        "IconName", "IconSize", "IconTone", "KitEvent", "LegendItem", "LegendSwatch", "PeriodKind", "RadioOption",
+        "IconName", "IconSize", "IconTone", "KitEvent", "LegendItem", "LegendSwatch", "LineChartPoint", "ListRowLayout", "PeriodKind", "RadioOption",
         "ShieldsUiServiceCollectionExtensions", "SnackbarMessage", "SnackbarService", "StackedBarSegment", "StatChange",
         "SystemBarInsetWriter", "TargetStatus", "TargetStatuses", "TextElement", "TextVariant", "ThemePreference", "ThemeService", "TrendBarPoint", "TrendBarStyle", "ValueKind"
     };

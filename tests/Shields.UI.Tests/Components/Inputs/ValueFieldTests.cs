@@ -130,6 +130,19 @@ public class ValueFieldTests : ComponentTestBase
         Assert.That(Render(kind).Find("input").GetAttribute("data-testid"), Is.EqualTo(expected));
 
     [Test]
+    public void Compact_MakesTheDurationBoxesCompact_AndOffLeavesThemNormal()
+    {
+        var compact = Render(ValueKind.Duration, p => p.Add(x => x.Compact, true));
+        var normal = Render(ValueKind.Duration);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(compact.Find(".parts").ClassList, Does.Contain("compact"));
+            Assert.That(normal.Find(".parts").ClassList, Does.Not.Contain("compact"));
+        });
+    }
+
+    [Test]
     public void Compact_MakesTheNumberBoxCompact()
     {
         var compact = Render(ValueKind.Whole, p => p.Add(x => x.Compact, true));

@@ -77,3 +77,13 @@
     font-weight: var(--font-weight-bold);
     white-space: nowrap;
 }
+
+.sticky {
+    position: sticky;
+    top: var(--section-header-sticky-top);
+    z-index: 1;
+    padding-top: var(--space-2);
+    padding-bottom: var(--space-1);
+    border-bottom: var(--border-width) solid var(--color-border-strong);
+    background-color: var(--color-bg);
+}

@@ -50,3 +50,87 @@
     font-size: var(--font-size-sm);
     white-space: nowrap;
 }
+
+.no-divider {
+    border-bottom: none;
+}
+
+.leading {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: var(--entry-grid-index-width);
+    margin-right: var(--space-2);
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.change {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    margin-left: var(--space-2);
+    font-size: var(--font-size-sm);
+    font-variant-numeric: tabular-nums;
+}
+
+.up {
+    color: var(--color-success);
+}
+
+.down {
+    color: var(--color-error);
+}
+
+.same {
+    color: var(--color-text-muted);
+}
+
+.trailing {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: var(--space-2);
+    margin-left: var(--space-2);
+}
+
+/* Headline: text and aside share the first line, the detail takes a line of its own under them. */
+.headline {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: baseline;
+    column-gap: var(--space-3);
+}
+
+.headline .texts {
+    display: contents;
+}
+
+.headline .text {
+    grid-column: 1;
+    grid-row: 1;
+    font-weight: var(--font-weight-bold);
+}
+
+.headline .aside {
+    grid-column: 2;
+    grid-row: 1;
+    margin-left: 0;
+    padding: 0;
+    color: var(--color-text);
+    font-size: inherit;
+    font-weight: var(--font-weight-bold);
+    font-variant-numeric: tabular-nums;
+}
+
+.headline .detail {
+    grid-column: 1 / -1;
+    grid-row: 2;
+}
+
+.headline .chevron {
+    grid-column: 3;
+    grid-row: 1;
+    align-self: center;
+}

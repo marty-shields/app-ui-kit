@@ -277,4 +277,31 @@ public class SectionHeaderTests : ComponentTestBase
             .Add(x => x.Expanded, expanded)
             .Add(x => x.ExpandedChanged, onChanged ?? (_ => { }))
             .Add(x => x.TestId, "head"));
+
+    [Test]
+    public void Sticky_AddsTheStickyClass_AndIsOffByDefault()
+    {
+        var sticky = Context.Render<SectionHeader>(p => p.Add(x => x.Title, "November").Add(x => x.Total, "4").Add(x => x.Sticky, true));
+        var plain = Context.Render<SectionHeader>(p => p.Add(x => x.Title, "November"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(sticky.Find(".header").ClassList, Does.Contain("sticky"));
+            Assert.That(plain.Find(".header").ClassList, Does.Not.Contain("sticky"));
+        });
+    }
+
+    [Test]
+    public void Css_Sticky_StaysAtTheTopOnThePageColourOverAppScreensPadding()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Lists", "SectionHeader.razor.css");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(css, Does.Contain("position: sticky;"));
+            Assert.That(css, Does.Contain("top: var(--section-header-sticky-top);"));
+            Assert.That(css, Does.Contain("background-color: var(--color-bg);"));
+            Assert.That(KitCss.Tokens, Does.Contain("--section-header-sticky-top: calc(-1 * var(--space-4));"));
+        });
+    }
 }

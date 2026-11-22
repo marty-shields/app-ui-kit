@@ -1,4 +1,4 @@
-<div class="header" data-testid="@TestId">
+<div class="header @(Sticky ? "sticky" : null)" data-testid="@TestId">
     <h2 class="heading">
         @if (ExpandedChanged.HasDelegate)
         {
@@ -62,6 +62,13 @@
     /// <summary>The <c>id</c> of the element the header opens and closes, written to <c>aria-controls</c> on the button only while open, so a panel removed when closed is never referenced. Null writes none.</summary>
     [Parameter]
     public string? ControlsId { get; set; }
+
+    /// <summary>
+    /// Keeps the header at the top of the scrolling area while its section is in view, on the page colour with a strong line under it, so rows pass under it. It sticks within its parent, so put each header and its rows in one section element.
+    /// The offset cancels <c>AppScreen</c>'s content padding. False by default.
+    /// </summary>
+    [Parameter]
+    public bool Sticky { get; set; }
 
     /// <summary>Value of the data-testid attribute, and the prefix of <c>-title</c>, <c>-badge</c>, <c>-hint</c>, <c>-total</c> and <c>-toggle</c>. None are rendered when unset.</summary>
     [Parameter]

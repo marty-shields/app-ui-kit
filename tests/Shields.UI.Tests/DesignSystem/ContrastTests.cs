@@ -12,6 +12,13 @@ public class ContrastTests
         ("--color-text", "--color-surface", Text),
         ("--color-text", "--color-selected", Text),
         ("--color-text-muted", "--color-bg", Text),
+        // Card Selected: every text colour a card holds, on its tint.
+        ("--color-text", "--color-card-selected", Text),
+        ("--color-text-muted", "--color-card-selected", Text),
+        ("--color-error", "--color-card-selected", Text),
+        ("--color-success", "--color-card-selected", Text),
+        ("--color-accent", "--color-card-selected", LargeTextOrControl),
+        ("--color-border-strong", "--color-card-selected", LargeTextOrControl),
         ("--color-text-muted", "--color-surface", Text),
         ("--color-error", "--color-bg", Text),
         ("--color-error", "--color-surface", Text),
@@ -81,7 +88,7 @@ public class ContrastTests
     // Read from each component's CSS, so a variant that gains a new colour is measured without a row here.
     private static readonly (string Css, string Selector, string Property, string[] Backgrounds, double Minimum)[] ComponentColours =
     [
-        .. new[] { ".text", ".label", ".muted", ".muted-small", ".strong", ".figure", ".error" }
+        .. new[] { ".text", ".label", ".muted", ".muted-small", ".strong", ".figure", ".error", ".heading", ".muted-small-strong", ".success-small" }
             .Select(selector => ("Layout/Typography.razor.css", selector, "color", new[] { "--color-bg", "--color-surface" }, Text)),
         ("Feedback/InlineAlert.razor.css", ".error", "color", ["--color-surface"], Text),
         ("Feedback/InlineAlert.razor.css", ".error", "border-color", ["--color-bg", "--color-surface"], LargeTextOrControl),

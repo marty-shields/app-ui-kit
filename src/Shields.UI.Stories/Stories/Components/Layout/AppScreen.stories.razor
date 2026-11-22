@@ -10,6 +10,21 @@
         </Template>
     </Story>
 
+    <Story Name="Toolbar with divider">
+        <Template>
+            <AppScreen Title="Exercises" OnBack="() => { }" ToolbarDivider>
+                <Toolbar>
+                    <div class="tools">
+                        <SearchField Placeholder="Search exercises" AriaLabel="Search exercises" />
+                    </div>
+                </Toolbar>
+                <ChildContent>
+                    <p>Scrolling content.</p>
+                </ChildContent>
+            </AppScreen>
+        </Template>
+    </Story>
+
     <Story Name="Bottom bar">
         <Template>
             <AppScreen Title="Screen title">

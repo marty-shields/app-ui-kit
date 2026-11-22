@@ -85,4 +85,46 @@ public class InlineAlertTests : ComponentTestBase
             Assert.That(TouchTargetCheck.Declarations(css, ".error"), Has.Member("border-color: var(--color-error)").And.Member("color: var(--color-error)"));
         });
     }
+
+    [Test]
+    public void Messages_ShowAsOneListInOneAlert_SkippingBlanks()
+    {
+        var cut = Context.Render<InlineAlert>(p => p
+            .Add(x => x.Messages, new[] { "Weight is required", " ", "Reps must be a whole number" })
+            .Add(x => x.TestId, "errors"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.FindAll("[role=alert]"), Has.Count.EqualTo(1));
+            Assert.That(cut.FindAll("[data-testid=errors-messages] li").Select(li => li.TextContent), Is.EqualTo(new[] { "Weight is required", "Reps must be a whole number" }));
+        });
+    }
+
+    [Test]
+    public void Messages_ComeAfterTheMessage_AndBeforeTheContent()
+    {
+        var cut = Context.Render<InlineAlert>(p => p
+            .Add(x => x.Message, "Couldn't save.")
+            .Add(x => x.Messages, new[] { "One" })
+            .AddChildContent("<b>Retry</b>"));
+
+        var text = cut.Find("[role=alert]").TextContent;
+        Assert.That(text.IndexOf("Couldn't save.", StringComparison.Ordinal), Is.LessThan(text.IndexOf("One", StringComparison.Ordinal)));
+        Assert.That(text.IndexOf("One", StringComparison.Ordinal), Is.LessThan(text.IndexOf("Retry", StringComparison.Ordinal)));
+    }
+
+    [TestCase(null)]
+    [TestCase("")]
+    [TestCase("  ")]
+    public void NoUsableMessages_AndNothingElse_RendersNothing(string? only)
+    {
+        var cut = Context.Render<InlineAlert>(p => p.Add(x => x.Messages, only is null ? null : new[] { only }));
+        var none = Context.Render<InlineAlert>(p => p.Add(x => x.Messages, Array.Empty<string>()));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Markup.Trim(), Is.Empty);
+            Assert.That(none.Markup.Trim(), Is.Empty);
+        });
+    }
 }

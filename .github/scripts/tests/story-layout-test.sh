@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Tests that check-story-layout.mjs fails a story whose page throws or logs a console error, against a stub page (needs node and Chrome; skips without Chrome).
+# Tests that check-story-layout.mjs fails a story whose page throws or logs a console error, against a stub page (needs node and Chrome; skips without Chrome locally, fails without it when CI=true).
 set -uo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
 source "$here/lib.sh"
@@ -10,6 +10,10 @@ for candidate in google-chrome chromium chromium-browser; do
 done
 [ -n "$chrome" ] || chrome="$(compgen -G "$HOME/.cache/ms-playwright/chromium-*/chrome-linux*/chrome" | head -1)"
 if [ -z "$chrome" ]; then
+  if [ "${CI:-}" = "true" ]; then
+    echo "FAIL story-layout: no Chrome found in CI (set CHROME)"
+    exit 1
+  fi
   echo "skip story-layout: no Chrome found (set CHROME)"
   exit 0
 fi

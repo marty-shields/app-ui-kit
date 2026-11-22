@@ -31,7 +31,7 @@
     font-size: var(--font-size-sm);
 }
 
-/* A label starts from its smallest size (swatch, 3 characters of text, value), so a line breaks only when even the shrunk labels do not fit and the row never overflows. Free space then grows each label up to its full width, so the text shrinks only as much as needed. */
+/* A label starts from its smallest size (swatch, a few characters of text, value), so a line breaks only when even the shrunk labels do not fit and the row never overflows. Free space then grows each label up to its full width, so the text shrinks only as much as needed. */
 .label {
     display: flex;
     align-items: center;
@@ -40,14 +40,17 @@
     white-space: nowrap;
 }
 
-/* The text is the only part that shrinks, so the value always stays visible. 3ch keeps at least a few characters of every name, since an ellipsis alone says nothing. ch is the width of the text's own font. */
+/* The text is the only part that shrinks, so the value always stays visible. A one-line clamp ends a cut name with an ellipsis, and letting it break anywhere makes the label's smallest size a few characters instead of the whole name (a nowrap ellipsis would keep the full name as the smallest size, and a fixed width would stop the label growing to the full name). 3ch keeps at least a few characters of every name, since an ellipsis alone says nothing. ch is the width of the text's own font. */
 .label-text {
-    flex: 1 1 3ch;
-    width: 3ch;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    overflow-wrap: anywhere;
+    white-space: normal;
+    flex: 1 1 auto;
     min-width: 3ch;
-    max-width: max-content;
     overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .label strong {

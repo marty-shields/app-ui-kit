@@ -1,9 +1,14 @@
-# Publishes the stories site to GitHub Pages on every push to main.
+# Publishes the combined stories site (issue #16) to GitHub Pages: the kit's stories and both apps' screens, each app's
+# main built against the kit's main (-p:UseKitSource=true). It runs on every push to main, once a day (so a change merged
+# to an app's main shows up without a kit change) and on demand. The site's Foundations/Built from page names the three
+# commits it was built from.
 name: Stories site
 
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: "0 5 * * *"
   workflow_dispatch:
 
 permissions:
@@ -16,22 +21,43 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          path: app-ui-kit
+          persist-credentials: false
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: marty-shields/calorie-tracker-app
+          ref: main
+          path: calorie-tracker-app
+          persist-credentials: false
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: marty-shields/workout-log-app
+          ref: main
+          path: workout-log-app
           persist-credentials: false
 
       - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
         with:
-          global-json-file: global.json
+          global-json-file: app-ui-kit/global.json
 
       - id: pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
 
-      # Pages compresses files itself, so the publish writes none.
+      # Pages compresses files itself, so the publish writes none. The apps sit beside the kit, where the host looks for them.
       - name: Publish
-        run: dotnet publish src/Shields.UI.Stories.Host -c Release -o publish -p:CompressionEnabled=false
+        run: |
+          dotnet publish app-ui-kit/src/Shields.UI.Stories.All -c Release -o publish -p:CompressionEnabled=false \
+            -p:UseKitSource=true "-p:KitPath=$GITHUB_WORKSPACE/app-ui-kit" -p:RestoreLockedMode=false \
+            "-p:KitCommit=$(git -C app-ui-kit rev-parse HEAD)" \
+            "-p:CalorieTrackerCommit=$(git -C calorie-tracker-app rev-parse HEAD)" \
+            "-p:WorkoutLogCommit=$(git -C workout-log-app rev-parse HEAD)" \
+            "-p:BuiltAt=$(date -u '+%Y-%m-%d %H:%M')"
 
       # The site is served under /<repo>/, not the root.
       - name: Set the base path

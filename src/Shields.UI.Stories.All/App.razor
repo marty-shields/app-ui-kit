@@ -1,0 +1,19 @@
+@using static BlazingStory.Types.NavigationTreeOrderBuilder
+@using Shields.UI.Stories.Shared
+
+@* Each app's sub-order is copied from its own stories host's App.razor. *@
+<BlazingStoryApp Title="Shields UI and apps"
+                 Assemblies="[typeof(DefaultLayout).Assembly,
+                              typeof(App).Assembly,
+                              typeof(CalorieTracker.UI.Stories.CalorieTrackerStories).Assembly,
+                              typeof(WorkoutLog.UI.Stories.Samples.StorySampleServices).Assembly]"
+                 DefaultLayout="typeof(DefaultLayout)"
+                 NavigationTreeOrder="@N["Foundations", N["Introduction", "Tokens", "Built from"],
+                                         "Components", N["Actions"],
+                                         "Calorie Tracker", N["Foundations", N["Navigation", "App Icon"],
+                                                              "Components", N["Charts", "Layout", "Lists"],
+                                                              "Screens", N["Dashboard", "Settings"]],
+                                         "Workout Log", N["Foundations", N["Introduction", "Navigation", "App Icon"],
+                                                          "Components", N["Inputs", "Lists", "Workout"],
+                                                          "Screens", N["This week", "New Workout", "Edit Workout", "Add Exercise", "Workouts"]]]">
+</BlazingStoryApp>

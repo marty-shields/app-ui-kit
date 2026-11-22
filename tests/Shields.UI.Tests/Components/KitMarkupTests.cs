@@ -24,7 +24,7 @@ public partial class KitMarkupTests : ComponentTestBase
             }
             catch (Exception ex) when (ex is not AssertionException)
             {
-                // Needs required parameters or services; its source is covered by the source scan.
+                // Needs required parameters or services, so its rendered markup is not checked here; only the source scan below sees it, and only for a doubled quote.
             }
         }
 
@@ -66,6 +66,6 @@ public partial class KitMarkupTests : ComponentTestBase
             .SelectMany(e => e.Attributes.Select(a => a.Name))
             .Where(name => name.Length == 0 || name.AsSpan().ContainsAny(InvalidNameChars));
 
-    [GeneratedRegex("=\"[^\"]*@(\\w[\\w.]*|\\([^\"]*\\))\"\"")]
+    [GeneratedRegex("=\"[^\"]*@[^\\s\"]+\"\"")]
     private static partial Regex DoubledQuote();
 }

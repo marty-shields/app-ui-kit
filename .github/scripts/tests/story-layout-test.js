@@ -4,7 +4,11 @@ const { createServer } = require('node:http');
 const scripts = {
   'components-layout-card--title': "throw new Error('boom from the page');",
   'components-layout-card--compact': "console.error('Unhandled exception rendering component: bad attribute\\n   at Card');",
+  // Allowed for its own story (AppErrorBoundary / Error) but not for another story.
   'components-layout-card--dark': "console.error('fail: Shields.UI.Components.Layout.AppErrorBoundary[9101]\\n      logged on purpose');",
+  'components-layout-apperrorboundary--error': "console.error('fail: Shields.UI.Components.Layout.AppErrorBoundary[9101]\\n      logged on purpose');",
+  // The parser accepts `class="x""` and makes an attribute named `"`.
+  'components-layout-card--light': "document.getElementById('app').innerHTML = '<div class=\"x\"\" >styled</div>';",
 };
 
 const server = createServer((request, response) => {

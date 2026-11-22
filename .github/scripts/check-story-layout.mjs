@@ -17,11 +17,12 @@ const WIDTH = 424;
 // Exploration knob (Android font size scales rem); not run in CI.
 const FONT_SCALE = Number(process.env.STORY_FONT_SCALE ?? 1);
 const CONCURRENCY = 8;
-// Console errors that are known to be harmless, matched against the first line of the message. Each is logged on purpose by a story that shows a failure.
-const IGNORED_ERRORS = [
-  'fail: Shields.UI.Components.Layout.AppErrorBoundary[9101]', // AppErrorBoundary / Error
-  'fail: Shields.UI.Components.Layout.StartupGate[9002]', // StartupGate / Load failed
-];
+// Console errors that are known to be harmless, by story id: the first line of the message may contain one of that story's prefixes. Each is logged on purpose by a story that shows a failure.
+const IGNORED_ERRORS = {
+  'components-layout-apperrorboundary--error': ['fail: Shields.UI.Components.Layout.AppErrorBoundary[9101]'],
+  'components-layout-startupgate--load-failed': ['fail: Shields.UI.Components.Layout.StartupGate[9002]'],
+  'components-layout-startupgate--load-failed-no-retry': ['fail: Shields.UI.Components.Layout.StartupGate[9002]'],
+};
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../src/Shields.UI.Stories/Stories');
 const scopes = prefixes.length ? prefixes : ['Components/'];
 
@@ -172,7 +173,7 @@ const send = (method, params = {}, sessionId) => new Promise((resolve, reject) =
 });
 
 // The first line of a thrown exception or console error, or undefined when the event is neither or the error is allowed.
-function pageError({ method, params }) {
+function pageError({ method, params }, storyId) {
   let text;
   if (method === 'Runtime.exceptionThrown') {
     const { exception, text: summary } = params.exceptionDetails;
@@ -183,7 +184,7 @@ function pageError({ method, params }) {
     return undefined;
   }
   const line = text.split('\n')[0].trim();
-  return IGNORED_ERRORS.some((ignored) => line.includes(ignored)) ? undefined : line;
+  return (IGNORED_ERRORS[storyId] ?? []).some((ignored) => line.includes(ignored)) ? undefined : line;
 }
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -194,7 +195,7 @@ async function check(story) {
   const run = (method, params) => send(method, params, sessionId);
   const errors = [];
   sessionEvents.set(sessionId, (event) => {
-    const line = pageError(event);
+    const line = pageError(event, story.id);
     if (line) errors.push(line);
   });
   try {
@@ -213,7 +214,7 @@ async function check(story) {
       await sleep(300);
     }
     const { result, exceptionDetails } = await run('Runtime.evaluate', { expression: `(${inspect})()`, returnByValue: true });
-    if (exceptionDetails) return { findings: [`checker failed: ${exceptionDetails.text}`] };
+    if (exceptionDetails) return { findings: [`checker failed: ${exceptionDetails.exception?.description ?? exceptionDetails.text}`, ...errors] };
     return { findings: [...result.value, ...errors] };
   } finally {
     sessionEvents.delete(sessionId);

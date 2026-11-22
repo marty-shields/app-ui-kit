@@ -17,6 +17,11 @@ const WIDTH = 424;
 // Exploration knob (Android font size scales rem); not run in CI.
 const FONT_SCALE = Number(process.env.STORY_FONT_SCALE ?? 1);
 const CONCURRENCY = 8;
+// Console errors that are known to be harmless, matched against the first line of the message. Each is logged on purpose by a story that shows a failure.
+const IGNORED_ERRORS = [
+  'fail: Shields.UI.Components.Layout.AppErrorBoundary[9101]', // AppErrorBoundary / Error
+  'fail: Shields.UI.Components.Layout.StartupGate[9002]', // StartupGate / Load failed
+];
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../src/Shields.UI.Stories/Stories');
 const scopes = prefixes.length ? prefixes : ['Components/'];
 
@@ -61,6 +66,11 @@ function inspect() {
     if (Math.abs(area - 328) > 1) findings.push(`story area is ${Math.round(area)}px wide, expected 328px`);
   } else if (!frame) {
     findings.push('no story root found (neither the phone frame nor [data-testid=preview]), so the width was not checked');
+  }
+  // Current Chrome accepts an attribute named `"` (from `class="x""`) that Android WebView rejects, so no exception tells us.
+  for (const el of app.querySelectorAll('*')) {
+    const bad = el.getAttributeNames().find((name) => /[\s"'<>\/=]/.test(name));
+    if (bad) findings.push(`${label(el)} has an invalid attribute name: ${JSON.stringify(bad)}`);
   }
   for (const card of app.querySelectorAll('.card')) {
     if (!card.parentElement) continue;
@@ -143,6 +153,7 @@ const socket = new WebSocket(endpoint);
 socket.onclose = () => die('Chrome connection lost');
 await new Promise((ok, fail) => { socket.onopen = ok; socket.onerror = () => fail(new Error('Cannot connect to Chrome')); }).catch((error) => die(error.message));
 let next = 0;
+const sessionEvents = new Map();
 const pending = new Map();
 socket.onmessage = ({ data }) => {
   const message = JSON.parse(data);
@@ -150,6 +161,8 @@ socket.onmessage = ({ data }) => {
   if (waiter) {
     pending.delete(message.id);
     message.error ? waiter.reject(new Error(message.error.message)) : waiter.resolve(message.result);
+  } else if (message.sessionId) {
+    sessionEvents.get(message.sessionId)?.(message);
   }
 };
 const send = (method, params = {}, sessionId) => new Promise((resolve, reject) => {
@@ -158,20 +171,41 @@ const send = (method, params = {}, sessionId) => new Promise((resolve, reject) =
   socket.send(JSON.stringify({ id, method, params, sessionId }));
 });
 
+// The first line of a thrown exception or console error, or undefined when the event is neither or the error is allowed.
+function pageError({ method, params }) {
+  let text;
+  if (method === 'Runtime.exceptionThrown') {
+    const { exception, text: summary } = params.exceptionDetails;
+    text = `page exception: ${exception?.description ?? exception?.value ?? summary}`;
+  } else if (method === 'Runtime.consoleAPICalled' && params.type === 'error') {
+    text = `console error: ${params.args.map((a) => a.value ?? a.description ?? '').join(' ')}`;
+  } else {
+    return undefined;
+  }
+  const line = text.split('\n')[0].trim();
+  return IGNORED_ERRORS.some((ignored) => line.includes(ignored)) ? undefined : line;
+}
+
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function check(story) {
   const { targetId } = await send('Target.createTarget', { url: 'about:blank' });
   const { sessionId } = await send('Target.attachToTarget', { targetId, flatten: true });
   const run = (method, params) => send(method, params, sessionId);
+  const errors = [];
+  sessionEvents.set(sessionId, (event) => {
+    const line = pageError(event);
+    if (line) errors.push(line);
+  });
   try {
+    await run('Runtime.enable');
     await run('Emulation.setDeviceMetricsOverride', { width: WIDTH, height: 900, deviceScaleFactor: 1, mobile: true });
     await run('Page.navigate', { url: `${baseUrl}/iframe.html?id=${story.id}&viewMode=story` });
     const ready = '(document.documentElement.classList.contains("_blazing_story_ready_for_visible") && document.querySelector("#app")?.children.length > 0)';
     for (let i = 0; ; i++) {
       const { result } = await run('Runtime.evaluate', { expression: ready, returnByValue: true });
       if (result.value) break;
-      if (i > 150) return { findings: ['did not render within 30s'] };
+      if (i > 150) return { findings: ['did not render within 30s', ...errors] };
       await sleep(200);
     }
     if (FONT_SCALE !== 1) {
@@ -180,8 +214,9 @@ async function check(story) {
     }
     const { result, exceptionDetails } = await run('Runtime.evaluate', { expression: `(${inspect})()`, returnByValue: true });
     if (exceptionDetails) return { findings: [`checker failed: ${exceptionDetails.text}`] };
-    return { findings: result.value };
+    return { findings: [...result.value, ...errors] };
   } finally {
+    sessionEvents.delete(sessionId);
     await send('Target.closeTarget', { targetId }).catch(() => {});
   }
 }

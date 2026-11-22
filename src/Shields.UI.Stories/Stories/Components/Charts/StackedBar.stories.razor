@@ -38,9 +38,15 @@
         </Template>
     </Story>
 
-    <Story Name="Phone width legend">
+    <Story Name="Card width legend">
         <Template>
-            <div class="phone-screen"><div class="themed"><StackedBar Label="Average macros" Unit="g" Segments="@([new StackedBarSegment("Protein", 182.6, DataSeries.One), new StackedBarSegment("Carbs", 245.0, DataSeries.Two), new StackedBarSegment("Fat", 91.3, DataSeries.Three)])" TestId="bar" /></div></div>
+            <div class="phone-screen"><div class="themed card-stand-in"><StackedBar Label="Average macros" Unit="g" Segments="@([new StackedBarSegment("Protein", 182.6, DataSeries.One), new StackedBarSegment("Carbs", 245.0, DataSeries.Two), new StackedBarSegment("Fat", 91.3, DataSeries.Three)])" TestId="bar" /></div></div>
+        </Template>
+    </Story>
+
+    <Story Name="Five segments with long values">
+        <Template>
+            <div class="themed mid"><StackedBar Label="Energy by meal" Segments="@([new StackedBarSegment("Breakfast", 1234.5, DataSeries.One, "1,234.5 kcal"), new StackedBarSegment("Lunch", 1100.5, DataSeries.Two, "1,100.5 kcal"), new StackedBarSegment("Dinner", 1500.5, DataSeries.Three, "1,500.5 kcal"), new StackedBarSegment("Snacks", 600.5, DataSeries.Four, "600.5 kcal"), new StackedBarSegment("Drinks", 300.5, DataSeries.Five, "300.5 kcal")])" TestId="bar" /></div>
         </Template>
     </Story>
 

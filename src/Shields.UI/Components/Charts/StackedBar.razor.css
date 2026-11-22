@@ -1,5 +1,4 @@
 .stack {
-    container-type: inline-size;
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
@@ -25,31 +24,28 @@
 
 .labels {
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     justify-content: space-between;
     gap: var(--space-1);
     color: var(--color-text-muted);
     font-size: var(--font-size-sm);
 }
 
+/* A label starts from its smallest size (swatch, 3 characters of text, value), so a line breaks only when even the shrunk labels do not fit and the row never overflows. Free space then grows each label up to its full width, so the text shrinks only as much as needed. */
 .label {
     display: flex;
     align-items: center;
-    max-width: 100%;
-    min-width: 0;
+    flex: 1 1 min-content;
+    max-width: max-content;
     white-space: nowrap;
 }
 
-/* The labels stay on one line and the text shrinks first. Only a box too narrow for even the shrunk labels lets them wrap. A container query cannot read a token, so the width is in ch, which follows the font size. */
-@container (max-width: 30ch) {
-    .labels {
-        flex-wrap: wrap;
-    }
-}
-
-/* Only the text shrinks, so the value always stays visible. */
+/* The text is the only part that shrinks, so the value always stays visible. 3ch keeps at least a few characters of every name, since an ellipsis alone says nothing. ch is the width of the text's own font. */
 .label-text {
-    min-width: 0;
+    flex: 1 1 3ch;
+    width: 3ch;
+    min-width: 3ch;
+    max-width: max-content;
     overflow: hidden;
     text-overflow: ellipsis;
 }

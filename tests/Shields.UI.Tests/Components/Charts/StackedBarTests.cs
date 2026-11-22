@@ -26,9 +26,9 @@ public class StackedBarTests : ComponentTestBase
         {
             Assert.That(cut.Find("[data-testid=bar]").GetAttribute("role"), Is.EqualTo("img"));
             Assert.That(Text(cut), Is.EqualTo("Sales by region: North 30 g, 24%; South 67 g, 53%; East 29 g, 23%."));
-            Assert.That(cut.Find("[data-testid=bar-label-0]").TextContent, Is.EqualTo("North30 g"));
-            Assert.That(cut.Find("[data-testid=bar-label-1]").TextContent, Is.EqualTo("South67 g"));
-            Assert.That(cut.Find("[data-testid=bar-label-2]").TextContent, Is.EqualTo("East29 g"));
+            Assert.That(cut.Find("[data-testid=bar-label-0]").TextContent, Is.EqualTo("North 30 g"));
+            Assert.That(cut.Find("[data-testid=bar-label-1]").TextContent, Is.EqualTo("South 67 g"));
+            Assert.That(cut.Find("[data-testid=bar-label-2]").TextContent, Is.EqualTo("East 29 g"));
             Assert.That(cut.Find(".track").GetAttribute("aria-hidden"), Is.EqualTo("true"));
             Assert.That(cut.Find(".labels").GetAttribute("aria-hidden"), Is.EqualTo("true"));
         });
@@ -41,9 +41,9 @@ public class StackedBarTests : ComponentTestBase
 
         Assert.Multiple(() =>
         {
-            Assert.That(cut.Find("[data-testid=bar-label-0]").TextContent, Is.EqualTo("A5 kg"));
-            Assert.That(cut.Find("[data-testid=bar-label-1]").TextContent, Is.EqualTo("B10 g"));
-            Assert.That(cut.Find("[data-testid=bar-label-2]").TextContent, Is.EqualTo("C7 lb"));
+            Assert.That(cut.Find("[data-testid=bar-label-0]").TextContent, Is.EqualTo("A 5 kg"));
+            Assert.That(cut.Find("[data-testid=bar-label-1]").TextContent, Is.EqualTo("B 10 g"));
+            Assert.That(cut.Find("[data-testid=bar-label-2]").TextContent, Is.EqualTo("C 7 lb"));
             Assert.That(Text(cut), Is.EqualTo("Sales by region: A 5 kg, 25%; B 10 g, 25%; C 7 lb, 50%."));
             Assert.That(cut.Find("[data-testid=bar-segment-0]").GetAttribute("style"), Does.Contain("flex-grow: 25"));
             Assert.That(cut.Find("[data-testid=bar-segment-2]").GetAttribute("style"), Does.Contain("flex-grow: 50"));
@@ -57,8 +57,8 @@ public class StackedBarTests : ComponentTestBase
 
         Assert.Multiple(() =>
         {
-            Assert.That(cut.Find("[data-testid=bar-label-0]").TextContent, Is.EqualTo("A10 g"));
-            Assert.That(cut.Find("[data-testid=bar-label-1]").TextContent, Is.EqualTo("B10 g"));
+            Assert.That(cut.Find("[data-testid=bar-label-0]").TextContent, Is.EqualTo("A 10 g"));
+            Assert.That(cut.Find("[data-testid=bar-label-1]").TextContent, Is.EqualTo("B 10 g"));
             Assert.That(Text(cut), Is.EqualTo("Sales by region: A 10 g, 50%; B 10 g, 50%."));
         });
     }
@@ -137,12 +137,12 @@ public class StackedBarTests : ComponentTestBase
         {
             Assert.That(cut.FindAll("[data-testid=bar-segment-0]"), Is.Empty);
             Assert.That(cut.FindAll("[data-testid=bar-segment-1]"), Is.Empty);
-            Assert.That(cut.Find("[data-testid=bar-label-0]").TextContent, Is.EqualTo("A0 g"));
+            Assert.That(cut.Find("[data-testid=bar-label-0]").TextContent, Is.EqualTo("A 0 g"));
             Assert.That(cut.FindAll("[data-testid=bar-segment-3]"), Is.Empty);
             Assert.That(cut.FindAll("[data-testid=bar-segment-4]"), Is.Empty);
-            Assert.That(cut.Find("[data-testid=bar-label-1]").TextContent, Is.EqualTo("B0 g"));
-            Assert.That(cut.Find("[data-testid=bar-label-3]").TextContent, Is.EqualTo("D0 g"));
-            Assert.That(cut.Find("[data-testid=bar-label-4]").TextContent, Is.EqualTo("E0 g"));
+            Assert.That(cut.Find("[data-testid=bar-label-1]").TextContent, Is.EqualTo("B 0 g"));
+            Assert.That(cut.Find("[data-testid=bar-label-3]").TextContent, Is.EqualTo("D 0 g"));
+            Assert.That(cut.Find("[data-testid=bar-label-4]").TextContent, Is.EqualTo("E 0 g"));
             Assert.That(Text(cut), Does.Contain("A 0 g, 0%").And.Contain("C 10 g, 100%"));
         });
     }
@@ -154,7 +154,7 @@ public class StackedBarTests : ComponentTestBase
 
         Assert.Multiple(() =>
         {
-            Assert.That(cut.Find("[data-testid=bar-label-0]").TextContent, Is.EqualTo("A12.5 g"));
+            Assert.That(cut.Find("[data-testid=bar-label-0]").TextContent, Is.EqualTo("A 12.5 g"));
             Assert.That(Text(cut), Does.Contain("A 12.5 g"));
         });
     }
@@ -166,8 +166,8 @@ public class StackedBarTests : ComponentTestBase
 
         Assert.Multiple(() =>
         {
-            Assert.That(cut.Find("[data-testid=bar-label-0]").TextContent, Is.EqualTo("A12,500 g"));
-            Assert.That(cut.Find("[data-testid=bar-label-1]").TextContent, Is.EqualTo("B1,234.5 g"));
+            Assert.That(cut.Find("[data-testid=bar-label-0]").TextContent, Is.EqualTo("A 12,500 g"));
+            Assert.That(cut.Find("[data-testid=bar-label-1]").TextContent, Is.EqualTo("B 1,234.5 g"));
         });
     }
 
@@ -215,7 +215,7 @@ public class StackedBarTests : ComponentTestBase
 
         Assert.Multiple(() =>
         {
-            Assert.That(Rule(".label-text"), Does.Contain("min-width: 0;").And.Contain("overflow: hidden;").And.Contain("text-overflow: ellipsis;"));
+            Assert.That(Rule(".label-text"), Does.Contain("min-width: 3ch;").And.Contain("overflow: hidden;").And.Contain("text-overflow: ellipsis;"));
             Assert.That(Rule(".label"), Does.Not.Contain("overflow").And.Not.Contain("text-overflow"));
             Assert.That(Rule(".label strong"), Does.Contain("flex-shrink: 0;"));
             Assert.That(Rule(".label::before"), Does.Contain("flex-shrink: 0;"));
@@ -223,24 +223,30 @@ public class StackedBarTests : ComponentTestBase
     }
 
     [Test]
-    public void Render_LabelAndValue_HaveNoTextSpaceBetweenThem_SoTheMarginIsTheOnlySpace()
-    {
-        var cut = Render(Three);
-
-        Assert.That(cut.Find("[data-testid=bar-label-0]").ChildNodes, Has.Length.EqualTo(2));
-    }
-
-    [Test]
-    public void Css_LabelsStayOnOneLine_AndOnlyWrapInAVeryNarrowBox()
+    public void Css_LabelIsFlex_SoTheWhitespaceBeforeTheValueIsNotRendered_AndTheMarginIsTheOnlyGap()
     {
         var css = RepoFiles.Read("src", "Shields.UI", "Components", "Charts", "StackedBar.razor.css");
         string Rule(string selector) => Regex.Match(css, Regex.Escape(selector) + @"\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
 
         Assert.Multiple(() =>
         {
-            Assert.That(Rule(".stack"), Does.Contain("container-type: inline-size;"));
-            Assert.That(Rule(".labels"), Does.Contain("flex-wrap: nowrap;"));
-            Assert.That(Regex.IsMatch(css, @"@container \(max-width: [^)]+\)\s*\{\s*\.labels\s*\{\s*flex-wrap: wrap;"), Is.True);
+            Assert.That(Rule(".label"), Does.Contain("display: flex;"));
+            Assert.That(Rule(".label strong"), Does.Contain("margin-left: var(--space-1);"));
+        });
+    }
+
+    [Test]
+    public void Css_LabelsWrapOnlyWhenTheShrunkLabelsDoNotFit_AndNamesKeepThreeCharacters()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Charts", "StackedBar.razor.css");
+        string Rule(string selector) => Regex.Match(css, Regex.Escape(selector) + @"\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(css, Does.Not.Contain("@container"));
+            Assert.That(Rule(".labels"), Does.Contain("flex-wrap: wrap;"));
+            Assert.That(Rule(".label"), Does.Contain("flex: 1 1 min-content;").And.Contain("max-width: max-content;"));
+            Assert.That(Rule(".label-text"), Does.Contain("flex: 1 1 3ch;").And.Contain("width: 3ch;").And.Contain("min-width: 3ch;").And.Contain("max-width: max-content;"));
             Assert.That(Rule(".label strong"), Does.Contain("margin-left: var(--space-1);"));
             Assert.That(Rule(".label::before"), Does.Contain("width: var(--legend-swatch-size);"));
         });
@@ -289,7 +295,7 @@ public class StackedBarTests : ComponentTestBase
         Assert.Multiple(() =>
         {
             Assert.That(Text(cut), Is.EqualTo("A 1, 25%; B 3, 75%."));
-            Assert.That(cut.Find("[data-testid=bar-label-0]").TextContent, Is.EqualTo("A1"));
+            Assert.That(cut.Find("[data-testid=bar-label-0]").TextContent, Is.EqualTo("A 1"));
         });
     }
 
@@ -315,7 +321,7 @@ public class StackedBarTests : ComponentTestBase
     }
 
     [Test]
-    public void Legend_UsesTheSmallestSpaceTokenForEveryGap_AndTheTextMayShrink()
+    public void Legend_UsesTheSmallestSpaceTokenForEveryGap()
     {
         var css = RepoFiles.Read("src", "Shields.UI", "Components", "Charts", "StackedBar.razor.css");
         var labels = Regex.Match(css, @"\.labels\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
@@ -324,7 +330,6 @@ public class StackedBarTests : ComponentTestBase
         Assert.Multiple(() =>
         {
             Assert.That(labels, Does.Contain("gap: var(--space-1);"));
-            Assert.That(label, Does.Contain("min-width: 0;"));
             Assert.That(css, Does.Contain("margin-left: var(--space-1);"));
             Assert.That(css, Does.Contain("margin-right: var(--space-1);"));
         });

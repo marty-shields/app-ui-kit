@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Usage: check-apps.sh [--advisory] <kit> <calorie-tracker-app> <workout-log-app>
 # Builds each app's UI, stories library and UI tests against the kit's source at <kit> (-p:UseKitSource=true), then runs
-# the app's UI tests. Both apps are checked even when the first fails. For each failure it prints an annotation that
+# the app's UI tests. An app whose kit references still resolve to packages (no UseKitSource switch) fails before its
+# tests, since it would test nothing. Both apps are checked even when the first fails. For each failure it prints an annotation that
 # names the app, the stage and the first error. With GITHUB_STEP_SUMMARY set, it also adds a table to the run summary.
 # Exits 1 when an app fails. With --advisory (a semver:major PR, which is expected to break the apps), failures are
 # warnings and it exits 0. DOTNET overrides the dotnet command, for the tests.

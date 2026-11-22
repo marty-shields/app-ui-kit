@@ -1,0 +1,57 @@
+<!-- The combined stories site: the kit's stories and both apps' (issue #16). It needs the app repos cloned beside this one,
+     so it is not in Shields.UI.slnx. Build it with -p:UseKitSource=true -p:KitPath=<this repo> -p:RestoreLockedMode=false
+     (see AGENTS.md), so both apps compile against the kit's current source. -->
+<Project>
+
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk.BlazorWebAssembly" />
+
+  <PropertyGroup>
+    <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+    <!-- The Gateway that `dotnet run` starts serves index.html for / and any other path that isn't a file, as in the .NET 11 Blazor WebAssembly template. -->
+    <StaticWebAssetSpaFallbackEnabled>true</StaticWebAssetSpaFallbackEnabled>
+    <!-- The dependency graph comes from three repos' main branches, so a committed lock file would always be stale. -->
+    <RestorePackagesWithLockFile>false</RestorePackagesWithLockFile>
+    <!-- The app repos' checkouts; relative values are relative to this repo's root. -->
+    <CalorieTrackerPath Condition="'$(CalorieTrackerPath)' == ''">../calorie-tracker-app</CalorieTrackerPath>
+    <WorkoutLogPath Condition="'$(WorkoutLogPath)' == ''">../workout-log-app</WorkoutLogPath>
+    <_KitRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../'))</_KitRoot>
+    <_CalorieTrackerRoot>$([System.IO.Path]::Combine('$(_KitRoot)', '$(CalorieTrackerPath)'))</_CalorieTrackerRoot>
+    <_WorkoutLogRoot>$([System.IO.Path]::Combine('$(_KitRoot)', '$(WorkoutLogPath)'))</_WorkoutLogRoot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BlazingStory" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Gateway" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Shields.UI.Stories\Shields.UI.Stories.csproj" />
+    <ProjectReference Include="$(_CalorieTrackerRoot)/src/CalorieTracker.UI.Stories/CalorieTracker.UI.Stories.csproj" />
+    <ProjectReference Include="$(_WorkoutLogRoot)/src/WorkoutLog.UI.Stories/WorkoutLog.UI.Stories.csproj" />
+  </ItemGroup>
+
+  <!-- The commits the site was built from, shown on Foundations/Built from. CI passes them; a local build leaves them empty. -->
+  <ItemGroup>
+    <AssemblyMetadata Include="KitCommit" Value="$(KitCommit)" />
+    <AssemblyMetadata Include="CalorieTrackerCommit" Value="$(CalorieTrackerCommit)" />
+    <AssemblyMetadata Include="WorkoutLogCommit" Value="$(WorkoutLogCommit)" />
+    <AssemblyMetadata Include="BuiltAt" Value="$(BuiltAt)" />
+  </ItemGroup>
+
+  <Target Name="CheckAppCheckouts" BeforeTargets="CollectPackageReferences;_GenerateRestoreProjectPathWalk">
+    <Error Condition="!Exists('$(_CalorieTrackerRoot)/src/CalorieTracker.UI.Stories/CalorieTracker.UI.Stories.csproj')" Text="Calorie Tracker is not at $(_CalorieTrackerRoot). Clone marty-shields/calorie-tracker-app there or pass -p:CalorieTrackerPath=&lt;its folder&gt; (see AGENTS.md)." />
+    <Error Condition="!Exists('$(_WorkoutLogRoot)/src/WorkoutLog.UI.Stories/WorkoutLog.UI.Stories.csproj')" Text="Workout Log is not at $(_WorkoutLogRoot). Clone marty-shields/workout-log-app there or pass -p:WorkoutLogPath=&lt;its folder&gt; (see AGENTS.md)." />
+    <Error Condition="'$(UseKitSource)' != 'true'" Text="Build this host with -p:UseKitSource=true -p:KitPath=$(_KitRoot) -p:RestoreLockedMode=false, so both apps compile against this kit's source (see AGENTS.md)." />
+  </Target>
+
+  <!-- Removes the native SQLite file that each app's Core brings in, as the apps' own stories hosts do. -->
+  <Target Name="RemoveSqliteNativeReference" BeforeTargets="_CheckBrowserWorkloadNeededButNotAvailable">
+    <ItemGroup>
+      <NativeFileReference Remove="@(NativeFileReference)" Condition="'%(Filename)' == 'e_sqlite3'" />
+    </ItemGroup>
+  </Target>
+
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk.BlazorWebAssembly" />
+
+</Project>

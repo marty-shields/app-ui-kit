@@ -1,0 +1,48 @@
+@attribute [CustomPage("Foundations/Built from")]
+@using System.Reflection
+
+<h1>Built from</h1>
+
+<p>This site shows each app's <code>main</code> built against the kit's <code>main</code>, so for a short time after a kit change it can be newer than what an app has installed.</p>
+
+@if (BuiltAt is { Length: > 0 })
+{
+    <p>Built at @BuiltAt (UTC).</p>
+}
+
+<table>
+    <thead><tr><th>Repo</th><th>Commit</th></tr></thead>
+    <tbody>
+        @foreach (var (name, repo, commit) in Commits)
+        {
+            <tr>
+                <td>@name</td>
+                <td>
+                    @if (commit.Length > 0)
+                    {
+                        <a href="https://github.com/marty-shields/@repo/commit/@commit" data-testid="commit-@repo"><code>@commit[..Math.Min(7, commit.Length)]</code></a>
+                    }
+                    else
+                    {
+                        <span data-testid="commit-@repo">local build</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private static readonly Dictionary<string, string> Metadata = typeof(BuiltFrom).Assembly
+        .GetCustomAttributes<AssemblyMetadataAttribute>()
+        .ToDictionary(a => a.Key, a => a.Value ?? "");
+
+    private static readonly (string Name, string Repo, string Commit)[] Commits =
+    [
+        ("Kit", "app-ui-kit", Metadata.GetValueOrDefault("KitCommit", "")),
+        ("Calorie Tracker", "calorie-tracker-app", Metadata.GetValueOrDefault("CalorieTrackerCommit", "")),
+        ("Workout Log", "workout-log-app", Metadata.GetValueOrDefault("WorkoutLogCommit", "")),
+    ];
+
+    private static readonly string BuiltAt = Metadata.GetValueOrDefault("BuiltAt", "");
+}

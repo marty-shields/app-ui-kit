@@ -1,0 +1,76 @@
+# Builds both apps' UI, stories library and UI tests against this PR's kit source and runs the UI tests (issue #17), so a
+# change that breaks an app shows up before it is released. Each app is checked out at main. A failure names the app and
+# its first error, in an annotation and in the run summary. A PR labelled semver:major is expected to break the apps: the
+# check still runs and reports, as warnings, and passes. A PR that changes only docs (docs/** and *.md) passes without
+# building. This is a required check, so it always reports, even when it skips the build.
+name: Apps check
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review, labeled, unlabeled]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: apps-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apps-check:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: app-ui-kit
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Docs only?
+        id: docs
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        working-directory: app-ui-kit
+        run: |
+          only=$(.github/scripts/docs-only.sh "$BASE_SHA" "$HEAD_SHA")
+          echo "only=$only" >> "$GITHUB_OUTPUT"
+          if [[ "$only" == true ]]; then
+            echo "Skipped: this PR changes only docs." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: steps.docs.outputs.only != 'true'
+        with:
+          repository: marty-shields/calorie-tracker-app
+          ref: main
+          path: calorie-tracker-app
+          persist-credentials: false
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: steps.docs.outputs.only != 'true'
+        with:
+          repository: marty-shields/workout-log-app
+          ref: main
+          path: workout-log-app
+          persist-credentials: false
+
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        if: steps.docs.outputs.only != 'true'
+        with:
+          global-json-file: app-ui-kit/global.json
+
+      # The labels are read from the environment, never written into the script.
+      - name: Build and test both apps against the kit
+        if: steps.docs.outputs.only != 'true'
+        env:
+          LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+        run: |
+          mode=()
+          if jq -e 'index("semver:major")' <<<"$LABELS" >/dev/null; then
+            mode=(--advisory)
+          fi
+          app-ui-kit/.github/scripts/check-apps.sh "${mode[@]}" app-ui-kit calorie-tracker-app workout-log-app

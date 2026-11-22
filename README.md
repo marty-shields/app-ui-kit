@@ -23,10 +23,10 @@ A trial is in place: `Shields.UI.Testing` (the kit's tokens and the tokens-only,
 ```
 dotnet build Shields.UI.slnx
 dotnet test tests/Shields.UI.Tests
-dotnet run --project src/Shields.UI.Stories.Host     # http://localhost:5056
+dotnet run --project src/Shields.UI.Stories.Host     # http://localhost:5056, the kit's stories only
 ```
 
-The stories site is published at <https://marty-shields.github.io/app-ui-kit/>; the command above runs it locally. It shows the kit's Foundations (Introduction, Tokens) and its components. The trial that also showed the apps' screens is in [docs/trial/README.md](https://github.com/marty-shields/app-ui-kit/blob/main/docs/trial/README.md).
+The combined stories site is published at <https://marty-shields.github.io/app-ui-kit/>. It shows the kit's Foundations and components and every screen of Calorie Tracker and Workout Log, each app's `main` built against the kit's `main`. The [AGENTS.md](AGENTS.md) Commands say how to run it locally, with both app repos cloned beside this one. Every PR also builds and tests both apps' UI against the change (`apps-check`).
 
 ## Licence
 

@@ -1,4 +1,5 @@
 .stack {
+    container-type: inline-size;
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
@@ -24,7 +25,7 @@
 
 .labels {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     justify-content: space-between;
     gap: var(--space-1);
     color: var(--color-text-muted);
@@ -37,6 +38,13 @@
     max-width: 100%;
     min-width: 0;
     white-space: nowrap;
+}
+
+/* The labels stay on one line and the text shrinks first. Only a box too narrow for even the shrunk labels lets them wrap. A container query cannot read a token, so the width is in ch, which follows the font size. */
+@container (max-width: 30ch) {
+    .labels {
+        flex-wrap: wrap;
+    }
 }
 
 /* Only the text shrinks, so the value always stays visible. */

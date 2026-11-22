@@ -29,6 +29,13 @@
     <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>{TestId}-label</code>, <code>{TestId}-value</code>, <code>{TestId}-change</code>, <code>{TestId}-caption</code>, <code>{TestId}-note</code>.</li>
 </ul>
 
+<h2><code>ChangeIndicator</code></h2>
+<p>The coloured change on its own, for a list row or a table cell: how a value moved on the period before. It is the same indicator <code>StatTile</code> shows.</p>
+<ul>
+    <li><code>Change</code> (required): a <code>StatChange</code>. Up is an up <code>Icon</code> and the amount in <code>--color-success</code>, Down a down <code>Icon</code> in <code>--color-error</code>, None a muted dash. Screen readers hear "up 35m", "down 1" or "no change".</li>
+    <li><code>data-testid</code>: <code>TestId</code>.</li>
+</ul>
+
 <h2><code>SectionHeader</code></h2>
 <p>A small upper-case heading over a section, with an optional <code>Badge</code> chip after the title, an optional smaller muted <code>Hint</code> (such as "from 11:00") before the total, and optional <code>Total</code> text at the trailing edge. With <code>@@bind-Expanded</code> (an <code>ExpandedChanged</code> callback) it is a button with <code>aria-expanded</code> and a chevron <code>Icon</code>, at least <code>--touch-target</code> tall; without, it is a plain heading.</p>
 <ul>
@@ -45,4 +52,4 @@
     <li><code>data-testid</code>: <code>TestId</code>, on the button.</li>
 </ul>
 
-<p>Stories: <a href="./?path=/docs/components-lists-listrow--docs">ListRow</a>, <a href="./?path=/docs/components-lists-emptystate--docs">EmptyState</a>, <a href="./?path=/docs/components-lists-stattile--docs">StatTile</a>, <a href="./?path=/docs/components-lists-sectionheader--docs">SectionHeader</a>, <a href="./?path=/docs/components-lists-collapsiblenote--docs">CollapsibleNote</a></p>
+<p>Stories: <a href="./?path=/docs/components-lists-listrow--docs">ListRow</a>, <a href="./?path=/docs/components-lists-emptystate--docs">EmptyState</a>, <a href="./?path=/docs/components-lists-stattile--docs">StatTile</a>, <a href="./?path=/docs/components-lists-changeindicator--docs">ChangeIndicator</a>, <a href="./?path=/docs/components-lists-sectionheader--docs">SectionHeader</a>, <a href="./?path=/docs/components-lists-collapsiblenote--docs">CollapsibleNote</a></p>

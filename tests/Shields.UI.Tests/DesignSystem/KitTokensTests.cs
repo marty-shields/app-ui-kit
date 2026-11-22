@@ -26,7 +26,7 @@ public class KitTokensTests
         "--color-chip", "--color-on-chip", "--color-chip-soft", "--color-on-chip-soft", "--letter-spacing-label",
         "--dialog-max-width", "--add-button-size", "--add-button-lift", "--legend-swatch-size",
         "--color-ring-track", "--color-ring-arc", "--color-ring-arc-over", "--font-size-xs", "--ring-size", "--ring-width", "--ring-size-compact", "--ring-width-compact",
-        "--color-chart-band", "--color-chart-past", "--snackbar-gap-bottom",
+        "--color-chart-band", "--color-chart-past", "--snackbar-gap-bottom", "--snackbar-gap-inline",
         "--opacity-thin", "--chart-dash", "--chart-dash-on", "--chart-dash-off", "--color-data-1", "--color-data-2", "--color-data-3", "--color-data-4", "--color-data-5",
         "--bar-list-bar-height", "--bar-list-bar-height-inline", "--bar-list-value-max-width", "--bar-list-label-width", "--bar-list-label-width-wide", "--bar-list-label-width-narrow", "--bar-list-value-width", "--bar-list-value-width-narrow",
         "--stacked-bar-height", "--stacked-bar-gap", "--stacked-bar-segment-min-width",
@@ -65,6 +65,7 @@ public class KitTokensTests
             Assert.That(DesignTokens.Value("--legend-swatch-size"), Is.EqualTo("0.75rem"));
             Assert.That(DesignTokens.Value("--color-chart-band"), Is.EqualTo("light-dark(#3f7fa6, #7fb8de)"));
             Assert.That(DesignTokens.Value("--snackbar-gap-bottom"), Is.EqualTo("var(--space-2)"));
+            Assert.That(DesignTokens.Value("--snackbar-gap-inline"), Is.EqualTo("var(--space-4)"));
             Assert.That(DesignTokens.Value("--opacity-thin"), Is.EqualTo("0.55"));
             Assert.That(DesignTokens.Value("--chart-dash"), Is.EqualTo("var(--chart-dash-on) var(--chart-dash-off)"));
             Assert.That(DesignTokens.Value("--chart-dash-on"), Is.EqualTo("calc(var(--space-1) * 1.5)"));

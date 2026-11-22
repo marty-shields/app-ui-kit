@@ -11,7 +11,7 @@ public enum LegendSwatch
     /// <summary>A filled dot in <c>--color-error</c>.</summary>
     Error,
 
-    /// <summary>A dashed ring in <c>--color-border-strong</c>, for something absent.</summary>
+    /// <summary>A ring of six even dashes in <c>--color-border-strong</c>, for something absent. Unlike <see cref="Today"/> it is broken, and it stays a clear circle at 12px.</summary>
     Outline,
 
     /// <summary>A short dashed line in <c>--color-text-muted</c> with the dash and gap of <c>--chart-dash</c>, the same as the chart's target line.</summary>

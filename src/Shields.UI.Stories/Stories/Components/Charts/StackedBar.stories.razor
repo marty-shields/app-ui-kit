@@ -38,6 +38,12 @@
         </Template>
     </Story>
 
+    <Story Name="Phone width legend">
+        <Template>
+            <div class="phone-screen"><div class="themed"><StackedBar Label="Macros" Unit="g" Segments="@([new StackedBarSegment("Protein", 120.5, DataSeries.One), new StackedBarSegment("Carbs", 210.3, DataSeries.Two), new StackedBarSegment("Fat", 91.3, DataSeries.Three)])" TestId="bar" /></div></div>
+        </Template>
+    </Story>
+
     <Story Name="Long labels">
         <Template>
             <div class="themed narrow"><StackedBar Label="Sales by region" Unit="units" Segments="@([new StackedBarSegment("A very long region name that cannot fit", 420, DataSeries.One), new StackedBarSegment("Another similarly long region name", 640, DataSeries.Two)])" TestId="bar" /></div>

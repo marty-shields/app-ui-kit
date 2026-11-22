@@ -19,9 +19,16 @@ public partial class SnackbarCssTests
     }
 
     [Test]
-    public void Snackbar_BottomMarginIsTheGapToken()
+    public void Snackbar_MarginIsTheInlineAndBottomGapTokens()
     {
-        Assert.That(Rule(".snackbar"), Does.Contain("margin: 0 var(--space-4) var(--snackbar-gap-bottom);"));
+        Assert.That(Rule(".snackbar"), Does.Contain("margin: 0 var(--snackbar-gap-inline) var(--snackbar-gap-bottom);"));
+    }
+
+    // Outlines follow the element's corners, so a button with no radius draws a square focus outline.
+    [Test]
+    public void Action_HasTheButtonRadius_SoItsFocusOutlineIsRounded()
+    {
+        Assert.That(Rule(".action"), Does.Contain("border-radius: var(--radius-md);"));
     }
 
     [Test]

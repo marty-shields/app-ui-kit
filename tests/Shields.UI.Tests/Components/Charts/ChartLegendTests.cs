@@ -44,7 +44,7 @@ public class ChartLegendTests : ComponentTestBase
     }
 
     [Test]
-    public void Outline_IsADashedRingThatIsNotThinAndKeepsItsBorderInsideTheBox()
+    public void Outline_IsASixDashRingMaskThatIsNotASolidRing()
     {
         var css = RepoFiles.Read("src", "Shields.UI", "Components", "Charts", "ChartLegend.razor.css");
         var rule = Regex.Match(css, @"\.swatch\.outline\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
@@ -53,7 +53,12 @@ public class ChartLegendTests : ComponentTestBase
         Assert.Multiple(() =>
         {
             Assert.That(baseRule, Does.Contain("box-sizing: border-box;"));
-            Assert.That(rule, Does.Contain("border: calc(var(--border-width-error) * 1.5) dashed var(--color-border-strong);"));
+            Assert.That(rule, Does.Contain("background-color: var(--color-border-strong);"));
+            Assert.That(rule, Does.Contain("radial-gradient(closest-side, transparent calc(100% - var(--border-width-error) * 1.5)"), "a ring 3px thick");
+            Assert.That(rule, Does.Contain("repeating-conic-gradient(var(--color-text) 0 30deg, transparent 30deg 60deg)"), "six equal dashes and gaps");
+            Assert.That(rule, Does.Contain("mask-composite: intersect;"));
+            Assert.That(rule, Does.Not.Contain("dashed"), "a dashed border breaks unevenly on a 12px circle");
+            Assert.That(Regex.Match(css, @"\.swatch\.today\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value, Does.Contain("solid"), "Today stays the solid ring");
         });
     }
 

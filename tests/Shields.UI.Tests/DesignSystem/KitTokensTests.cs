@@ -29,7 +29,7 @@ public class KitTokensTests
         "--color-chart-band", "--color-chart-past", "--snackbar-gap-bottom", "--snackbar-gap-inline",
         "--opacity-thin", "--chart-dash", "--chart-dash-on", "--chart-dash-off", "--color-data-1", "--color-data-2", "--color-data-3", "--color-data-4", "--color-data-5",
         "--bar-list-bar-height", "--bar-list-bar-height-inline", "--bar-list-value-max-width", "--bar-list-label-width", "--bar-list-label-width-wide", "--bar-list-label-width-narrow", "--bar-list-value-width", "--bar-list-value-width-narrow",
-        "--stacked-bar-height", "--stacked-bar-gap", "--stacked-bar-segment-min-width",
+        "--stacked-bar-height", "--stacked-bar-gap", "--stacked-bar-segment-min-width", "--stacked-bar-swatch-size", "--stacked-bar-font-size",
         // AppScreen, StatTile and Card compact.
         "--app-screen-nav-clearance", "--stat-tile-compact-padding", "--stat-tile-compact-value-size", "--card-compact-padding", "--card-compact-title-gap", "--entry-grid-index-width", "--entry-grid-aside-width", "--calendar-day-size", "--calendar-dot-size",
         // Sheet and SheetAction.
@@ -63,6 +63,8 @@ public class KitTokensTests
             Assert.That(DesignTokens.Value("--add-button-size"), Is.EqualTo("3.5rem"));
             Assert.That(DesignTokens.Value("--add-button-lift"), Is.EqualTo("1.5rem"));
             Assert.That(DesignTokens.Value("--legend-swatch-size"), Is.EqualTo("0.75rem"));
+            Assert.That(DesignTokens.Value("--stacked-bar-swatch-size"), Is.EqualTo("0.5rem"));
+            Assert.That(DesignTokens.Value("--stacked-bar-font-size"), Is.EqualTo("0.8125rem"));
             Assert.That(DesignTokens.Value("--color-chart-band"), Is.EqualTo("light-dark(#3f7fa6, #7fb8de)"));
             Assert.That(DesignTokens.Value("--snackbar-gap-bottom"), Is.EqualTo("var(--space-2)"));
             Assert.That(DesignTokens.Value("--snackbar-gap-inline"), Is.EqualTo("var(--space-4)"));

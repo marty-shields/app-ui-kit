@@ -28,7 +28,7 @@
     justify-content: space-between;
     gap: var(--space-1);
     color: var(--color-text-muted);
-    font-size: var(--font-size-sm);
+    font-size: var(--stacked-bar-font-size);
 }
 
 /* A label starts from its smallest size (swatch, a few characters of text, value), so a line breaks only when even the shrunk labels do not fit and the row never overflows. Free space then grows each label up to its full width, so the text shrinks only as much as needed. */
@@ -40,7 +40,7 @@
     white-space: nowrap;
 }
 
-/* The text is the only part that shrinks, so the value always stays visible. A one-line clamp ends a cut name with an ellipsis, and letting it break anywhere makes the label's smallest size a few characters instead of the whole name (a nowrap ellipsis would keep the full name as the smallest size, and a fixed width would stop the label growing to the full name). 4ch keeps a name readable (a few characters and the ellipsis), since an ellipsis alone says nothing, and it is the widest minimum that still keeps three short names with long values on one row at 346px; a larger one wraps the legend before then. ch is the width of the text's own font. */
+/* The text is the only part that shrinks, so the value always stays visible. A one-line clamp ends a cut name with an ellipsis, and letting it break anywhere makes the label's smallest size a few characters instead of the whole name (a nowrap ellipsis would keep the full name as the smallest size, and a fixed width would stop the label growing to the full name). StackedBar sets --label-min per label to min(5ch, the name's length in ch): a cut name keeps about five characters, since an ellipsis alone says nothing, and a short name gets no more than its own length. calc-size() caps the minimum at the name's own width, because a box wider than its text would pad the gap before the value and make the full-name row wider (a browser without calc-size() keeps the first line). ch is the width of the text's own font. With Protein 182.6 g, Carbs 365.3 g and Fat 91.3 g, every name shows in full on one line from 347px in DejaVu Sans and 304px in Roboto. */
 .label-text {
     display: -webkit-box;
     -webkit-box-orient: vertical;
@@ -49,7 +49,10 @@
     overflow-wrap: anywhere;
     white-space: normal;
     flex: 1 1 auto;
-    min-width: 4ch;
+    /* StackedBar's inline style replaces this default for each name. */
+    --label-min: 5ch;
+    min-width: var(--label-min);
+    min-width: calc-size(max-content, min(size, var(--label-min)));
     overflow: hidden;
 }
 
@@ -63,8 +66,8 @@
 .label::before {
     content: "";
     display: inline-block;
-    width: var(--legend-swatch-size);
-    height: var(--legend-swatch-size);
+    width: var(--stacked-bar-swatch-size);
+    height: var(--stacked-bar-swatch-size);
     flex-shrink: 0;
     margin-right: var(--space-1);
     border-radius: var(--radius-round);

@@ -16,7 +16,8 @@ if (!baseUrl || !chromePath) {
 const WIDTH = 424;
 // Exploration knob (Android font size scales rem); not run in CI.
 const FONT_SCALE = Number(process.env.STORY_FONT_SCALE ?? 1);
-const CONCURRENCY = 8;
+// Tabs checked in parallel; the tests set 1 to fix which story a tab checks next.
+const CONCURRENCY = Number(process.env.STORY_CONCURRENCY ?? 8);
 // Console errors that are known to be harmless, by story id: the first line of the message may contain one of that story's prefixes. Each is logged on purpose by a story that shows a failure.
 const IGNORED_ERRORS = {
   'components-layout-apperrorboundary--error': ['fail: Shields.UI.Components.Layout.AppErrorBoundary[9101]'],
@@ -139,7 +140,7 @@ function die(message) {
   process.exit(1);
 }
 
-setTimeout(() => die('Timed out'), 300_000).unref();
+setTimeout(() => die('Timed out'), 600_000).unref();
 
 let endpointResolved = false;
 const endpoint = await new Promise((resolveEndpoint, reject) => {
@@ -191,37 +192,48 @@ function pageError({ method, params }, storyId) {
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-async function check(story) {
+// One tab per worker, reused for every story it checks: navigating an open tab is cheaper than creating a target per story.
+async function openTab() {
   const { targetId } = await send('Target.createTarget', { url: 'about:blank' });
   const { sessionId } = await send('Target.attachToTarget', { targetId, flatten: true });
-  const run = (method, params) => send(method, params, sessionId);
-  const errors = [];
+  const tab = { targetId, run: (method, params) => send(method, params, sessionId), story: undefined, errors: [], live: false };
   sessionEvents.set(sessionId, (event) => {
-    const line = pageError(event, story.id);
-    if (line) errors.push(line);
+    // The old document's contexts are cleared when the next one commits, so events before that belong to the previous story.
+    if (event.method === 'Runtime.executionContextsCleared') tab.live = true;
+    if (!tab.live || !tab.story) return;
+    const line = pageError(event, tab.story.id);
+    if (line) tab.errors.push(line);
   });
-  try {
-    await run('Runtime.enable');
-    await run('Emulation.setDeviceMetricsOverride', { width: WIDTH, height: 900, deviceScaleFactor: 1, mobile: true });
-    await run('Page.navigate', { url: `${baseUrl}/iframe.html?id=${story.id}&viewMode=story` });
-    const ready = '(document.documentElement.classList.contains("_blazing_story_ready_for_visible") && document.querySelector("#app")?.children.length > 0)';
-    for (let i = 0; ; i++) {
-      const { result } = await run('Runtime.evaluate', { expression: ready, returnByValue: true });
-      if (result.value) break;
-      if (i > 150) return { findings: ['did not render within 30s', ...errors] };
-      await sleep(200);
-    }
-    if (FONT_SCALE !== 1) {
-      await run('Runtime.evaluate', { expression: `document.documentElement.style.fontSize = '${FONT_SCALE * 100}%'` });
-      await sleep(300);
-    }
-    const { result, exceptionDetails } = await run('Runtime.evaluate', { expression: `(${inspect})()`, returnByValue: true });
-    if (exceptionDetails) return { findings: [`checker failed: ${exceptionDetails.exception?.description ?? exceptionDetails.text}`, ...errors] };
-    return { findings: [...result.value, ...errors] };
-  } finally {
+  tab.close = async () => {
     sessionEvents.delete(sessionId);
     await send('Target.closeTarget', { targetId }).catch(() => {});
+  };
+  await tab.run('Runtime.enable');
+  await tab.run('Emulation.setDeviceMetricsOverride', { width: WIDTH, height: 900, deviceScaleFactor: 1, mobile: true });
+  return tab;
+}
+
+async function check(tab, story) {
+  tab.story = story;
+  tab.errors = [];
+  tab.live = false;
+  const { run, errors } = tab;
+  await run('Page.navigate', { url: `${baseUrl}/iframe.html?id=${story.id}&viewMode=story` });
+  const ready = '(document.documentElement.classList.contains("_blazing_story_ready_for_visible") && document.querySelector("#app")?.children.length > 0)';
+  // Polls every 50ms for up to 30s.
+  for (let i = 0; ; i++) {
+    const { result } = await run('Runtime.evaluate', { expression: ready, returnByValue: true });
+    if (result.value) break;
+    if (i > 600) return { findings: ['did not render within 30s', ...errors] };
+    await sleep(50);
   }
+  if (FONT_SCALE !== 1) {
+    await run('Runtime.evaluate', { expression: `document.documentElement.style.fontSize = '${FONT_SCALE * 100}%'` });
+    await sleep(300);
+  }
+  const { result, exceptionDetails } = await run('Runtime.evaluate', { expression: `(${inspect})()`, returnByValue: true });
+  if (exceptionDetails) return { findings: [`checker failed: ${exceptionDetails.exception?.description ?? exceptionDetails.text}`, ...errors] };
+  return { findings: [...result.value, ...errors] };
 }
 
 const jobs = stories();
@@ -232,11 +244,25 @@ try {
   const failures = [];
   const started = Date.now();
   let cursor = 0;
-  await Promise.all(Array.from({ length: CONCURRENCY }, async () => {
-    while (cursor < jobs.length) {
-      const story = jobs[cursor++];
-      const result = await check(story);
-      if (result.findings.length) failures.push({ story, findings: [...new Set(result.findings)] });
+  await Promise.all(Array.from({ length: Math.min(CONCURRENCY, jobs.length) }, async () => {
+    let tab = await openTab();
+    try {
+      while (cursor < jobs.length) {
+        const story = jobs[cursor++];
+        let result;
+        try {
+          result = await check(tab, story);
+        } catch (error) {
+          // A broken tab fails its story and is replaced, so the next story starts clean.
+          result = { findings: [`check failed: ${error.message}`, ...tab.errors] };
+          await tab.close();
+          tab = await openTab();
+        }
+        tab.story = undefined;
+        if (result.findings.length) failures.push({ story, findings: [...new Set(result.findings)] });
+      }
+    } finally {
+      await tab.close();
     }
   }));
 

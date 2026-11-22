@@ -14,6 +14,12 @@ cat > "$work/dotnet" <<'STUB'
 #!/usr/bin/env bash
 echo "$*" >> "$CALLS"
 project=$(basename "$2")
+if [[ "$1" == build ]]; then
+  type=project
+  [[ "$project" == "${PACKAGE:-}" ]] && type=package
+  mkdir -p "$2/obj"
+  echo "{\"libraries\": {\"Shields.UI/1.1.0\": {\"type\": \"$type\"}, \"bunit/2.0.0\": {\"type\": \"package\"}}}" > "$2/obj/project.assets.json"
+fi
 IFS=: read -r command target kind <<<"${FAIL:-}"
 if [[ "$1" != "$command" || "$project" != "$target" ]]; then
   echo "  $project -> bin/$project.dll"
@@ -102,6 +108,12 @@ FAIL="" run "semver:major with nothing broken passes quietly" 0 "" \
 "| Calorie Tracker | build and test | passed | |
 | Workout Log | build and test | passed | |" --advisory
 check "semver:major with nothing broken: no note" "0" "$(grep -c 'semver:major' "$work/summary")"
+
+PACKAGE=CalorieTracker.UI.Stories FAIL="" run "an app that builds the kit from its package fails before its tests" 1 \
+"::error title=Calorie Tracker kit source failed::Calorie Tracker builds Shields.UI/1.1.0 from the package, not from the kit's source: it needs a UseKitSource switch for each kit reference." \
+"| Calorie Tracker | kit source | failed | \`Calorie Tracker builds Shields.UI/1.1.0 from the package, not from the kit's source: it needs a UseKitSource switch for each kit reference.\` |
+| Workout Log | build and test | passed | |"
+check "kit from package: no test run for that app" "0" "$(grep -c '^test .*CalorieTracker' "$work/calls")"
 
 rm -rf "$work/wl"
 FAIL="" run "a missing checkout fails that app" 1 \

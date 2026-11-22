@@ -64,6 +64,18 @@ check_app() {
       echo "::endgroup::"
       [[ -z "$stage" ]] || break
     done
+    # An app without its own UseKitSource switch still builds, from the kit's packages, which would test nothing here.
+    if [[ -z "$stage" ]]; then
+      local packages
+      packages=$(for project in "src/$prefix.UI" "src/$prefix.UI.Stories" "tests/$prefix.UI.Tests"; do
+        jq -r '.libraries | to_entries[] | select((.key | startswith("Shields.UI")) and .value.type != "project") | .key' \
+          "$folder/$project/obj/project.assets.json"
+      done | sort -u | paste -sd ' ' -)
+      if [[ -n "$packages" ]]; then
+        stage="kit source"
+        error="$name builds $packages from the package, not from the kit's source: it needs a UseKitSource switch for each kit reference."
+      fi
+    fi
     if [[ -z "$stage" ]]; then
       echo "::group::$name: test tests/$prefix.UI.Tests"
       if ! "$dotnet" test "$folder/tests/$prefix.UI.Tests" --no-build "${props[@]}" 2>&1 | tee "$log"; then

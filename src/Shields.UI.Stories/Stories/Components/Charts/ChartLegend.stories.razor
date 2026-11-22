@@ -1,0 +1,125 @@
+@attribute [Stories("Components/Charts/ChartLegend")]
+
+<Stories TComponent="ChartLegend" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Plain dots">
+        <Template>
+            <ChartLegend Items="Plain" TestId="legend" />
+        </Template>
+    </Story>
+
+    <Story Name="Past and today">
+        <Template>
+            <ChartLegend Items="PastPrimaryToday" TestId="legend" />
+        </Template>
+    </Story>
+
+    <Story Name="Outline swatch">
+        <Template>
+            @foreach (var theme in new[] { "light", "dark" })
+            {
+                <div class="themed" data-theme="@theme">
+                    <ChartLegend Items="OutlineAndToday" TestId="@($"legend-{theme}")" />
+                </div>
+            }
+        </Template>
+    </Story>
+
+    <Story Name="Primary">
+        <Template>
+            <ChartLegend Items="PrimarySelected" TestId="legend" />
+        </Template>
+    </Story>
+
+    <Story Name="Dot with a marker">
+        <Template>
+            <ChartLegend Items="WithMarker" TestId="legend" />
+        </Template>
+    </Story>
+
+    <Story Name="Calendar marks">
+        <Template>
+            <ChartLegend Items="CalendarMarks" TestId="legend" />
+        </Template>
+    </Story>
+
+    <Story Name="Long labels">
+        <Template>
+            <ChartLegend Items="Long" TestId="legend" />
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <ChartLegend Items="WithMarker" />
+                <ChartLegend Items="PastPrimaryToday" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <ChartLegend Items="WithMarker" />
+                <ChartLegend Items="PastPrimaryToday" />
+            </div>
+        </Template>
+    </Story>
+
+</Stories>
+
+@code {
+    private static readonly IReadOnlyList<LegendItem> Plain =
+    [
+        new(LegendSwatch.Chip, "Under"),
+        new(LegendSwatch.Accent, "On target"),
+        new(LegendSwatch.Outline, "Not logged"),
+        new(LegendSwatch.Line, "Target"),
+        new(LegendSwatch.Band, "Target range"),
+    ];
+
+    private static readonly IReadOnlyList<LegendItem> PastPrimaryToday =
+    [
+        new(LegendSwatch.Past, "Earlier weeks"),
+        new(LegendSwatch.Accent, "This week"),
+        new(LegendSwatch.Today, "Today"),
+        new(LegendSwatch.Outline, "Not logged"),
+    ];
+
+    private static readonly IReadOnlyList<LegendItem> OutlineAndToday =
+    [
+        new(LegendSwatch.Outline, "Not logged"),
+        new(LegendSwatch.Today, "Today"),
+    ];
+
+    private static readonly IReadOnlyList<LegendItem> PrimarySelected =
+    [
+        new(LegendSwatch.Primary, "Selected week"),
+        new(LegendSwatch.Chip, "Other weeks"),
+    ];
+
+    private static readonly IReadOnlyList<LegendItem> CalendarMarks =
+    [
+        new(LegendSwatch.Check, "On target"),
+        new(LegendSwatch.Triangle, "Over"),
+        new(LegendSwatch.Chip, "Under"),
+        new(LegendSwatch.Line, "Target"),
+    ];
+
+    private static readonly IReadOnlyList<LegendItem> Long =
+    [
+        new(LegendSwatch.Chip, "Under the daily calorie target by more than one hundred kcal"),
+        new(LegendSwatch.Accent, "Within the daily calorie target range"),
+        new(LegendSwatch.Error, "Over the daily calorie target by any amount at all", "▲"),
+    ];
+
+    private static readonly IReadOnlyList<LegendItem> WithMarker =
+    [
+        new(LegendSwatch.Chip, "Under"),
+        new(LegendSwatch.Accent, "On target"),
+        new(LegendSwatch.Error, "Over", "▲"),
+        new(LegendSwatch.Line, "Target"),
+        new(LegendSwatch.Band, "Target range"),
+    ];
+}

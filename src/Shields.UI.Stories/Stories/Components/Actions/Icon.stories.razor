@@ -1,0 +1,39 @@
+@attribute [Stories("Components/Actions/Icon")]
+
+<Stories TComponent="Icon" Layout="typeof(ThemeLayout)">
+
+    <Story Name="All icons">
+        <Template>
+            <div class="grid">
+                @foreach (var name in Enum.GetValues<IconName>())
+                {
+                    <figure class="cell">
+                        <Icon Name="name" />
+                        <figcaption>@name</figcaption>
+                    </figure>
+                }
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Sizes and tones">
+        <Template>
+            <div class="rows">
+                @foreach (var name in Enum.GetValues<IconName>())
+                {
+                    <div class="row">
+                        <span class="label">@name</span>
+                        @foreach (var size in Enum.GetValues<IconSize>())
+                        {
+                            foreach (var tone in Enum.GetValues<IconTone>())
+                            {
+                                <Icon Name="name" Tone="tone" Size="size" />
+                            }
+                        }
+                    </div>
+                }
+            </div>
+        </Template>
+    </Story>
+
+</Stories>

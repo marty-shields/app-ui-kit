@@ -1,0 +1,136 @@
+@attribute [CustomPage("Components/Layout/Overview")]
+
+<h1>Layout</h1>
+
+<h2><code>Card</code></h2>
+<p>A bordered, rounded surface that holds whatever it is given in <code>ChildContent</code>.</p>
+<ul>
+    <li><code>Title</code>: a bold heading at the top. Null shows a plain card with no heading and no aside.</li>
+    <li><code>Aside</code>: muted text at the right of the title, e.g. "1 this week". It stays on one line. Only shown with a title.</li>
+    <li><code>Compact</code>: for cards that hold rows with their own bottom space: padding 16px, 16px, 0 and an 8px gap under the title (<code>--card-compact-padding</code>, <code>--card-compact-title-gap</code>).</li>
+    <li><code>HeaderActions</code>: content at the end of the header row, after the title and aside, such as <code>IconButton</code>s: a name and its Done, Edit and Delete buttons share one row. The title stays the heading; the buttons keep their own 48px touch targets. Setting it draws the header row even without a title. The row is pulled up into the card's top padding (8px), as the buttons' own space already clears the edge.</li>
+    <li>No <code>ChildContent</code> (a card with only a header, such as a collapsed one): no gap under the header, and with <code>HeaderActions</code> the card's top and bottom padding shrink to 4px, so the card is 58px tall at 48px buttons. Content written between the tags is never null, even when it renders nothing, so a collapsible card passes <code>ChildContent="@@(open ? body : null)"</code> rather than an <code>@@if</code> inside the tags.</li>
+    <li><code>Error</code>: the border and an inset ring turn <code>--color-error</code> (at least 3:1 on both the page and the card). The ring is drawn inside the border, so the card keeps its size. The error text itself goes inside the card, e.g. in an <code>InlineAlert</code>.</li>
+    <li><code>Selected</code>: tints the card with <code>--color-card-selected</code> and draws its border in <code>--color-accent</code>, for the open or chosen card. Text, muted text, error and success text keep at least 4.5:1 on the tint in both themes. With <code>Error</code> the error border wins.</li>
+    <li><code>HeadingLevel</code>: the level of the title's heading element, 2 by default (1 to 6); use 3 for a card inside a section that has an h2. The look does not change.</li>
+    <li><code>data-testid</code>: <code>TestId</code>, <code>{TestId}-aside</code> on the aside and <code>{TestId}-actions</code> on the actions.</li>
+</ul>
+
+<p>Stories: <a href="./?path=/docs/components-layout-card--docs">Card</a></p>
+
+<h2><code>BottomNav</code></h2>
+<p>The bar at the foot of a screen: the tabs in <code>Items</code> with a raised button between them. The tab equal to <code>Current</code> has a pill behind its icon, bold text and <code>aria-current="page"</code>; tapping it raises nothing. With an odd number of tabs the extra one goes left of the raised button.</p>
+<ul>
+    <li><code>AddLabel</code> and <code>AddIcon</code>: the raised button, a primary rounded square (<code>--radius-md</code>) of <code>--add-button-size</code>, lifted by <code>--add-button-lift</code> so its label is level with the tab labels. It is an action and is never current.</li>
+    <li><code>AddHasPopup</code>: optional <code>aria-haspopup</code> value, e.g. <code>dialog</code>.</li>
+    <li><code>OnNavigate</code> is raised with the tapped tab; <code>OnAdd</code> by the raised button.</li>
+    <li><code>data-testid</code>: <code>bottom-nav</code>, <code>add-button</code> and each item's <code>TestId</code>.</li>
+</ul>
+
+<p>Stories: <a href="./?path=/docs/components-layout-bottomnav--docs">BottomNav</a></p>
+
+<h2><code>AppScreen</code></h2>
+<p>The frame of a screen: a top bar with <code>Title</code>, <code>Subtitle</code>, <code>Actions</code> and a back arrow, an optional <code>Toolbar</code>, the scrolling <code>ChildContent</code>, and a footer with <code>Status</code>, <code>BottomBar</code> and the bottom navigation bar, in that order from the top.</p>
+<ul>
+    <li><code>OnBack</code> shows the back arrow (<code>data-testid</code> <code>BackTestId</code>, default <code>back</code>) and takes Android back. Unset, Android back leaves the app, except on a top-level screen other than the first of <code>NavItems</code>: it raises <code>OnNavigate</code> with that first item.</li>
+    <li><code>NavItems</code> makes the screen top-level and shows a <code>BottomNav</code> with <code>Current</code> marked; <code>AddLabel</code>, <code>AddIcon</code>, <code>AddHasPopup</code>, <code>AddButtonAttributes</code>, <code>OnNavigate</code> and <code>OnAdd</code> go to the bar.</li>
+    <li><code>Status</code> sits in a polite live region above the bar, and above the raised button when there is one. Without a bar it floats over the foot of the content.</li>
+    <li>The content ends clear of the raised button and the status message, so screens add no bottom padding of their own.</li>
+    <li><code>OnRefresh</code> adds pull-to-refresh to the content; a failure to set it up is logged (9701) and the screen works without it.</li>
+    <li><code>ToolbarDivider</code>: draws a <code>--border-width</code> line in <code>--color-border</code> under the <code>Toolbar</code>, setting a pinned search or filters apart from the scrolling content.</li>
+    <li><code>data-testid</code>: <code>screen-title</code>, <code>screen-subtitle</code>, <code>bottom-bar</code> and <code>pull-refresh</code>.</li>
+</ul>
+
+<p>Stories: <a href="./?path=/docs/components-layout-appscreen--docs">AppScreen</a></p>
+
+<h2><code>StartupGate</code></h2>
+<p>Runs <code>Initialize</code> once before showing its content, with a <code>StartupView</code> meanwhile. A failure is logged (9002) and shown; with <code>Retryable</code> (the default) Try again runs <code>Initialize</code> again. The app passes its own wording: <code>Title</code>, <code>LoadingLabel</code> and <code>FailedMessage</code>. <code>RetryVariant</code> (<code>ButtonVariant</code>, <code>Primary</code> by default) sets the weight of Try again.</p>
+
+<h2><code>StartupView</code></h2>
+<p>The start-up screen: a spinner, or <code>FailedMessage</code> with Try again when <code>OnRetry</code> is set. <code>data-testid</code>: <code>startup-top-bar</code>, <code>startup-loading</code>, <code>startup-error</code>, <code>startup-retry</code> and <code>startup-failed</code> (on the content while failed, with or without Try again). With Try again the failure is shown plain: centred, without the red border (<code>LoadFailed</code> with <code>Plain</code>). <code>RetryVariant</code> (<code>ButtonVariant</code>, <code>Primary</code> by default) sets the weight of Try again.</p>
+
+<h2><code>AppErrorBoundary</code></h2>
+<p>Shows an <code>ErrorView</code> instead of its content when the content throws, and logs the error (9101). Restart raises <code>OnRestart</code>, then shows the content again.</p>
+
+<h2><code>ErrorView</code></h2>
+<p>"Something went wrong" with a Restart button that raises <code>OnRestart</code>. <code>data-testid</code>: <code>error-top-bar</code>, <code>error-message</code>, <code>error-bottom-bar</code> and <code>error-restart</code>.</p>
+
+<h2><code>Typography</code></h2>
+<p>Text in one of the kit's looks, so a screen sets only layout. The tag is <code>Typography</code>, not <code>Text</code>, because Razor reads <code>&lt;Text&gt;</code> at the start of a code block as its own <code>&lt;text&gt;</code> tag (RZ1023). <code>Variant</code> (<code>TextVariant</code>): <code>Body</code> (default), <code>Label</code> (muted, small, bold, upper case, <code>--letter-spacing-label</code>), <code>Muted</code>, <code>MutedSmall</code>, <code>Strong</code> (bold, normal text colour, also inside muted text), <code>Figure</code> (<code>--font-size-xl</code>, bold) and <code>Error</code> (<code>--color-error</code>). Every variant reads at 4.5:1 on the page and on cards in both themes.</p>
+<ul>
+    <li><code>As</code> (<code>TextElement</code>): the element, <code>Span</code> by default; <code>P</code>, <code>Div</code> and <code>H2</code> to <code>H6</code> let a label be a heading of the right level.</li>
+    <li><code>Variant</code> (<code>TextVariant</code>) also has <code>Heading</code> (<code>--font-size-lg</code>, bold), <code>MutedSmallStrong</code> (muted, small, bold, equal-width figures, for a total) and <code>SuccessSmall</code> (bold small <code>--color-success</code>). Each is at least 4.5:1 on the page and cards.</li>
+    <li>Other attributes (an <code>id</code>, a <code>class</code>) go on the element; a <code>class</code> is added to the component's own. A class from the caller's scoped CSS does not match the element, so use <code>::deep</code> or a global class.</li>
+    <li><code>data-testid</code>: <code>TestId</code>.</li>
+</ul>
+
+<h2><code>Divider</code></h2>
+<p>A line in <code>--color-border</code>, <code>--border-width</code> thick. Horizontal by default (the full width); <code>Vertical</code> stretches to the height of a flex row. It is a <code>role="separator"</code> with <code>aria-orientation</code>; <code>Decorative</code> hides it from screen readers (<code>aria-hidden</code>, no role) for a line that only separates what is already grouped, such as the rule inside <code>SearchField</code>.</p>
+<ul>
+    <li><code>data-testid</code>: <code>TestId</code>.</li>
+</ul>
+
+<p>Stories: <a href="./?path=/docs/components-layout-startupgate--docs">StartupGate</a>, <a href="./?path=/docs/components-layout-startupview--docs">StartupView</a>, <a href="./?path=/docs/components-layout-apperrorboundary--docs">AppErrorBoundary</a>, <a href="./?path=/docs/components-layout-errorview--docs">ErrorView</a>, <a href="./?path=/docs/components-layout-typography--docs">Typography</a>, <a href="./?path=/docs/components-layout-divider--docs">Divider</a></p>
+
+<h2><code>HostBridges</code></h2>
+<p>Renders nothing. The back button and app lifecycle are scoped to the BlazorWebView, but Android's activity events happen outside that scope. <code>AddShieldsUi()</code> registers two singletons, <code>BackButtonBridge</code> and <code>AppLifecycleBridge</code>, for the activity to call; <code>HostBridges</code> connects the scoped <code>IBackButton</code> and <code>IAppLifecycle</code> to them when it initialises and disconnects them when it is disposed. Put <code>&lt;HostBridges /&gt;</code> first in the root component (<code>Routes</code>), so it connects before any page registers.</p>
+<p>The kit has no MAUI dependency, so the app's <code>MainActivity</code> makes the calls. The activity must be an AndroidX <code>ComponentActivity</code> (MAUI's <code>MauiAppCompatActivity</code> is one), which has the <code>OnBackPressedDispatcher</code> the back callback registers with. <code>BackButtonBridge.Enabled</code> is true while an activity is current and a page has a back handler; <code>EnabledChanged</code> can be raised on any thread.</p>
+<p>Usings needed: <code>Android.App</code>, <code>Android.OS</code>, <code>AndroidX.Activity</code>, and the kit's <code>Shields.UI.Navigation</code> and <code>Shields.UI.Lifecycle</code> (the bridges).</p>
+<pre><code>using Android.App;
+using Android.OS;
+using AndroidX.Activity;
+using Shields.UI.Lifecycle;
+using Shields.UI.Navigation;
+
+// Keep your existing [Activity(...)] attribute, e.g. the usual MAUI one:
+[Activity(Theme = "@@style/Maui.SplashTheme", MainLauncher = true)]
+public class MainActivity : MauiAppCompatActivity // a ComponentActivity
+{
+    private BackButtonBridge backBridge = null!;
+    private AppLifecycleBridge lifecycleBridge = null!;
+    private BackCallback backCallback = null!;
+
+    protected override void OnCreate(Bundle? savedInstanceState)
+    {
+        base.OnCreate(savedInstanceState);
+        var services = IPlatformApplication.Current!.Services;
+        backBridge = services.GetRequiredService&lt;BackButtonBridge&gt;();
+        lifecycleBridge = services.GetRequiredService&lt;AppLifecycleBridge&gt;();
+        backBridge.Attach(this);
+        lifecycleBridge.Attach(this);
+
+        backCallback = new BackCallback(this, backBridge);
+        OnBackPressedDispatcher.AddCallback(this, backCallback);
+        backBridge.EnabledChanged += SyncBackCallback;
+        SyncBackCallback();
+    }
+
+    protected override void OnStart()
+    {
+        base.OnStart();
+        _ = lifecycleBridge.StartedAsync();
+    }
+
+    protected override void OnDestroy()
+    {
+        backBridge.EnabledChanged -= SyncBackCallback;
+        backBridge.Detach(this);
+        lifecycleBridge.Detach(this);
+        base.OnDestroy();
+    }
+
+    private void SyncBackCallback() => RunOnUiThread(() => backCallback.Enabled = backBridge.Enabled);
+
+    // HandleAsync is null when no page handles back: switch the callback off and let Android handle it.
+    private sealed class BackCallback(ComponentActivity activity, BackButtonBridge bridge) : OnBackPressedCallback(false)
+    {
+        public override void HandleOnBackPressed()
+        {
+            if (bridge.HandleAsync() is null)
+            {
+                Enabled = false;
+                activity.OnBackPressedDispatcher.OnBackPressed();
+            }
+        }
+    }
+}</code></pre>

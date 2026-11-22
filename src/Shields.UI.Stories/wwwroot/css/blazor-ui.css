@@ -1,0 +1,77 @@
+#blazor-error-ui {
+    background: var(--stories-error-ui-bg);
+    bottom: 0;
+    box-shadow: var(--stories-error-ui-shadow);
+    display: none;
+    left: 0;
+    padding: var(--stories-error-ui-padding);
+    position: fixed;
+    right: 0;
+    z-index: var(--stories-error-ui-z-index)
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: var(--stories-error-dismiss-right);
+    top: var(--stories-error-dismiss-top)
+}
+
+.blazor-error-boundary {
+    background: var(--stories-error-boundary-background);
+    padding: var(--stories-error-boundary-padding);
+    color: var(--stories-error-boundary-text);
+}
+
+.blazor-error-boundary::after {
+    content: "An error has occurred."
+}
+
+.loading-progress {
+    position: fixed;
+    inset: 0;
+    color-scheme: light dark;
+    background: var(--stories-loading-bg);
+}
+
+.loading-progress svg {
+    position: relative;
+    display: block;
+    width: var(--stories-loading-ring-size);
+    height: var(--stories-loading-ring-size);
+    margin: var(--stories-loading-ring-margin);
+}
+
+.loading-progress svg circle {
+    fill: none;
+    stroke: var(--stories-loading-track);
+    stroke-width: var(--stories-loading-stroke-width);
+    transform-origin: var(--stories-loading-origin);
+    transform: rotate(-90deg);
+}
+
+.loading-progress svg circle:last-child {
+    stroke: var(--stories-loading-progress);
+    stroke-dasharray: calc(3.141 * var(--blazor-load-percentage, var(--stories-loading-start)) * var(--stories-loading-arc)), var(--stories-loading-dash-gap);
+    transition: stroke-dasharray var(--stories-loading-transition) ease-in-out;
+}
+
+.loading-progress img {
+    position: absolute;
+    width: var(--stories-loading-icon-size);
+    height: var(--stories-loading-icon-size);
+    margin: auto;
+    inset: var(--stories-loading-icon-inset);
+}
+
+.loading-progress .text {
+    position: absolute;
+    text-align: center;
+    color: var(--stories-loading-text);
+    font-weight: bold;
+    inset: var(--stories-loading-text-inset);
+}
+
+.loading-progress .text:after {
+    content: var(--blazor-load-percentage-text, "Loading");
+}

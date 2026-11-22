@@ -1,0 +1,193 @@
+diff --git a/src/WorkoutLog.UI.ScreenStories/Screens/SampleThisWeek.cs b/src/WorkoutLog.UI.ScreenStories/Screens/SampleThisWeek.cs
+new file mode 100644
+index 0000000..43d7db0
+--- /dev/null
++++ b/src/WorkoutLog.UI.ScreenStories/Screens/SampleThisWeek.cs
+@@ -0,0 +1,62 @@
++using WorkoutLog.UI.Components.ThisWeek;
++using WorkoutLog.UI.Components.Weekly;
++using WorkoutLog.UI.Models.Muscles;
++
++namespace WorkoutLog.UI.ScreenStories.Screens;
++
++/// <summary>Sample data for the This week stories and the UI tests. Today is Wed 18 Nov 2026; the week is Mon 16 to Sun 22 Nov.</summary>
++public static class SampleThisWeek
++{
++    public static DateOnly Monday { get; } = new(2026, 11, 16);
++
++    public static DateOnly Wednesday { get; } = new(2026, 11, 18);
++
++    /// <summary>Monday to Wednesday, all trained.</summary>
++    public static IReadOnlyList<DateOnly> TrainedDays { get; } = [Monday, Monday.AddDays(1), Wednesday];
++
++    /// <summary>3 workouts, 2h 35m, 34 sets.</summary>
++    public static WeekTotals ThisWeek { get; } = new(3, new TimeSpan(2, 35, 0), 34);
++
++    /// <summary>Monday to Wednesday last week: 2 workouts, 2h, 33 sets.</summary>
++    public static WeekTotals LastWeekToDate { get; } = new(2, new TimeSpan(2, 0, 0), 33);
++
++    public static WeekTotals Nothing { get; } = new(0, TimeSpan.Zero, 0);
++
++    /// <summary>All of last week: 4 workouts, 4h 10m, 67 sets.</summary>
++    public static WeekTotals LastWeek { get; } = new(4, new TimeSpan(4, 10, 0), 67);
++
++    /// <summary>Three workouts, oldest first.</summary>
++    public static IReadOnlyList<WeekWorkout> Workouts { get; } =
++    [
++        new(31, new DateTime(2026, 11, 16, 18, 5, 0), ["Bench press", "Overhead press", "Lateral raise", "Tricep pushdown"], new TimeSpan(1, 2, 0)),
++        new(32, new DateTime(2026, 11, 17, 18, 30, 0), ["Treadmill run"], new TimeSpan(0, 35, 0)),
++        new(33, new DateTime(2026, 11, 18, 7, 10, 0), ["Squat", "Leg press", "Leg curl"], new TimeSpan(0, 58, 0)),
++    ];
++
++    /// <summary>One record.</summary>
++    public static IReadOnlyList<WeekRecord> Records { get; } = [new(8, "Bench press", "82.5kg × 5", DayOfWeek.Monday)];
++
++    /// <summary>Seven records, newest first.</summary>
++    public static IReadOnlyList<WeekRecord> ManyRecords { get; } =
++    [
++        new(115, "Deadlift", "160kg × 3", DayOfWeek.Wednesday),
++        new(22, "Squat", "120kg × 5", DayOfWeek.Wednesday),
++        new(24, "Leg press", "240kg × 8", DayOfWeek.Wednesday),
++        new(263, "Pull-up", "12 reps", DayOfWeek.Tuesday),
++        new(41, "Treadmill run", "5.2 km", DayOfWeek.Tuesday),
++        new(8, "Bench press", "82.5kg × 5", DayOfWeek.Monday),
++        new(9, "Overhead press", "52.5kg × 5", DayOfWeek.Monday),
++    ];
++
++    /// <summary>Four groups trained, Back at zero.</summary>
++    public static IReadOnlyList<MuscleGroupSets> Muscles { get; } =
++        [new("Legs", 14), new("Chest", 9), new("Shoulders", 6), new("Arms", 3), new("Core", 2), new("Back", 0)];
++
++    /// <summary>Every group trained.</summary>
++    public static IReadOnlyList<MuscleGroupSets> AllTrained { get; } =
++        [new("Legs", 14), new("Chest", 9), new("Shoulders", 6), new("Arms", 3), new("Core", 2), new("Back", 1)];
++
++    /// <summary>No group trained.</summary>
++    public static IReadOnlyList<MuscleGroupSets> NoneTrained { get; } =
++        [new("Legs", 0), new("Chest", 0), new("Shoulders", 0), new("Arms", 0), new("Core", 0), new("Back", 0)];
++}
+diff --git a/src/WorkoutLog.UI.ScreenStories/Screens/ThisWeek.stories.razor b/src/WorkoutLog.UI.ScreenStories/Screens/ThisWeek.stories.razor
+new file mode 100644
+index 0000000..c25ccc9
+--- /dev/null
++++ b/src/WorkoutLog.UI.ScreenStories/Screens/ThisWeek.stories.razor
+@@ -0,0 +1,18 @@
++@using WorkoutLog.UI.Navigation
++@using WorkoutLog.UI.Screens
++@using WorkoutLog.UI.ScreenStories.Screens
++@attribute [Stories("Workout Log/Screens/This week")]
++
++<Stories TComponent="ThisWeekView" Layout="typeof(WorkoutLogLayout)">
++
++    <Story Name="Mid-week">
++        <Template>
++            <ThisWeekView Monday="SampleThisWeek.Monday" Today="SampleThisWeek.Wednesday" Trained="SampleThisWeek.TrainedDays" Streak="23"
++                          ThisWeek="SampleThisWeek.ThisWeek" LastWeekToDate="SampleThisWeek.LastWeekToDate"
++                          Workouts="SampleThisWeek.Workouts" Records="SampleThisWeek.Records" Muscles="SampleThisWeek.Muscles"
++                          OnSettings="() => { }" OnNew="() => { }" OnNavigate="(MainTab _) => { }"
++                          OnOpenWorkout="(int _) => { }" OnOpenRecord="(int _) => { }" />
++        </Template>
++    </Story>
++
++</Stories>
+diff --git a/src/WorkoutLog.UI.ScreenStories/Shared/WorkoutLogLayout.razor b/src/WorkoutLog.UI.ScreenStories/Shared/WorkoutLogLayout.razor
+new file mode 100644
+index 0000000..68e8115
+--- /dev/null
++++ b/src/WorkoutLog.UI.ScreenStories/Shared/WorkoutLogLayout.razor
+@@ -0,0 +1,6 @@
++@inherits LayoutComponentBase
++@* Phone frame plus the tokens only this app uses. *@
++<link rel="stylesheet" href="_content/WorkoutLog.UI.ScreenStories/css/app-tokens.css" />
++<PhoneFrame>
++    @Body
++</PhoneFrame>
+diff --git a/src/WorkoutLog.UI.ScreenStories/WorkoutLog.UI.ScreenStories.csproj b/src/WorkoutLog.UI.ScreenStories/WorkoutLog.UI.ScreenStories.csproj
+new file mode 100644
+index 0000000..143bca3
+--- /dev/null
++++ b/src/WorkoutLog.UI.ScreenStories/WorkoutLog.UI.ScreenStories.csproj
+@@ -0,0 +1,20 @@
++<Project Sdk="Microsoft.NET.Sdk.Razor">
++
++  <PropertyGroup>
++    <GenerateDocumentationFile>true</GenerateDocumentationFile>
++  </PropertyGroup>
++
++  <ItemGroup>
++    <SupportedPlatform Include="browser" />
++  </ItemGroup>
++
++  <ItemGroup>
++    <PackageReference Include="BlazingStory" />
++  </ItemGroup>
++
++  <ItemGroup>
++    <ProjectReference Include="..\WorkoutLog.UI\WorkoutLog.UI.csproj" />
++    <ProjectReference Include="$(KitPath)/src/Shields.UI.Stories/Shields.UI.Stories.csproj" />
++  </ItemGroup>
++
++</Project>
+diff --git a/src/WorkoutLog.UI.ScreenStories/WorkoutLogStories.cs b/src/WorkoutLog.UI.ScreenStories/WorkoutLogStories.cs
+new file mode 100644
+index 0000000..27336dd
+--- /dev/null
++++ b/src/WorkoutLog.UI.ScreenStories/WorkoutLogStories.cs
+@@ -0,0 +1,11 @@
++using Microsoft.Extensions.DependencyInjection;
++using WorkoutLog.UI.Navigation;
++
++namespace WorkoutLog.UI.ScreenStories;
++
++public static class WorkoutLogStories
++{
++    /// <summary>Registers what Workout Log's screen stories need: the back button the screens' back handler uses. AddUi() is left out on purpose: it also registers services that need Core's, which the host does not have.</summary>
++    public static IServiceCollection AddWorkoutLogStories(this IServiceCollection services) =>
++        services.AddSingleton<IBackButton, BackButton>();
++}
+diff --git a/src/WorkoutLog.UI.ScreenStories/_Imports.razor b/src/WorkoutLog.UI.ScreenStories/_Imports.razor
+new file mode 100644
+index 0000000..9915570
+--- /dev/null
++++ b/src/WorkoutLog.UI.ScreenStories/_Imports.razor
+@@ -0,0 +1,5 @@
++@using Microsoft.AspNetCore.Components.Web
++@using BlazingStory.Components
++@using BlazingStory.Types
++@using Shields.UI.Stories.Shared
++@using WorkoutLog.UI.ScreenStories.Shared
+diff --git a/src/WorkoutLog.UI.ScreenStories/wwwroot/css/app-tokens.css b/src/WorkoutLog.UI.ScreenStories/wwwroot/css/app-tokens.css
+new file mode 100644
+index 0000000..86dc5bc
+--- /dev/null
++++ b/src/WorkoutLog.UI.ScreenStories/wwwroot/css/app-tokens.css
+@@ -0,0 +1,29 @@
++/* Tokens only this app uses; the shared ones come from Shields.UI. */
++:root {
++    --color-bar-past: light-dark(#77878b, #7d8a8c);
++    --font-size-input: 1.25rem;
++    --touch-target-compact: 40px;
++    --border-width-error: 2px;
++    --chart-stroke-width: 2px;
++    --set-number-width: 2rem;
++    --set-last-width: 3.5rem;
++    --dialog-max-width: 22rem;
++    --pull-refresh-threshold: 64px;
++    --pull-refresh-return-duration: 200ms;
++    --snackbar-enter-duration: 150ms;
++    --radio-size: 1.5rem;
++    --radio-dot-size: 0.75rem;
++    --nav-indicator-width: 4rem;
++    --nav-indicator-height: 2rem;
++    --calendar-day-size: 2.25rem;
++    --calendar-dot-size: 0.25rem;
++    --nav-new-size: 3.5rem;
++    --nav-new-raise: 1.5rem;
++    --meter-height: 0.625rem;
++    --meter-label-width: 5.5rem;
++    --meter-value-width: 6rem;
++    --meter-label-width-wide: 8rem;
++    --meter-label-width-narrow: 2.5rem;
++    --meter-value-width-narrow: 2rem;
++    --legend-swatch-size: 0.75rem;
++}

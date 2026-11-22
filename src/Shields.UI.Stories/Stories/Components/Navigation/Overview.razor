@@ -1,0 +1,15 @@
+@attribute [CustomPage("Components/Navigation/Overview")]
+
+<h1>Navigation</h1>
+
+<h2><code>PeriodStepper</code></h2>
+<p>A previous arrow, the period's label and a next arrow in one row: <em>16 – 22 Nov</em>, <em>November 2026</em> or <em>2026</em>. The arrows are round buttons at <code>--touch-target</code>, a left chevron for previous and a right chevron for next, named by <code>Kind</code> (<code>Week</code>, <code>Month</code> or <code>Year</code>): "Previous week", "Next month". An arrow is disabled, at <code>--opacity-disabled</code>, when its flag is false: <code>CanGoPrevious</code> at the first period with data, <code>CanGoNext</code> at the period that holds today. The label is a polite live region, so a screen reader hears the new period; a long label wraps.</p>
+<ul>
+    <li><code>OnPrevious</code> and <code>OnNext</code> are raised by the arrows.</li>
+    <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>{TestId}-previous</code>, <code>{TestId}-label</code>, <code>{TestId}-next</code>.</li>
+</ul>
+
+<h2><code>BackHandler</code></h2>
+<p>Renders nothing. While <code>OnBack</code> is set, the Android back button runs it instead of leaving the app; the newest handler on screen wins, and removing the component or clearing <code>OnBack</code> unregisters it. A failure in <code>OnBack</code> goes to the nearest error boundary, as one from a button click would. It needs the <code>IBackButton</code> service from <code>AddShieldsUi()</code>; the host's activity reaches it through <code>BackButtonBridge</code> (see <code>HostBridges</code> in the Layout overview), not by resolving <code>IBackButton</code> itself.</p>
+
+<p>Stories: <a href="./?path=/docs/components-navigation-periodstepper--docs">PeriodStepper</a>, <a href="./?path=/docs/components-navigation-backhandler--docs">BackHandler</a></p>

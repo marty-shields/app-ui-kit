@@ -1,0 +1,72 @@
+@using System.Diagnostics
+@using Microsoft.Extensions.Logging
+@inject ILogger<StartupGate> Logger
+@if (state == State.Ready)
+{
+    @ChildContent
+}
+else
+{
+    <StartupView Title="@Title" LoadingLabel="@LoadingLabel" FailedMessage="@FailedMessage" Failed="state == State.Failed"
+                 RetryVariant="RetryVariant" OnRetry="Retry" />
+}
+
+@code {
+    private enum State { Loading, Ready, Failed }
+
+    private State state;
+
+    /// <summary>Start-up work run before the content shows: once, and with <see cref="Retryable"/> again each time Try again is pressed after it failed.</summary>
+    [Parameter, EditorRequired]
+    public Func<Task> Initialize { get; set; } = () => Task.CompletedTask;
+
+    /// <summary>Content shown once <see cref="Initialize"/> completes.</summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>App name shown at the top of the start-up screen. Null shows no title.</summary>
+    [Parameter]
+    public string? Title { get; set; }
+
+    /// <summary>Text under the spinner while starting.</summary>
+    [Parameter]
+    public string LoadingLabel { get; set; } = "Loading…";
+
+    /// <summary>Text shown when <see cref="Initialize"/> fails, e.g. Couldn't open the database</summary>
+    [Parameter, EditorRequired]
+    public string FailedMessage { get; set; } = "";
+
+    /// <summary>Offers Try again after a failure, which runs <see cref="Initialize"/> again. False shows the message only.</summary>
+    [Parameter]
+    public bool Retryable { get; set; } = true;
+
+    /// <summary>Visual weight of Try again. Used only when <see cref="Retryable"/> is true.</summary>
+    [Parameter]
+    public ButtonVariant RetryVariant { get; set; } = ButtonVariant.Primary;
+
+    private EventCallback Retry => Retryable ? EventCallback.Factory.Create(this, InitializeAgainAsync) : default;
+
+    protected override Task OnInitializedAsync() => RunAsync();
+
+    private Task InitializeAgainAsync()
+    {
+        state = State.Loading;
+        return RunAsync();
+    }
+
+    private async Task RunAsync()
+    {
+        var started = Stopwatch.GetTimestamp();
+        try
+        {
+            await Initialize();
+            state = State.Ready;
+            Log.Started(Logger, (long)Stopwatch.GetElapsedTime(started).TotalMilliseconds);
+        }
+        catch (Exception exception)
+        {
+            state = State.Failed;
+            Log.Failed(Logger, exception);
+        }
+    }
+}

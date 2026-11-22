@@ -1,0 +1,231 @@
+@using Shields.UI.Components.Navigation
+@using Microsoft.Extensions.Logging
+@using Microsoft.JSInterop
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+@inject ILogger<AppScreen> Logger
+
+<div class="screen @(HasNav ? "with-nav" : null)">
+    <BackHandler OnBack="Back" />
+    <header class="top-bar">
+        @if (OnBack.HasDelegate)
+        {
+            <IconButton Icon="IconName.Back" AriaLabel="Back" TestId="@BackTestId" OnClick="OnBack" />
+        }
+        <div class="titles">
+            <h1 class="title" data-testid="screen-title">@Title</h1>
+            @if (Subtitle is not null)
+            {
+                <p class="subtitle" data-testid="screen-subtitle">@Subtitle</p>
+            }
+        </div>
+        @Actions
+    </header>
+    @if (Toolbar is not null)
+    {
+        <div class="toolbar @(ToolbarDivider ? "divided" : null)">
+            @Toolbar
+        </div>
+    }
+    @if (OnRefresh.HasDelegate)
+    {
+        <div @ref="indicator" class="pull-refresh" data-testid="pull-refresh" aria-hidden="true">
+            <span class="ring"></span>
+        </div>
+    }
+    <main @ref="content" class="content">
+        @ChildContent
+    </main>
+    @if (BottomBar is not null || HasNav || Status is not null)
+    {
+        <footer class="bottom">
+            @if (Status is not null)
+            {
+                <div class="status-slot" role="status" aria-live="polite">
+                    @Status
+                </div>
+            }
+            @if (BottomBar is not null)
+            {
+                <div class="bottom-bar" data-testid="bottom-bar">
+                    @BottomBar
+                </div>
+            }
+            @if (HasNav)
+            {
+                <BottomNav Items="NavItems!" Current="Current" AddLabel="@AddLabel" AddIcon="AddIcon" AddHasPopup="@AddHasPopup"
+                           AddButtonAttributes="AddButtonAttributes" OnNavigate="OnNavigate" OnAdd="OnAdd" />
+            }
+        </footer>
+    }
+</div>
+
+@code {
+    private ElementReference content;
+    private ElementReference indicator;
+    private IJSObjectReference? module;
+    private DotNetObjectReference<AppScreen>? self;
+    private bool refreshing;
+    private bool disposed;
+
+    /// <summary>Screen title.</summary>
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = "";
+
+    /// <summary>Line under the title.</summary>
+    [Parameter]
+    public string? Subtitle { get; set; }
+
+    /// <summary>Raised by the back arrow and the Android back button. No arrow shows when unset, and Android back leaves the app (on a top-level screen other than the first of <see cref="NavItems"/>, it goes to that item). Unset on a top-level screen, unless a view layered over it needs its own back; set, it takes Android back instead of <see cref="OnNavigate"/>.</summary>
+    [Parameter]
+    public EventCallback OnBack { get; set; }
+
+    /// <summary>data-testid of the back arrow, so a screen layered over another keeps its own.</summary>
+    [Parameter]
+    public string BackTestId { get; set; } = "back";
+
+    /// <summary>Makes this a top-level screen: shows the bottom navigation bar with these tabs, the first being the start screen. No bar shows when null or empty.</summary>
+    [Parameter]
+    public IReadOnlyList<BottomNavItem>? NavItems { get; set; }
+
+    /// <summary>The tab of this screen, one of <see cref="NavItems"/>. Android back from any other current tab goes to the first, or leaves the app from the first. Null marks none and leaves Android back alone.</summary>
+    [Parameter]
+    public BottomNavItem? Current { get; set; }
+
+    /// <summary>Raised with the tab tapped in the bottom navigation bar, or with the first of <see cref="NavItems"/> on Android back from another top-level screen.</summary>
+    [Parameter]
+    public EventCallback<BottomNavItem> OnNavigate { get; set; }
+
+    /// <summary>The words under the raised button of the bar. Needed when <see cref="NavItems"/> is set.</summary>
+    [Parameter]
+    public string AddLabel { get; set; } = "";
+
+    /// <summary>The icon in the raised button of the bar. Needed when <see cref="NavItems"/> is set.</summary>
+    [Parameter]
+    public IconName AddIcon { get; set; }
+
+    /// <summary>Value of the raised button's aria-haspopup, e.g. <c>dialog</c> when it opens one. Null leaves the attribute off.</summary>
+    [Parameter]
+    public string? AddHasPopup { get; set; }
+
+    /// <summary>Extra attributes for the raised button, e.g. <c>data-sheet-opener</c> so a sheet can return focus to it.</summary>
+    [Parameter]
+    public IReadOnlyDictionary<string, object>? AddButtonAttributes { get; set; }
+
+    /// <summary>Raised by the bar's raised button. The screen shows its own sheet or dialog; nothing happens when unset.</summary>
+    [Parameter]
+    public EventCallback OnAdd { get; set; }
+
+    /// <summary>Actions at the right of the top bar.</summary>
+    [Parameter]
+    public RenderFragment? Actions { get; set; }
+
+    /// <summary>
+    /// Controls fixed between the top bar and the content, such as filters. They scroll on their own only when taller than the screen.
+    /// No toolbar shows when unset.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? Toolbar { get; set; }
+
+    /// <summary>Draws a line under the <see cref="Toolbar"/>, in the border colour, to set it apart from the scrolling content. Nothing changes without a toolbar. False by default.</summary>
+    [Parameter]
+    public bool ToolbarDivider { get; set; }
+
+    /// <summary>Scrolling screen content. With the bottom navigation bar it ends clear of the raised button, so the content needs no bottom padding of its own.</summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>Actions fixed at the bottom, in thumb reach.</summary>
+    [Parameter]
+    public RenderFragment? BottomBar { get; set; }
+
+    /// <summary>
+    /// A message just above the bottom bar, over the content, and above the raised button of the navigation bar. Its slot is a polite live region,
+    /// there whenever this is set, so a message shown later is read out. Without <see cref="BottomBar"/> or <see cref="NavItems"/> it floats over the foot of the content on its own.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? Status { get; set; }
+
+    /// <summary>
+    /// Makes the content pull-to-refresh: pulling it down from the top far enough runs this once the finger lifts. The indicator
+    /// shows only while pulling, so the handler shows its own loading state. A pull during a refresh is ignored. Read once, when
+    /// the screen first shows. No gesture when unset.
+    /// </summary>
+    [Parameter]
+    public EventCallback OnRefresh { get; set; }
+
+    private bool HasNav => NavItems is { Count: > 0 };
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || !OnRefresh.HasDelegate)
+        {
+            return;
+        }
+
+        try
+        {
+            self = DotNetObjectReference.Create(this);
+            var imported = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/Shields.UI/Components/Layout/AppScreen.razor.js");
+            if (disposed)
+            {
+                await imported.DisposeAsync();
+                return;
+            }
+
+            module = imported;
+            await module.InvokeVoidAsync("attach", content, indicator, self);
+        }
+        catch (Exception exception) when (!disposed)
+        {
+            Log.PullRefreshFailed(Logger, exception);
+        }
+    }
+
+    [JSInvokable]
+    public async Task RefreshAsync()
+    {
+        if (refreshing)
+        {
+            return;
+        }
+
+        refreshing = true;
+        try
+        {
+            await OnRefresh.InvokeAsync();
+        }
+        catch (Exception exception)
+        {
+            // Thrown back over interop it would only reach the console: pass it to the nearest error boundary, as a click handler's would.
+            await DispatchExceptionAsync(exception);
+        }
+        finally
+        {
+            refreshing = false;
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        disposed = true;
+        if (module is not null)
+        {
+            try
+            {
+                await module.InvokeVoidAsync("detach", content);
+                await module.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+        }
+
+        self?.Dispose();
+    }
+
+    private EventCallback Back =>
+        OnBack.HasDelegate || !OnNavigate.HasDelegate || NavItems is not { Count: > 0 } items || Current is null || Current == items[0]
+            ? OnBack
+            : EventCallback.Factory.Create(this, () => OnNavigate.InvokeAsync(items[0]));
+}

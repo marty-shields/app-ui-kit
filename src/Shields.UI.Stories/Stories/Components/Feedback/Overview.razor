@@ -1,0 +1,37 @@
+@attribute [CustomPage("Components/Feedback/Overview")]
+
+<h1>Feedback</h1>
+
+<h2><code>InlineAlert</code></h2>
+<p>A box for an error that belongs to the content around it: an error border (<code>--border-width-error</code>), the surface background and error text, announced to screen readers (<code>role="alert"</code>). Shows <code>Message</code>, then <code>ChildContent</code>.</p>
+<ul>
+    <li><code>Tone</code> (<code>AlertTone</code>): <code>Error</code>, the only tone and the default; the enum leaves room for others.</li>
+    <li><code>data-testid</code>: <code>TestId</code>.</li>
+    <li><code>Messages</code>: several short messages, such as one per invalid field, as a list in the one alert, after <code>Message</code> and before <code>ChildContent</code>. Blank entries are skipped. <code>data-testid</code> of the list: <code>{TestId}-messages</code>.</li>
+</ul>
+
+<h2><code>Banner</code></h2>
+<p>A short bold highlight, such as "Editing a copy": a <code>--radius-lg</code> pill with a small padding, in the normal text colour on the selected background (<code>--color-selected</code>, 4.5:1). The screen decides where it sits.</p>
+<ul>
+    <li><code>Tone</code> (<code>BannerTone</code>): <code>Selected</code>, the only tone and the default.</li>
+    <li><code>data-testid</code>: <code>TestId</code>.</li>
+</ul>
+
+<h2><code>Snackbar</code></h2>
+<p>A short message at the foot of the screen on the inverse surface, with an optional action such as Undo. It shows <code>Message</code>, or the next message of its <code>Service</code> (<code>SnackbarService</code>) when that is null, and goes after <code>Duration</code> (10 seconds by default, <code>Timeout.InfiniteTimeSpan</code> to keep it) or when the action is used.</p>
+<ul>
+    <li><code>ActionLabel</code> and <code>OnAction</code>: the action button shows only when both are set. <code>OnTimeout</code> is raised when the time runs out.</li>
+    <li><code>TakeFocus</code> moves focus to the action when it first shows.</li>
+    <li><code>data-testid</code>: <code>TestId</code> (default <code>snackbar</code>), <code>{TestId}-message</code> and <code>{TestId}-action</code>.</li>
+</ul>
+
+<h2><code>Spinner</code></h2>
+<p>A spinning indicator with <code>Label</code> under it, e.g. "Loading…". Reduced motion stops the spin. <code>data-testid</code>: <code>TestId</code>.</p>
+
+<h2><code>LoadFailed</code></h2>
+<p>An error message in a bordered error box with a Try again button that raises <code>OnRetry</code>. <code>RetryVariant</code> sets the button's weight; <code>Plain</code> centres the message without the border for a failure that fills the screen; <code>TakeFocus</code> moves focus to Try again when it first shows. <code>data-testid</code>: <code>{TestId}-error</code> and <code>{TestId}-retry</code>.</p>
+
+<h2><code>SuccessBadge</code></h2>
+<p>A small success-coloured <code>Icon</code> followed by bold small text in the <code>TextVariant.SuccessSmall</code> look, such as a "Record" mark. <code>Text</code> is required; <code>Icon</code> is the record mark by default. <code>data-testid</code>: <code>TestId</code>. The text is at least 4.5:1 on the page and cards, as <code>--color-success</code> is.</p>
+
+<p>Stories: <a href="./?path=/docs/components-feedback-inlinealert--docs">InlineAlert</a>, <a href="./?path=/docs/components-feedback-banner--docs">Banner</a>, <a href="./?path=/docs/components-feedback-snackbar--docs">Snackbar</a>, <a href="./?path=/docs/components-feedback-spinner--docs">Spinner</a>, <a href="./?path=/docs/components-feedback-loadfailed--docs">LoadFailed</a>, <a href="./?path=/docs/components-feedback-successbadge--docs">SuccessBadge</a></p>

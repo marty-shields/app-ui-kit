@@ -1,0 +1,93 @@
+@attribute [Stories("Components/Charts/StackedBar")]
+
+<Stories TComponent="StackedBar" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Three segments">
+        <Template>
+            <div class="themed"><StackedBar Label="Sales by region" Unit="units" Segments="@([new StackedBarSegment("North", 420, DataSeries.One), new StackedBarSegment("South", 640, DataSeries.Two), new StackedBarSegment("East", 810, DataSeries.Three)])" TestId="bar" /></div>
+        </Template>
+    </Story>
+
+    <Story Name="All five series">
+        <Template>
+            <div class="themed"><StackedBar Label="Share by group" Segments="@([new StackedBarSegment("A", 30, DataSeries.One), new StackedBarSegment("B", 25, DataSeries.Two), new StackedBarSegment("C", 20, DataSeries.Three), new StackedBarSegment("D", 15, DataSeries.Four), new StackedBarSegment("E", 10, DataSeries.Five)])" TestId="bar" /></div>
+        </Template>
+    </Story>
+
+    <Story Name="Without labels">
+        <Template>
+            <div class="themed"><StackedBar Label="Sales by region" ShowLabels="false" Segments="@([new StackedBarSegment("North", 420, DataSeries.One), new StackedBarSegment("South", 640, DataSeries.Two), new StackedBarSegment("East", 810, DataSeries.Three)])" TestId="bar" /></div>
+        </Template>
+    </Story>
+
+    <Story Name="Sized by one unit, labelled in another">
+        <Template>
+            <div class="themed"><StackedBar Label="Macros by energy" Segments="@([new StackedBarSegment("Protein", 128, DataSeries.One, "32 g"), new StackedBarSegment("Carbs", 400, DataSeries.Two, "100 g"), new StackedBarSegment("Fat", 270, DataSeries.Three, "30 g")])" TestId="bar" /></div>
+        </Template>
+    </Story>
+
+    <Story Name="Single segment">
+        <Template>
+            <div class="themed"><StackedBar Label="Sales by region" Unit="units" Segments="@([new StackedBarSegment("North", 420, DataSeries.One)])" TestId="bar" /></div>
+        </Template>
+    </Story>
+
+    <Story Name="One tiny segment">
+        <Template>
+            <div class="themed"><StackedBar Label="Sales by region" Unit="units" Segments="@([new StackedBarSegment("North", 900, DataSeries.One), new StackedBarSegment("South", 1, DataSeries.Two)])" TestId="bar" /></div>
+        </Template>
+    </Story>
+
+    <Story Name="Card width legend">
+        <Template>
+            <div class="phone-screen"><div class="themed card-stand-in"><StackedBar Label="Average macros" Unit="g" Segments="@([new StackedBarSegment("Protein", 182.6, DataSeries.One), new StackedBarSegment("Carbs", 365.3, DataSeries.Two), new StackedBarSegment("Fat", 91.3, DataSeries.Three)])" TestId="bar" /></div></div>
+        </Template>
+    </Story>
+
+    <Story Name="Card width legend with wider values">
+        <Template>
+            <div class="phone-screen"><div class="themed card-stand-in"><StackedBar Label="Average macros" Unit="g" Segments="@([new StackedBarSegment("Protein", 188.8, DataSeries.One), new StackedBarSegment("Carbs", 388.8, DataSeries.Two), new StackedBarSegment("Fat", 188.8, DataSeries.Three)])" TestId="bar" /></div></div>
+        </Template>
+    </Story>
+
+    <Story Name="Five segments with long values">
+        <Template>
+            <div class="themed mid"><StackedBar Label="Energy by meal" Segments="@([new StackedBarSegment("Breakfast", 1234.5, DataSeries.One, "1,234.5 kcal"), new StackedBarSegment("Lunch", 1100.5, DataSeries.Two, "1,100.5 kcal"), new StackedBarSegment("Dinner", 1500.5, DataSeries.Three, "1,500.5 kcal"), new StackedBarSegment("Snacks", 600.5, DataSeries.Four, "600.5 kcal"), new StackedBarSegment("Drinks", 300.5, DataSeries.Five, "300.5 kcal")])" TestId="bar" /></div>
+        </Template>
+    </Story>
+
+    <Story Name="Long labels">
+        <Template>
+            <div class="themed narrow"><StackedBar Label="Sales by region" Unit="units" Segments="@([new StackedBarSegment("A very long region name that cannot fit", 420, DataSeries.One), new StackedBarSegment("Another similarly long region name", 640, DataSeries.Two)])" TestId="bar" /></div>
+        </Template>
+    </Story>
+
+    <Story Name="All zero">
+        <Template>
+            <div class="themed"><StackedBar Label="Sales by region" Unit="units" EmptyText="Nothing recorded yet" Segments="@([new StackedBarSegment("North", 0, DataSeries.One), new StackedBarSegment("South", 0, DataSeries.Two)])" TestId="bar" /></div>
+        </Template>
+    </Story>
+
+    <Story Name="All zero on the page">
+        <Template>
+            <StackedBar Label="Sales by region" Unit="units" EmptyText="Nothing recorded yet" Segments="@([new StackedBarSegment("North", 0, DataSeries.One), new StackedBarSegment("South", 0, DataSeries.Two)])" TestId="bar" />
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <StackedBar Label="Sales by region" Unit="units" Segments="@([new StackedBarSegment("North", 420, DataSeries.One), new StackedBarSegment("South", 640, DataSeries.Two), new StackedBarSegment("East", 810, DataSeries.Three), new StackedBarSegment("West", 0, DataSeries.Four)])" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <StackedBar Label="Sales by region" Unit="units" Segments="@([new StackedBarSegment("North", 420, DataSeries.One), new StackedBarSegment("South", 640, DataSeries.Two), new StackedBarSegment("East", 810, DataSeries.Three), new StackedBarSegment("West", 0, DataSeries.Four)])" />
+            </div>
+        </Template>
+    </Story>
+
+</Stories>

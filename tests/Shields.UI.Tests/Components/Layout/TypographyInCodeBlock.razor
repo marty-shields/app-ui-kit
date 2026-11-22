@@ -1,0 +1,12 @@
+@using Shields.UI.Components.Layout
+
+@* Compiling this file is the guard: <Text> here would be Razor's <text> tag (RZ1023). *@
+@if (Show)
+{
+    <Typography Variant="TextVariant.Strong" TestId="inside">Inside a block</Typography>
+}
+
+@code {
+    [Parameter]
+    public bool Show { get; set; } = true;
+}

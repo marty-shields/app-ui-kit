@@ -1,0 +1,285 @@
+#!/usr/bin/env node
+// No npm packages: drives headless Chrome over CDP with Node's built-in WebSocket.
+import { spawn } from 'node:child_process';
+import { readFileSync, readdirSync, statSync, mkdtempSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join, resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const [baseUrl, chromePath, ...prefixes] = process.argv.slice(2);
+if (!baseUrl || !chromePath) {
+  console.error('Usage: check-story-layout.mjs <stories-url> <chrome-path> [title-prefix ...]');
+  process.exit(64);
+}
+
+// 424px is the narrowest preview width: a 328px story area (a 360dp phone less 16px padding either side) plus the 96px the story preview adds around it.
+const WIDTH = 424;
+// Exploration knob (Android font size scales rem); not run in CI.
+const FONT_SCALE = Number(process.env.STORY_FONT_SCALE ?? 1);
+// Tabs checked in parallel; the tests set 1 to fix which story a tab checks next.
+const CONCURRENCY = Number(process.env.STORY_CONCURRENCY ?? 8);
+// Console errors that are known to be harmless, by story id: the first line of the message may contain one of that story's prefixes. Each is logged on purpose by a story that shows a failure.
+const IGNORED_ERRORS = {
+  'components-layout-apperrorboundary--error': ['fail: Shields.UI.Components.Layout.AppErrorBoundary[9101]'],
+  'components-layout-startupgate--load-failed': ['fail: Shields.UI.Components.Layout.StartupGate[9002]'],
+  'components-layout-startupgate--load-failed-no-retry': ['fail: Shields.UI.Components.Layout.StartupGate[9002]'],
+};
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../src/Shields.UI.Stories/Stories');
+const scopes = prefixes.length ? prefixes : ['Components/'];
+
+const slug = (text) => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
+function storyFiles(dir) {
+  return readdirSync(dir).flatMap((name) => {
+    const path = join(dir, name);
+    return statSync(path).isDirectory() ? storyFiles(path) : name.endsWith('.stories.razor') ? [path] : [];
+  });
+}
+
+function stories() {
+  return storyFiles(root).flatMap((file) => {
+    const source = readFileSync(file, 'utf8');
+    const title = /\[Stories\("([^"]+)"\)\]/.exec(source)?.[1];
+    if (!title || !scopes.some((scope) => title.startsWith(scope))) return [];
+    return [...source.matchAll(/<Story\s+Name="([^"]+)"/g)].map((m) => ({ title, name: m[1], id: `${slug(title)}--${slug(m[1])}` }));
+  });
+}
+
+// Runs in the page. Returns one finding per problem.
+function inspect() {
+  const PROSE = 'h1, h2, h3, [role=alert], .note, .error, [data-wrap-ok]';
+  const findings = [];
+  const label = (el) => {
+    const id = el.closest('[data-testid]')?.getAttribute('data-testid');
+    return `${el.tagName.toLowerCase()}${el.className && typeof el.className === 'string' ? '.' + el.className.trim().split(/\s+/)[0] : ''}${id ? `[${id}]` : ''}`;
+  };
+  const app = document.querySelector('#app');
+  // A story in the PhoneLayout frame is a fixed 412px device mock: check what is inside it against the frame's content box, not the page.
+  const frame = app.querySelector('[data-testid=phone] > .viewport');
+  const viewport = frame ? frame.getBoundingClientRect().right : document.documentElement.clientWidth;
+  if (!frame && document.documentElement.scrollWidth > viewport) {
+    findings.push(`page scrolls sideways (${document.documentElement.scrollWidth}px > ${viewport}px)`);
+  }
+  // The story root is the preview box ThemeLayout puts around a story. It must be 328px wide inside: a 360dp phone less 16px padding either side, so a changed WIDTH fails here.
+  const storyRoot = app.querySelector('[data-testid=preview]');
+  if (storyRoot) {
+    const style = getComputedStyle(storyRoot);
+    const area = storyRoot.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+    if (Math.abs(area - 328) > 1) findings.push(`story area is ${Math.round(area)}px wide, expected 328px`);
+  } else if (!frame) {
+    findings.push('no story root found (neither the phone frame nor [data-testid=preview]), so the width was not checked');
+  }
+  // Current Chrome accepts an attribute named `"` (from `class="x""`) that Android WebView rejects, so no exception tells us.
+  for (const el of app.querySelectorAll('*')) {
+    const bad = el.getAttributeNames().find((name) => /[\s"'<>\/=]/.test(name));
+    if (bad) findings.push(`${label(el)} has an invalid attribute name: ${JSON.stringify(bad)}`);
+  }
+  for (const card of app.querySelectorAll('.card')) {
+    if (!card.parentElement) continue;
+    const box = card.getBoundingClientRect();
+    const container = card.parentElement.getBoundingClientRect();
+    if (box.left < container.left - 1 || box.right > container.right + 1) {
+      findings.push(`${label(card)} does not fit its container (${Math.round(box.left)}-${Math.round(box.right)}px in ${Math.round(container.left)}-${Math.round(container.right)}px)`);
+    }
+  }
+  for (const el of (frame ?? app).querySelectorAll('*')) {
+    const style = getComputedStyle(el);
+    if (style.display === 'none' || el.closest('.visually-hidden')) continue;
+    const box = el.getBoundingClientRect();
+    if (box.width === 0 || box.height === 0) continue;
+    if (el.scrollWidth > el.clientWidth + 1 && style.textOverflow !== 'ellipsis') {
+      if (el.tagName === 'INPUT' || style.overflowX !== 'visible') {
+        findings.push(`${label(el)} clips its content (${el.scrollWidth}px of ${el.clientWidth}px)`);
+      } else if (style.whiteSpace === 'nowrap') {
+        findings.push(`${label(el)} text overflows its box (${el.scrollWidth}px in ${el.clientWidth}px)`);
+      }
+    }
+    if (el.tagName === 'INPUT' && el.placeholder && !el.value) {
+      // Placeholder text never counts toward scrollWidth, so it needs its own measurement.
+      const probe = document.createElement('span');
+      probe.style.cssText = 'position:absolute;visibility:hidden;white-space:pre';
+      probe.style.font = style.font;
+      probe.style.fontSize = getComputedStyle(el, '::placeholder').fontSize;
+      probe.textContent = el.placeholder;
+      document.body.append(probe);
+      const needed = probe.getBoundingClientRect().width;
+      probe.remove();
+      const room = el.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+      if (needed > room + 0.5) findings.push(`${label(el)} placeholder is cut off (${Math.round(needed)}px in ${Math.round(room)}px)`);
+    }
+    if (box.right > viewport + 1) {
+      findings.push(`${label(el)} runs past the screen edge (${Math.round(box.right)}px > ${viewport}px)`);
+    }
+    if (el.childElementCount === 0 && el.textContent.trim() && !el.closest(PROSE) && style.whiteSpace !== 'nowrap') {
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      // Text clipped by overflow (a line-clamp) keeps its hidden lines' rects below the box; only the lines inside the box are seen.
+      const clipped = style.overflowY !== 'visible';
+      const lines = new Set([...range.getClientRects()].filter((r) => !clipped || r.top < box.bottom - 1).map((r) => Math.round(r.top)));
+      if (lines.size > 1) findings.push(`${label(el)} wraps onto ${lines.size} lines: "${el.textContent.trim().slice(0, 60)}"`);
+    }
+  }
+  return findings;
+}
+
+const reachable = await fetch(`${baseUrl}/iframe.html`).then((r) => r.ok, () => false);
+if (!reachable) {
+  console.error(`Stories not reachable at ${baseUrl}`);
+  process.exit(1);
+}
+
+const chromeDir = mkdtempSync(join(tmpdir(), 'story-layout-'));
+const chrome = spawn(chromePath, [
+  '--headless=new', '--no-sandbox', '--disable-gpu', '--remote-debugging-port=0', `--user-data-dir=${chromeDir}`, 'about:blank',
+], { stdio: ['ignore', 'ignore', 'pipe'] });
+chrome.on('error', (error) => die(`Cannot start Chrome: ${error.message}`));
+
+function die(message) {
+  console.error(message);
+  chrome.kill();
+  process.exit(1);
+}
+
+setTimeout(() => die('Timed out'), 600_000).unref();
+
+let endpointResolved = false;
+const endpoint = await new Promise((resolveEndpoint, reject) => {
+  let log = '';
+  chrome.stderr.on('data', (chunk) => {
+    log += chunk;
+    const match = /DevTools listening on (ws:\/\/\S+)/.exec(log);
+    if (match) { endpointResolved = true; resolveEndpoint(match[1]); }
+  });
+  chrome.on('exit', () => { if (!endpointResolved) reject(new Error(`Chrome exited early:\n${log}`)); });
+}).catch((error) => die(error.message));
+
+const socket = new WebSocket(endpoint);
+socket.onclose = () => die('Chrome connection lost');
+await new Promise((ok, fail) => { socket.onopen = ok; socket.onerror = () => fail(new Error('Cannot connect to Chrome')); }).catch((error) => die(error.message));
+let next = 0;
+const sessionEvents = new Map();
+const pending = new Map();
+socket.onmessage = ({ data }) => {
+  const message = JSON.parse(data);
+  const waiter = pending.get(message.id);
+  if (waiter) {
+    pending.delete(message.id);
+    message.error ? waiter.reject(new Error(message.error.message)) : waiter.resolve(message.result);
+  } else if (message.sessionId) {
+    sessionEvents.get(message.sessionId)?.(message);
+  }
+};
+const send = (method, params = {}, sessionId) => new Promise((resolve, reject) => {
+  const id = ++next;
+  pending.set(id, { resolve, reject });
+  socket.send(JSON.stringify({ id, method, params, sessionId }));
+});
+
+// The first line of a thrown exception or console error, or undefined when the event is neither or the error is allowed.
+function pageError({ method, params }, storyId) {
+  let text;
+  if (method === 'Runtime.exceptionThrown') {
+    const { exception, text: summary } = params.exceptionDetails;
+    text = `page exception: ${exception?.description ?? exception?.value ?? summary}`;
+  } else if (method === 'Runtime.consoleAPICalled' && params.type === 'error') {
+    text = `console error: ${params.args.map((a) => a.value ?? a.description ?? '').join(' ')}`;
+  } else {
+    return undefined;
+  }
+  const line = text.split('\n')[0].trim();
+  return (IGNORED_ERRORS[storyId] ?? []).some((ignored) => line.includes(ignored)) ? undefined : line;
+}
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// One tab per worker, reused for every story it checks: navigating an open tab is cheaper than creating a target per story.
+async function openTab() {
+  const { targetId } = await send('Target.createTarget', { url: 'about:blank' });
+  const { sessionId } = await send('Target.attachToTarget', { targetId, flatten: true });
+  const tab = { targetId, run: (method, params) => send(method, params, sessionId), story: undefined, errors: [], live: false };
+  sessionEvents.set(sessionId, (event) => {
+    // The old document's contexts are cleared when the next one commits, so events before that belong to the previous story.
+    if (event.method === 'Runtime.executionContextsCleared') tab.live = true;
+    if (!tab.live || !tab.story) return;
+    const line = pageError(event, tab.story.id);
+    if (line) tab.errors.push(line);
+  });
+  tab.close = async () => {
+    sessionEvents.delete(sessionId);
+    await send('Target.closeTarget', { targetId }).catch(() => {});
+  };
+  await tab.run('Runtime.enable');
+  await tab.run('Emulation.setDeviceMetricsOverride', { width: WIDTH, height: 900, deviceScaleFactor: 1, mobile: true });
+  return tab;
+}
+
+async function check(tab, story) {
+  tab.story = story;
+  tab.errors = [];
+  tab.live = false;
+  const { run, errors } = tab;
+  await run('Page.navigate', { url: `${baseUrl}/iframe.html?id=${story.id}&viewMode=story` });
+  const ready = '(document.documentElement.classList.contains("_blazing_story_ready_for_visible") && document.querySelector("#app")?.children.length > 0)';
+  // Polls every 50ms for up to 30s.
+  for (let i = 0; ; i++) {
+    const { result } = await run('Runtime.evaluate', { expression: ready, returnByValue: true });
+    if (result.value) break;
+    if (i > 600) return { findings: ['did not render within 30s', ...errors] };
+    await sleep(50);
+  }
+  if (FONT_SCALE !== 1) {
+    await run('Runtime.evaluate', { expression: `document.documentElement.style.fontSize = '${FONT_SCALE * 100}%'` });
+    await sleep(300);
+  }
+  const { result, exceptionDetails } = await run('Runtime.evaluate', { expression: `(${inspect})()`, returnByValue: true });
+  if (exceptionDetails) return { findings: [`checker failed: ${exceptionDetails.exception?.description ?? exceptionDetails.text}`, ...errors] };
+  return { findings: [...result.value, ...errors] };
+}
+
+const jobs = stories();
+if (jobs.length === 0) die(`No stories match ${scopes.join(', ')}.`);
+
+let exitCode = 0;
+try {
+  const failures = [];
+  const started = Date.now();
+  let cursor = 0;
+  await Promise.all(Array.from({ length: Math.min(CONCURRENCY, jobs.length) }, async () => {
+    let tab = await openTab();
+    try {
+      while (cursor < jobs.length) {
+        const story = jobs[cursor++];
+        let result;
+        try {
+          result = await check(tab, story);
+        } catch (error) {
+          // A broken tab fails its story and is replaced, so the next story starts clean.
+          result = { findings: [`check failed: ${error.message}`, ...tab.errors] };
+          await tab.close();
+          tab = await openTab();
+        }
+        tab.story = undefined;
+        if (result.findings.length) failures.push({ story, findings: [...new Set(result.findings)] });
+      }
+    } finally {
+      await tab.close();
+    }
+  }));
+
+  console.log(`Checked ${jobs.length} stories at ${WIDTH}px in ${((Date.now() - started) / 1000).toFixed(1)}s.`);
+  for (const { story, findings } of failures.sort((a, b) => a.story.id.localeCompare(b.story.id))) {
+    console.log(`\n${story.title} / ${story.name}`);
+    for (const finding of findings) {
+      console.log(`  ${finding}`);
+      console.log(`::error title=Story layout::${story.title} / ${story.name} at ${WIDTH}px: ${finding}`);
+    }
+    exitCode = 1;
+  }
+} catch (error) {
+  console.error(error);
+  exitCode = 1;
+} finally {
+  socket.onclose = null;
+  chrome.kill();
+}
+process.exit(exitCode);

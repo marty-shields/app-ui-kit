@@ -1,0 +1,96 @@
+@attribute [Stories("Components/Charts/BarList")]
+
+<Stories TComponent="BarList" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Sized to the largest">
+        <Template>
+            <BarList Label="Sales by region" Items="@([new BarListItem("North", 420, "420 units"), new BarListItem("South", 640, "640 units"), new BarListItem("East", 810, "810 units"), new BarListItem("West", 190, "190 units")])" TestId="list" />
+        </Template>
+    </Story>
+
+    <Story Name="With a max">
+        <Template>
+            <BarList Label="Active days per month" Max="30" Items="@([new BarListItem("Sep", 24, "24 days"), new BarListItem("Oct", 30, "30 days"), new BarListItem("Nov", 18, "18 days")])" TestId="list" />
+        </Template>
+    </Story>
+
+    <Story Name="Long labels">
+        <Template>
+            <BarList Label="Top items" Items="@([new BarListItem("A very long item name that has to be cut so the row stays on one line", 12, "12 times"), new BarListItem("Short", 9, "9 times")])" TestId="list" />
+        </Template>
+    </Story>
+
+    <Story Name="Single row">
+        <Template>
+            <BarList Label="Top items" Items="@([new BarListItem("Only item", 5, "5 times")])" TestId="list" />
+        </Template>
+    </Story>
+
+    <Story Name="Empty">
+        <Template>
+            <BarList Label="Top items" EmptyText="Nothing recorded yet" TestId="list" />
+        </Template>
+    </Story>
+
+    <Story Name="All zero">
+        <Template>
+            <BarList Label="Sales by region" Items="@([new BarListItem("North", 0), new BarListItem("South", 0)])" TestId="list" />
+        </Template>
+    </Story>
+
+    <Story Name="All zero, with text">
+        <Template>
+            <BarList Label="Sessions per group" AllZeroText="Nothing logged yet" Items="@([new BarListItem("Chest", 0), new BarListItem("Back", 0)])" TestId="list" />
+        </Template>
+    </Story>
+
+    <Story Name="Test ids by label">
+        <Template>
+            <BarList Label="Sessions per group" TestIdBy="BarListTestIdBy.Slug" Items="@([new BarListItem("Upper body", 8), new BarListItem("Legs & core", 5), new BarListItem("Legs & core", 2)])" TestId="list" />
+        </Template>
+    </Story>
+
+    <Story Name="Inline, narrow label, months">
+        <Template>
+            <BarList Inline="true" LabelWidth="BarListLabelWidth.Narrow" ValueWidth="BarListValueWidth.Narrow" Unit="sessions" Label="Sessions per month" Items="@([new BarListItem("Sep", 12), new BarListItem("Oct", 9), new BarListItem("Nov", 15)])" TestId="list" />
+        </Template>
+    </Story>
+
+    <Story Name="Inline, wide label, tappable">
+        <Template>
+            <BarList Inline="true" LabelWidth="BarListLabelWidth.Wide" ValueWidth="BarListValueWidth.Narrow" Unit="sessions" Label="Sessions of each item" OnSelect="_ => { }"
+                     Items="@([new BarListItem("Bench press", 5), new BarListItem("Squat", 4), new BarListItem("Treadmill run", 3), new BarListItem("Overhead press", 3, Selectable: false)])" TestId="list" />
+        </Template>
+    </Story>
+
+    <Story Name="Inline, zero row">
+        <Template>
+            <BarList Inline="true" LabelWidth="BarListLabelWidth.Narrow" Label="Sessions per day" Items="@([new BarListItem("Mon", 3, "3 sessions"), new BarListItem("Tue", 0, "Not trained"), new BarListItem("Wed", 2, "2 sessions")])" TestId="list" />
+        </Template>
+    </Story>
+
+    <Story Name="Inline, dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <BarList Inline="true" LabelWidth="BarListLabelWidth.Narrow" ValueWidth="BarListValueWidth.Narrow" Label="Sessions per month" Items="@([new BarListItem("Sep", 12), new BarListItem("Oct", 9), new BarListItem("Nov", 15)])" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <BarList Label="Sales by region" Items="@([new BarListItem("North", 420, "420 units"), new BarListItem("South", 640, "640 units"), new BarListItem("East", 0)])" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <BarList Label="Sales by region" Items="@([new BarListItem("North", 420, "420 units"), new BarListItem("South", 640, "640 units"), new BarListItem("East", 0)])" />
+            </div>
+        </Template>
+    </Story>
+
+</Stories>

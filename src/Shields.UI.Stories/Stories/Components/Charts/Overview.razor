@@ -1,0 +1,121 @@
+@attribute [CustomPage("Components/Charts/Overview")]
+
+<h1>Charts</h1>
+
+<h2><code>ChartLegend</code></h2>
+<p>A row of entries that names what a chart's colours and shapes mean; it wraps to more rows when it is too narrow. Each <code>LegendItem</code> has a swatch, a label and an optional <code>Marker</code> glyph such as ▲, so colour is not the only cue. With no items nothing is rendered.</p>
+<table>
+    <thead><tr><th>Swatch</th><th>Looks like</th></tr></thead>
+    <tbody>
+        <tr><td>Accent</td><td>A filled dot in <code>--color-accent</code>.</td></tr>
+        <tr><td>Chip</td><td>A filled dot in <code>--color-chip</code>.</td></tr>
+        <tr><td>Error</td><td>A filled dot in <code>--color-error</code>.</td></tr>
+        <tr><td>Outline</td><td>A ring of six even dashes in <code>--color-border-strong</code>, for something absent.</td></tr>
+        <tr><td>Line</td><td>A short dashed line in <code>--color-text-muted</code> with the dash and gap of <code>--chart-dash</code>, as the target line of <code>TrendBarChart</code> has, for a reference line.</td></tr>
+        <tr><td>Band</td><td>An unfilled box, twice as wide as tall, edged in <code>--color-chart-band</code>, for a target band. Apps stroke the band's top and bottom edges in this colour with no fill.</td></tr>
+        <tr><td>Past</td><td>A filled dot in <code>--color-chart-past</code>, for the bars of earlier periods beside the current one. Tuned to sit beside the accent bar, not beside <code>--color-primary</code>.</td></tr>
+        <tr><td>Primary</td><td>A filled dot in <code>--color-primary</code>.</td></tr>
+        <tr><td>Today</td><td>A solid ring in <code>--color-text</code>, the stroke of the <code>MonthCalendar</code> today ring.</td></tr>
+        <tr><td>Check</td><td>A small <code>--color-accent</code> box with a ✓ in <code>--color-on-primary</code>, the on-target cell of <code>MonthCalendar</code> in miniature.</td></tr>
+        <tr><td>Triangle</td><td>A small <code>--color-error</code> box with a ▲ in <code>--color-on-danger</code>, the over cell of <code>MonthCalendar</code> in miniature.</td></tr>
+    </tbody>
+</table>
+<ul>
+    <li>The list is labelled "Legend"; the swatches are hidden from screen readers.</li>
+    <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>{TestId}-0</code>, <code>{TestId}-1</code>, … by position.</li>
+</ul>
+
+<h2><code>ProgressRing</code></h2>
+<p>A ring that fills as <code>Value</code> approaches <code>Max</code>, with the value in the middle. Above <code>Max</code> the arc turns <code>--color-ring-arc-over</code> and the number <code>--color-ring-arc-over</code> too, so an over ring shows one red. <code>Compact</code> uses the smaller <code>--ring-size-compact</code>.</p>
+<ul>
+    <li>With a zero or negative <code>Max</code> there is no maximum: the ring is full once <code>Value</code> is above zero, and never over.</li>
+    <li><code>Caption</code> is a short line under the number.</li>
+    <li><code>Figure</code> and <code>FigureUnit</code> replace the number and the line under it, for a figure such as what is left (<code>1,441</code> over <code>kcal left</code>), styled like the number: smaller when long, red when over. <code>FigureUnit</code> alone replaces the line under the value. <code>ChildContent</code> beats both, and shows only <code>Caption</code> under it. Set <code>AriaLabel</code> to describe the figure, as the default name goes by <code>Value</code>.</li>
+    <li>The ring is an image named by <code>AriaLabel</code>, by default "{value} of {max} {caption}"; its centre is hidden from screen readers.</li>
+    <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>{TestId}-value</code> and <code>{TestId}-caption</code>.</li>
+</ul>
+
+<h2><code>BarList</code></h2>
+<p>Labelled horizontal bars, one per <code>BarListItem</code>, each with its value text at the end of the row. Bars are sized against the largest value, or against <code>Max</code> when it is a positive number. Negative and non-finite values fill no bar; the default value text shows a negative number as it is and a non-finite one as 0.</p>
+<ul>
+    <li><code>ValueText</code> replaces the value shown, by default the number with thousands separators and no decimals. A long label is cut with an ellipsis.</li>
+    <li>With no items <code>EmptyText</code> is shown instead of the list. With <code>AllZeroText</code> set and every value zero, that text is shown instead of the bars, in the same style.</li>
+    <li><code>Inline</code> puts label, bar and value on one line; <code>LabelWidth</code> (<code>Normal</code>, <code>Wide</code>, <code>Narrow</code>) and <code>ValueWidth</code> (<code>Normal</code>, <code>Narrow</code>) size the two columns (<code>--bar-list-label-width*</code>, <code>--bar-list-value-width*</code>). The bar height is <code>--bar-list-bar-height</code>.</li>
+    <li><code>Unit</code> is read after each value by a screen reader and not shown. With <code>OnSelect</code> each row whose <code>Selectable</code> is not false is a button that raises its position.</li>
+    <li>A row whose value draws as zero shows its value text in normal weight instead of bold (still <code>--color-text-muted</code>), so a longer text such as "Not trained" fits the value column.</li>
+    <li>The list is named by <code>Label</code>; the bars are hidden from screen readers, so put what matters in the label and value text.</li>
+    <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>{TestId}-row-0</code>, <code>-select-0</code> (a tappable row's button), <code>-label-0</code>, <code>-value-0</code> and <code>-bar-0</code> by position, or <code>{TestId}-empty</code> with no items and <code>{TestId}-all-zero</code> for <code>AllZeroText</code>. None are rendered without <code>TestId</code>.</li>
+    <li><code>TestIdBy</code> is <code>Position</code> by default. <code>Slug</code> replaces the position in the row ids with the label as a slug (lowercase, other characters as one <code>-</code>, trimmed, "item" if nothing is left): <code>{TestId}-row-legs-core</code>. A repeated slug gets <code>-2</code>, <code>-3</code> in list order, so ids stay the same when rows are added or reordered only if the labels are unique.</li>
+</ul>
+
+<h2><code>StackedBar</code></h2>
+<p>One bar split into <code>StackedBarSegment</code>s, each sized by its share of the total and coloured by its <code>DataSeries</code>, with a label and value under the bar. Neighbouring data colours are under 3:1 against each other, so the segments are separated by a transparent gap (<code>--stacked-bar-gap</code>), so the page or card behind the bar shows through.</p>
+<ul>
+    <li>A segment at zero, negative or not finite draws nothing but keeps its label, with 0 as its value (or its <code>ValueText</code>). With every segment at zero the track is empty and the text alternative ends with <code>EmptyText</code>.</li>
+    <li>The bar is one image named by its text alternative, which starts with <code>Label</code> and lists each segment's label, value (followed by <code>Unit</code>) and percentage; percentages are rounded so they add up to 100. <code>ShowLabels</code> hides the visible labels, not the text alternative.</li>
+    <li>A segment's <code>ValueText</code> replaces its formatted value and <code>Unit</code> in the visible label and the text alternative, so a bar sized in one unit (such as energy) can be labelled in another (such as grams). <code>Value</code> still sizes the segment and sets its percentage. A null or blank <code>ValueText</code> falls back to the formatted value.</li>
+    <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>{TestId}-segment-0</code> (only above zero) and <code>-label-0</code> by position. None are rendered without <code>TestId</code>.</li>
+</ul>
+
+<h2><code>TrendBarChart</code></h2>
+<p>A bar chart of one value per slot, such as a week of days or a year of months, judged against a <code>Target</code>. Bars are <code>TrendBarPoint</code> records; a bar with no value leaves an empty slot. The chart is meant to sit on a card (<code>--color-surface</code>).</p>
+<table>
+    <thead><tr><th>Part</th><th>Looks like</th></tr></thead>
+    <tbody>
+        <tr><td>Under</td><td>A bar in <code>--color-chip</code>, more than 10% below the target.</td></tr>
+        <tr><td>On target</td><td>A bar in <code>--color-accent</code>, within 10% either side of the target.</td></tr>
+        <tr><td>Over</td><td>A bar in <code>--color-error</code> with a ▲ marker above it, more than 10% over.</td></tr>
+        <tr><td>Target</td><td>A dashed line (<code>--chart-dash</code>) at the target.</td></tr>
+        <tr><td>Target range</td><td>The band 10% either side of the target, drawn as a top and bottom edge in <code>--color-chart-band</code> at <code>--border-width</code> with no fill, so no bar loses contrast.</td></tr>
+    </tbody>
+</table>
+<ul>
+    <li>Without a target (or with zero) there is no line, no band and no status.</li>
+    <li><code>Max</code>, when a positive number, is the top of the y scale in both styles, so charts of different periods share one scale. The ticks keep the 1, 2, 5 steps up to it (a <code>Max</code> that is not a step has no tick of its own) and a bar above it is drawn at the top. A <code>Target</code> above it draws no target line, and a band edge above it is not drawn. Without it the scale fits the tallest bar.</li>
+    <li>With <code>OnSelect</code> the bars are buttons: click, or Enter on focus, raises it with the bar's date. Without it they are images, as are bars whose <code>Selectable</code> is false (the last <code>TrendBarPoint</code> parameter, true by default): not buttons, not focusable, no callback, and they keep their text alternative.</li>
+    <li><code>Style</code> is <code>Status</code> by default. <code>PastAndCurrent</code> drops the target, band and markers: the bar whose <code>Current</code> is true is <code>--color-accent</code> and the others <code>--color-chart-past</code>, unless the chart is paired (see <code>Earlier</code>), when every bar's own column is accent and every earlier column past; <code>Current</code> then only bolds the axis label and adds "current" to the text alternative. There, <code>Labelled</code> prints a bar's value above it, and <code>Earlier</code> draws the period before as a second bar to the left of each, named in the text alternative with <code>EarlierLabel</code> ("last week"); add a <code>ChartLegend</code> to say which is which. <code>Current</code> also bolds the axis label in <code>Status</code>; the other two do nothing there.</li>
+    <li>Each bar's text alternative is its date, value, <code>Unit</code>, status and <code>Note</code>; a bar with a <code>Note</code> is drawn faded. The chart is a group named by <code>Label</code>; with no values it shows <code>EmptyText</code>.</li>
+    <li><code>ShowOverMarker</code> is true by default. False draws no ▲ above Over bars and drops the value label's lift for it, so Over is shown by colour alone on screen (the text alternative still says "over target"); keep another cue, such as a <code>ChartLegend</code> entry.</li>
+    <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>-band</code> (<code>-band-top</code>, <code>-band-bottom</code>), <code>-target</code>, <code>-baseline</code>, <code>-tick-{value}</code>, <code>-bar-{date}</code>, <code>-column-{date}</code>, <code>-marker-{date}</code>, <code>-gap-{date}</code>, <code>-value-label</code> (<code>-value-label-{date}</code> in <code>PastAndCurrent</code>), <code>-earlier-{date}</code>, <code>-empty</code>.</li>
+</ul>
+
+<h2><code>MonthCalendar</code></h2>
+<p>A grid of one month, Monday first unless <code>FirstDayOfWeek</code> says otherwise, with a cell per day judged against a <code>Target</code>. Days are <code>CalendarDay</code> records; a day missing from <code>Days</code>, or without a value, counts as not recorded. It is meant to sit on a card (<code>--color-surface</code>).</p>
+<table>
+    <thead><tr><th>Day</th><th>Looks like</th></tr></thead>
+    <tbody>
+        <tr><td>Under</td><td>A cell in <code>--color-chip</code>, more than 10% below the target.</td></tr>
+        <tr><td>On target</td><td>A cell in <code>--color-accent</code>, within 10% either side of the target, with a ✓ marker.</td></tr>
+        <tr><td>Over</td><td>A cell in <code>--color-error</code> with a ▲ marker, more than 10% over. Under has no marker, so the three differ without colour.</td></tr>
+        <tr><td>Not recorded</td><td>A dashed outline in <code>--color-border-strong</code> and no fill.</td></tr>
+        <tr><td>Future</td><td>Faded and disabled; data on a future day is ignored.</td></tr>
+        <tr><td>Today</td><td>A thin <code>--color-surface</code> gap and a <code>--color-text</code> ring outside the cell, visible on every fill, and a bold number. <code>Today</code> sets the day; without it the clock does.</td></tr>
+    </tbody>
+</table>
+<ul>
+    <li>Without a target (or with zero) a recorded day has no status, unless the day carries its own target.</li>
+    <li><code>Style</code> is <code>Status</code> by default. <code>Marks</code> draws each day's number in a circle: solid <code>--color-primary</code> when recorded, dashed when not, a <code>--color-text</code> ring on today, and no target or markers. The day's text alternative then says "recorded" without the value (<em>Wed 4 Nov, recorded</em>), or the value with <code>Unit</code> when one is set (<em>Wed 4 Nov, 1,000 pts</em>), so the circle is never the only cue; the circle size is <code>--calendar-day-size</code>, shared with RangeCalendar.</li>
+    <li><code>FirstDayOfWeek</code> (Monday by default) sets the first column. <code>DayNames</code> is seven labels, Sunday first; without it each heading is the first letter of the current culture's shortest day name, and a list of any other length throws.</li>
+    <li>With <code>OnSelect</code> the enabled days are buttons that raise it with the day's date; without it they are plain cells.</li>
+    <li>Each day's text alternative is its date, "today" when it is, its value, <code>Unit</code> and status (with <code>Marks</code>, see its bullet above), or "not recorded" or "future". The grid is a group named by the month; the weekday letters are hidden from screen readers.</li>
+    <li><code>ShowOverMarker</code> is true by default. False draws no ▲ in Over cells; the ✓ on on-target days stays. Over is then shown by colour alone on screen (the text alternative still says "over target"); keep another cue, such as a <code>ChartLegend</code> entry.</li>
+    <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>-day-{date}</code> and <code>-marker-{date}</code>, the date as yyyy-MM-dd.</li>
+</ul>
+
+<h2><code>LineChart</code></h2>
+<p>A line of values along an x-axis, drawn as an SVG that scales to the width of its card. Evenly spaced points, y-axis ticks on whole 1, 2 or 5 steps, the first and last <code>LineChartPoint.XLabel</code> under the axis, and a label over the best and the latest point (the best has a ring; the latest is filled and larger). The line is <code>--chart-line-width</code> wide. A point with no value is skipped and the line joins across. A visually hidden list repeats every value as the text alternative.</p>
+<ul>
+    <li><code>Points</code> and <code>Format</code> (value text) are required, and so is <code>Label</code>, the accessible name.</li>
+    <li><code>LowerIsBetter</code>: the lowest value is the best and is drawn at the top. <code>TimeScale</code>: values are seconds and ticks step on whole times, m:ss, or h:mm:ss from an hour.</li>
+    <li><code>data-testid</code>: <code>TestId</code>, and <code>{TestId}-values</code> on the text alternative.</li>
+</ul>
+
+<h2><code>CountBars</code></h2>
+<p>A small row of unlabelled bars, one per <code>Counts</code> entry, sized against the largest; the last is the current one in the accent colour and the others use <code>--color-chart-past</code>. <code>StartLabel</code> and <code>EndLabel</code> sit under the ends. <code>ValueText</code> words each bar for the hidden text alternative. All zero shows <code>EmptyText</code> instead.</p>
+<ul>
+    <li><code>Label</code> (required) names the chart. <code>data-testid</code>: <code>TestId</code>, <code>{TestId}-values</code> and <code>{TestId}-none</code>.</li>
+</ul>
+
+<p>Week rows with a proportional bar need no new part: <code>BarList</code> with <code>Inline</code>, <code>ValueText</code> and <code>OnSelect</code> draws them.</p>
+
+<p>Stories: <a href="./?path=/docs/components-charts-chartlegend--docs">ChartLegend</a>, <a href="./?path=/docs/components-charts-progressring--docs">ProgressRing</a>, <a href="./?path=/docs/components-charts-barlist--docs">BarList</a>, <a href="./?path=/docs/components-charts-stackedbar--docs">StackedBar</a>, <a href="./?path=/docs/components-charts-trendbarchart--docs">TrendBarChart</a>, <a href="./?path=/docs/components-charts-monthcalendar--docs">MonthCalendar</a>, <a href="./?path=/docs/components-charts-linechart--docs">LineChart</a>, <a href="./?path=/docs/components-charts-countbars--docs">CountBars</a></p>

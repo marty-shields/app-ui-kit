@@ -1,0 +1,49 @@
+@attribute [Stories("Components/Inputs/NoteField")]
+
+<Stories TComponent="NoteField" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Editing">
+        <Template>
+            <NoteField Label="Workout note" Value="Belt on from set 3" Editing MaxLength="500" TestId="note" />
+        </Template>
+    </Story>
+
+    <Story Name="Collapsed">
+        <Template>
+            <NoteField Label="Workout note" Value="Belt on from set 3, left knee felt tight on the last rep." MaxLength="500" TestId="note" />
+        </Template>
+    </Story>
+
+    <Story Name="Over the limit">
+        <Template>
+            <NoteField Label="Workout note" Value="@Over" Editing MaxLength="20" Error="Note must be 20 characters or less" TestId="note" />
+        </Template>
+    </Story>
+
+    <Story Name="Collapsed with error">
+        <Template>
+            <NoteField Label="Workout note" Value="@Over" MaxLength="20" Error="Note must be 20 characters or less" />
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <NoteField Label="Workout note" Value="@Over" Editing MaxLength="20" Error="Note must be 20 characters or less" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <NoteField Label="Workout note" Value="@Over" Editing MaxLength="20" Error="Note must be 20 characters or less" />
+            </div>
+        </Template>
+    </Story>
+
+</Stories>
+
+@code {
+    private const string Over = "Belt on from set 3, knee tight";
+}

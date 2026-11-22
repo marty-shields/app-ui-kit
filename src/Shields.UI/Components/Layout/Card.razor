@@ -1,0 +1,105 @@
+@if (Title is not null)
+{
+    <section class="@CardClass" data-testid="@TestId">
+        <div class="header @(HeaderActions is not null ? "with-actions" : null)">
+            @Heading
+            @if (Aside is not null)
+            {
+                <span class="aside" data-testid="@(TestId is null ? null : $"{TestId}-aside")">@Aside</span>
+            }
+            @if (HeaderActions is not null)
+            {
+                <div class="actions" data-testid="@(TestId is null ? null : $"{TestId}-actions")">@HeaderActions</div>
+            }
+        </div>
+        @ChildContent
+    </section>
+}
+else
+{
+    <div class="@CardClass" data-testid="@TestId">
+        @if (HeaderActions is not null)
+        {
+            <div class="header with-actions">
+                <div class="actions" data-testid="@(TestId is null ? null : $"{TestId}-actions")">@HeaderActions</div>
+            </div>
+        }
+        @ChildContent
+    </div>
+}
+
+@code {
+    private string CardClass => string.Join(' ', new[]
+    {
+        "card",
+        Compact ? "compact" : null,
+        Error ? "error" : null,
+        Selected ? "selected" : null,
+        ChildContent is null ? "no-body" : null,
+        ChildContent is null && HeaderActions is not null ? "header-only-actions" : null,
+    }.Where(c => c is not null));
+
+    private RenderFragment Heading =>
+        @<text>
+            @switch (Math.Clamp(HeadingLevel, 1, 6))
+            {
+                case 1:
+                    <h1 class="title" data-wrap-ok>@Title</h1>
+                    break;
+                case 2:
+                    <h2 class="title" data-wrap-ok>@Title</h2>
+                    break;
+                case 3:
+                    <h3 class="title" data-wrap-ok>@Title</h3>
+                    break;
+                case 4:
+                    <h4 class="title" data-wrap-ok>@Title</h4>
+                    break;
+                case 5:
+                    <h5 class="title" data-wrap-ok>@Title</h5>
+                    break;
+                default:
+                    <h6 class="title" data-wrap-ok>@Title</h6>
+                    break;
+            }
+        </text>;
+
+    /// <summary>Heading of the card. Null shows a plain card with no heading, and no aside.</summary>
+    [Parameter]
+    public string? Title { get; set; }
+
+    /// <summary>Muted text at the right of the title, e.g. 1 this week. Null shows none. Needs a <see cref="Title"/>: without one it is not shown.</summary>
+    [Parameter]
+    public string? Aside { get; set; }
+
+    /// <summary>
+    /// Content at the end of the header row, such as <c>IconButton</c>s, after the title and aside. Setting it draws the header row even without a title, but then the card is a plain card, not a titled section.
+    /// The title stays the card's heading, so a name and its buttons share one row. The actions keep their own touch-target size.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? HeaderActions { get; set; }
+
+    /// <summary>Draws the card's border and an inset ring in the error colour. The card keeps its size. The error text itself goes inside the card, e.g. in an <c>InlineAlert</c>.</summary>
+    [Parameter]
+    public bool Error { get; set; }
+
+    /// <summary>What the card holds. Null (a card with only a header) drops the gap under the header, and with <see cref="HeaderActions"/> trims the card's vertical padding, so a collapsed card is as tall as its action row. Content written between the tags is always a non-null fragment, even when it renders nothing, so a collapsible card passes <c>ChildContent="@(open ? body : null)"</c> (with <c>body</c> a <c>RenderFragment</c>) instead of an <c>@if</c> inside the tags.</summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>Level of the title's heading element, 1 to 6 (values outside are clamped). 2 by default; use 3 for a card inside a section that already has an h2. Only the element changes, not the look.</summary>
+    [Parameter]
+    public int HeadingLevel { get; set; } = 2;
+
+    /// <summary>Tints the card and draws its border in the accent colour, for the card that is open or chosen. Text keeps at least 4.5:1 on the tint. Combines with <see cref="Error"/>, whose border wins.</summary>
+    [Parameter]
+    public bool Selected { get; set; }
+
+    /// <summary>Tightens the card: no padding under the content (the rows it holds supply their own) and a smaller gap under the title.</summary>
+    [Parameter]
+    public bool Compact { get; set; }
+
+    /// <summary>Value of the data-testid attribute, <c>{TestId}-aside</c> on the aside and <c>{TestId}-actions</c> on the actions.</summary>
+    [Parameter]
+    public string? TestId { get; set; }
+}

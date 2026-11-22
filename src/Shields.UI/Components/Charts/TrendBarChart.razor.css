@@ -1,0 +1,107 @@
+.chart {
+    display: block;
+    width: 100%;
+    height: auto;
+    font-size: var(--font-size-sm);
+    overflow: visible;
+}
+
+.grid {
+    stroke: var(--color-border);
+    stroke-width: var(--border-width);
+}
+
+.baseline {
+    stroke: var(--color-border-strong);
+    stroke-width: var(--border-width);
+}
+
+/* The chart's text elements are built in code, so they carry no scope attribute: ::deep reaches them. */
+.chart ::deep .tick,
+.chart ::deep .axis-label,
+.chart ::deep .empty {
+    fill: var(--color-text-muted);
+}
+
+/* The band is an outline: its top and bottom edges only, never a fill, so every bar sits on the plain card. The edges are as wide
+   as the legend's band swatch, whatever the chart's scale, and snapped to the pixel grid so a fractional y does not blur the colour. */
+.band-edge {
+    stroke: var(--color-chart-band);
+    stroke-width: var(--border-width);
+    vector-effect: non-scaling-stroke;
+    shape-rendering: crispEdges;
+}
+
+.target {
+    stroke: var(--color-text-muted);
+    stroke-width: var(--border-width-error);
+    stroke-dasharray: var(--chart-dash);
+    vector-effect: non-scaling-stroke;
+}
+
+.gap {
+    fill: transparent;
+}
+
+.bar.thin .column {
+    opacity: var(--opacity-thin);
+}
+
+.bar.selectable {
+    cursor: pointer;
+}
+
+.hit {
+    fill: transparent;
+}
+
+.column {
+    fill: var(--color-chip);
+}
+
+.bar.on .column {
+    fill: var(--color-accent);
+}
+
+.bar.over .column,
+.bar.over .marker {
+    fill: var(--color-error);
+}
+
+.chart ::deep .value-label,
+.chart ::deep .tip {
+    fill: var(--color-text);
+    font-weight: var(--font-weight-bold);
+}
+
+.chart ::deep .tip {
+    display: none;
+    paint-order: stroke;
+    stroke: var(--color-surface);
+    stroke-width: var(--focus-width);
+    stroke-linejoin: round;
+}
+
+.bar:hover ::deep .tip,
+.bar:focus-visible ::deep .tip {
+    display: block;
+}
+
+.chart:has(.bar:hover, .bar:focus-visible) ::deep .value-label {
+    display: none;
+}
+
+/* PastAndCurrent style: without pairs only the Current bar is the accent and the others are past; in a pair every bar's own column is the accent and every earlier column the past colour. */
+.bar.past .column,
+.column.earlier {
+    fill: var(--color-chart-past);
+}
+
+.bar.now .column:not(.earlier) {
+    fill: var(--color-accent);
+}
+
+.chart ::deep .axis-label.current {
+    fill: var(--color-text);
+    font-weight: var(--font-weight-bold);
+}

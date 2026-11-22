@@ -1,0 +1,161 @@
+@using System.Globalization
+@inject TimeProvider Time
+<div class="calendar @(Style == CalendarStyle.Marks ? "marks" : null)" role="group" aria-label="@MonthName" data-testid="@TestId">
+    <div class="weekdays" aria-hidden="true">
+        @for (var i = 0; i < 7; i++)
+        {
+            <span>@Heading(i)</span>
+        }
+    </div>
+    <div class="days">
+        @for (var i = 0; i < LeadingBlanks; i++)
+        {
+            <span class="blank" aria-hidden="true"></span>
+        }
+        @foreach (var date in DatesOfMonth)
+        {
+            var cell = Cell(date);
+            if (OnSelect.HasDelegate && (Style != CalendarStyle.Marks || cell.Recorded))
+            {
+                <button type="button" class="cell @cell.Class" disabled="@cell.Disabled" data-testid="@Id($"day-{Day(date)}")"
+                        @onclick="() => Select(date)">
+                    @Content(date, cell)
+                </button>
+            }
+            else
+            {
+                <div class="cell @cell.Class" data-testid="@Id($"day-{Day(date)}")">
+                    @Content(date, cell)
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    private sealed record CellInfo(string Class, string Name, bool Disabled, TargetStatus Status, bool Recorded = false);
+
+    /// <summary>Any day of the month to show.</summary>
+    [Parameter]
+    public DateOnly Month { get; set; }
+
+    /// <summary>The days that have data. A day missing from the list counts as not recorded.</summary>
+    [Parameter]
+    public IReadOnlyList<CalendarDay> Days { get; set; } = [];
+
+    /// <summary>The target for days that carry none of their own. Null or zero leaves each recorded day without a status.</summary>
+    [Parameter]
+    public double? Target { get; set; }
+
+    /// <summary>The current day, outlined; later days are future and disabled. Null means today by the clock.</summary>
+    [Parameter]
+    public DateOnly? Today { get; set; }
+
+    /// <summary>Raised with the day's date when an enabled day is clicked or gets Enter or Space. Without a handler the days are plain text, not buttons. With <see cref="CalendarStyle.Marks"/> only the recorded days are buttons.</summary>
+    [Parameter]
+    public EventCallback<DateOnly> OnSelect { get; set; }
+
+    /// <summary>The unit that follows each value in a day's text alternative, such as "steps". Null for none. With <see cref="CalendarStyle.Marks"/> a recorded day names its value only when this is set ("1,000 pts"); without it the day reads "recorded".</summary>
+    [Parameter]
+    public string? Unit { get; set; }
+
+    /// <summary>The day the week starts on, which sets the leading blanks and the order of the headings. Monday by default.</summary>
+    [Parameter]
+    public DayOfWeek FirstDayOfWeek { get; set; } = DayOfWeek.Monday;
+
+    /// <summary>The seven heading labels in the order of <see cref="DayOfWeek"/>, Sunday first, whatever <see cref="FirstDayOfWeek"/> is. Null uses the first letter of each shortest day name of the current culture. Any other length throws an <see cref="ArgumentException"/>.</summary>
+    [Parameter]
+    public IReadOnlyList<string>? DayNames { get; set; }
+
+    /// <summary>How a recorded day is drawn. <see cref="CalendarStyle.Status"/> by default.</summary>
+    [Parameter]
+    public CalendarStyle Style { get; set; }
+
+    /// <summary>
+    /// Whether an Over day gets a ▲. True by default. With false, Over is shown by colour alone on screen (the accessible name still says "over target"), so keep another cue, such as a <see cref="ChartLegend"/> entry or text. The ✓ on an on-target day stays either way.
+    /// </summary>
+    [Parameter]
+    public bool ShowOverMarker { get; set; } = true;
+
+    /// <summary>Value of the data-testid attribute, and the prefix of <c>-day-{date}</c> and <c>-marker-{date}</c> (the date as yyyy-MM-dd). None are rendered without it.</summary>
+    [Parameter]
+    public string? TestId { get; set; }
+
+    private DateOnly First => new(Month.Year, Month.Month, 1);
+
+    private DateOnly now;
+
+    protected override void OnParametersSet()
+    {
+        if (DayNames is { Count: not 7 })
+        {
+            throw new ArgumentException("DayNames needs seven labels, Sunday first.", nameof(DayNames));
+        }
+
+        now = Today ?? DateOnly.FromDateTime(Time.GetLocalNow().DateTime);
+    }
+
+    private static string Day(DateOnly date) => date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+
+    private string Heading(int column)
+    {
+        var day = ((int)FirstDayOfWeek + column) % 7;
+        return DayNames?[day] ?? CultureInfo.CurrentCulture.DateTimeFormat.ShortestDayNames[day][..1];
+    }
+
+    private string MonthName => First.ToString("MMMM yyyy", CultureInfo.InvariantCulture);
+
+    /// <summary>Days of the week that fall before the 1st in its row, with <see cref="FirstDayOfWeek"/> first.</summary>
+    private int LeadingBlanks => ((int)First.DayOfWeek - (int)FirstDayOfWeek + 7) % 7;
+
+    private IEnumerable<DateOnly> DatesOfMonth => Enumerable.Range(0, DateTime.DaysInMonth(Month.Year, Month.Month)).Select(i => First.AddDays(i));
+
+    private RenderFragment Content(DateOnly date, CellInfo cell) => @<text>
+        <span class="visually-hidden">@cell.Name</span>
+        <span class="num" aria-hidden="true">@date.Day</span>
+        @if (cell.Status == TargetStatus.On || (cell.Status == TargetStatus.Over && ShowOverMarker))
+        {
+            <span class="marker" aria-hidden="true" data-testid="@Id($"marker-{Day(date)}")">@(cell.Status == TargetStatus.Over ? "▲" : "✓")</span>
+        }
+    </text>;
+
+    private CellInfo Cell(DateOnly date)
+    {
+        var name = date.ToString("ddd d MMM", CultureInfo.InvariantCulture);
+        var isToday = date == now;
+        var today = isToday ? " today" : "";
+        var todayName = isToday ? ", today" : "";
+        if (date > now)
+        {
+            return new CellInfo("future", $"{name}, future", true, TargetStatus.None);
+        }
+
+        var day = Days.FirstOrDefault(d => d.Date == date);
+        if (!TargetStatuses.IsRecorded(day?.Value))
+        {
+            return new CellInfo("none" + today, $"{name}{todayName}, not recorded", false, TargetStatus.None);
+        }
+
+        var value = TargetStatuses.Number(day!.Value!.Value) + (string.IsNullOrEmpty(Unit) ? "" : $" {Unit}");
+        if (Style == CalendarStyle.Marks)
+        {
+            var marked = string.IsNullOrEmpty(Unit) ? "recorded" : value;
+            return new CellInfo("marked" + today, $"{name}{todayName}, {marked}", false, TargetStatus.None, true);
+        }
+
+        var status = TargetStatuses.Of(day.Value!.Value, TargetStatuses.ValidTarget(day.Target) ?? Target);
+        var word = TargetStatuses.Word(status);
+        var full = $"{name}{todayName}, {value}{(word.Length > 0 ? ", " + word : "")}";
+        return new CellInfo(TargetStatuses.Class(status) + today, full, false, status);
+    }
+
+    private async Task Select(DateOnly date)
+    {
+        if (date <= now)
+        {
+            await OnSelect.InvokeAsync(date);
+        }
+    }
+
+    private string? Id(string part) => TestId is null ? null : $"{TestId}-{part}";
+}

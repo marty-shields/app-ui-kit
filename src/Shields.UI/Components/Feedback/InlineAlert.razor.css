@@ -1,0 +1,20 @@
+.alert {
+    padding: var(--space-3) var(--space-4);
+    border: var(--border-width-error) solid;
+    border-radius: var(--radius-md);
+    background-color: var(--color-surface);
+}
+
+.error {
+    border-color: var(--color-error);
+    color: var(--color-error);
+}
+
+.messages {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}

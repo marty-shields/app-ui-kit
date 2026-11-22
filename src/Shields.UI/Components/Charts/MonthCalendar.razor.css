@@ -1,0 +1,130 @@
+.calendar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.weekdays,
+.days {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: var(--space-1);
+}
+
+.weekdays {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+    text-align: center;
+}
+
+.cell {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--touch-target);
+    padding: 0;
+    border: var(--border-width-error) solid transparent;
+    border-radius: var(--radius-sm);
+    background-color: transparent;
+    font-size: var(--font-size-sm);
+}
+
+button.cell {
+    cursor: pointer;
+}
+
+.cell.under,
+.cell.plain {
+    background-color: var(--color-chip);
+    color: var(--color-on-chip);
+}
+
+.cell.on {
+    background-color: var(--color-accent);
+    color: var(--color-on-primary);
+}
+
+.cell.over {
+    background-color: var(--color-error);
+    color: var(--color-on-danger);
+}
+
+.cell.none {
+    border-style: dashed;
+    border-color: var(--color-border-strong);
+    color: var(--color-text-muted);
+}
+
+.cell.future {
+    color: var(--color-text-muted);
+    opacity: var(--opacity-disabled);
+    cursor: default;
+}
+
+.cell.today {
+    box-shadow: 0 0 0 var(--border-width) var(--color-surface), 0 0 0 calc(var(--border-width) + var(--border-width-error)) var(--color-text);
+    font-weight: var(--font-weight-bold);
+}
+
+/* Push the focus outline past the today ring so keyboard focus does not hide it. */
+.cell.today:focus-visible {
+    outline-offset: calc(var(--focus-offset) + var(--border-width) + var(--border-width-error));
+}
+
+.marker {
+    position: absolute;
+    top: 0;
+    right: var(--space-1);
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-tight);
+}
+
+/* Marks style: the day number sits in a circle, solid when recorded and dashed when not; the target is not used. */
+.marks .cell {
+    background-color: transparent;
+    border-color: transparent;
+}
+
+.marks .num {
+    display: inline-grid;
+    place-items: center;
+    box-sizing: border-box;
+    width: var(--calendar-day-size);
+    height: var(--calendar-day-size);
+    border: var(--border-width) dashed var(--color-border-strong);
+    border-radius: var(--radius-round);
+    font-variant-numeric: tabular-nums;
+}
+
+.marks .cell.marked {
+    color: var(--color-on-primary);
+}
+
+.marks .cell.marked .num {
+    border-style: solid;
+    border-color: var(--color-primary);
+    background-color: var(--color-primary);
+}
+
+/* Only the circle shows the pressed state, not the cell around it. */
+.marks button.cell:not(:disabled):active {
+    background-image: none;
+}
+
+.marks button.cell:active .num {
+    background-image: linear-gradient(var(--state-pressed), var(--state-pressed));
+}
+
+.marks .cell.today {
+    box-shadow: none;
+}
+
+.marks .cell.today .num {
+    outline: var(--border-width-error) solid var(--color-text);
+    outline-offset: var(--focus-offset);
+}
+
+.marks .cell.today:focus-visible {
+    outline-offset: var(--focus-offset);
+}

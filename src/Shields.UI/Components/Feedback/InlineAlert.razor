@@ -1,0 +1,48 @@
+@if (!string.IsNullOrEmpty(Message) || ChildContent is not null || shown.Count > 0)
+{
+    <div class="alert @ToneClass" role="alert" data-testid="@TestId">
+        @Message
+        @if (shown.Count > 0)
+        {
+            <ul class="messages" data-testid="@(TestId is null ? null : $"{TestId}-messages")">
+                @foreach (var message in shown)
+                {
+                    <li>@message</li>
+                }
+            </ul>
+        }
+        @ChildContent
+    </div>
+}
+
+@code {
+    /// <summary>Text of the alert. With no message and no content nothing is rendered. Shown before <see cref="ChildContent"/>.</summary>
+    [Parameter]
+    public string? Message { get; set; }
+
+    /// <summary>Several short messages, such as one per invalid field, shown as a list in one alert after <see cref="Message"/>. Blank entries are skipped; with none left no list shows, and with no message and no content nothing is rendered.</summary>
+    [Parameter]
+    public IEnumerable<string>? Messages { get; set; }
+
+    /// <summary>Markup after the message, for an alert that holds more than plain text.</summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>Colour of the border and text.</summary>
+    [Parameter]
+    public AlertTone Tone { get; set; }
+
+    /// <summary>Value of the data-testid attribute, and the prefix of <c>-messages</c> on the list.</summary>
+    [Parameter]
+    public string? TestId { get; set; }
+
+    private IReadOnlyList<string> shown = [];
+
+    protected override void OnParametersSet() => shown = Messages?.Where(m => !string.IsNullOrWhiteSpace(m)).ToList() ?? [];
+
+    private string ToneClass => Tone switch
+    {
+        AlertTone.Error => "error",
+        _ => "error",
+    };
+}

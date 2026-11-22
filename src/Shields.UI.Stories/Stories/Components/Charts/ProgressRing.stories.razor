@@ -1,0 +1,66 @@
+@attribute [Stories("Components/Charts/ProgressRing")]
+
+<Stories TComponent="ProgressRing" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Normal">
+        <Template>
+            <ProgressRing Value="659" Max="2100" Caption="of 2,100" TestId="ring" />
+        </Template>
+    </Story>
+
+    <Story Name="Over">
+        <Template>
+            <ProgressRing Value="2359" Max="2100" Caption="of 2,100" TestId="ring" />
+        </Template>
+    </Story>
+
+    <Story Name="Compact">
+        <Template>
+            <ProgressRing Value="659" Max="2100" Caption="of 2,100" Compact TestId="ring" />
+            <ProgressRing Value="2359" Max="2100" Caption="of 2,100" Compact TestId="ring-over" />
+        </Template>
+    </Story>
+
+    <Story Name="Centre content">
+        <Template>
+            <ProgressRing Value="659" Max="2100" Caption="left" AriaLabel="1,441 left of 2,100" TestId="ring">1,441</ProgressRing>
+        </Template>
+    </Story>
+
+    <Story Name="Figure and unit">
+        <Template>
+            <ProgressRing Value="659" Max="2100" Figure="1,441" FigureUnit="kcal left" AriaLabel="1,441 kcal left of 2,100" TestId="ring" />
+            <ProgressRing Value="659" Max="2100" Figure="1,441" FigureUnit="left" AriaLabel="1,441 left of 2,100" Compact TestId="ring-compact" />
+            <ProgressRing Value="2359" Max="2100" Figure="-259" FigureUnit="kcal left" AriaLabel="259 kcal over 2,100" TestId="ring-over" />
+        </Template>
+    </Story>
+
+    <Story Name="Long numbers">
+        <Template>
+            <ProgressRing Value="12345" Max="20000" TestId="ring" />
+            <ProgressRing Value="123456" Max="200000" Compact TestId="ring-compact" />
+            <ProgressRing Value="1234567" Max="2000000" Compact TestId="ring-compact-millions" />
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <ProgressRing Value="659" Max="2100" Caption="of 2,100" />
+                <ProgressRing Value="2359" Max="2100" Caption="of 2,100" />
+                <ProgressRing Value="659" Max="2100" Compact />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <ProgressRing Value="659" Max="2100" Caption="of 2,100" />
+                <ProgressRing Value="2359" Max="2100" Caption="of 2,100" />
+                <ProgressRing Value="659" Max="2100" Compact />
+            </div>
+        </Template>
+    </Story>
+
+</Stories>

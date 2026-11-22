@@ -1,0 +1,29 @@
+@attribute [Stories("Components/Inputs/FieldInput")]
+
+<Stories TComponent="FieldInput" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Label and input">
+        <Template>
+            <FieldInput Label="Note" InputId="example-input">
+                <input id="example-input" class="example" data-testid="example-input" />
+            </FieldInput>
+        </Template>
+    </Story>
+
+    <Story Name="Required">
+        <Template>
+            <FieldInput Label="Note" Required="true" InputId="example-input">
+                <input id="example-input" class="example" data-testid="example-input" />
+            </FieldInput>
+        </Template>
+    </Story>
+
+    <Story Name="Error">
+        <Template>
+            <FieldInput Label="Note" InputId="example-input" Message="Enter a note." MessageId="example-message" MessageTestId="example-error">
+                <input id="example-input" class="example" aria-invalid="true" aria-describedby="example-message" data-testid="example-input" />
+            </FieldInput>
+        </Template>
+    </Story>
+
+</Stories>

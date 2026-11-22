@@ -1,0 +1,33 @@
+@attribute [Stories("Components/Feedback/SuccessBadge")]
+
+<Stories TComponent="SuccessBadge" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Record">
+        <Template>
+            <SuccessBadge Text="Record" TestId="badge" />
+        </Template>
+    </Story>
+
+    <Story Name="Another icon">
+        <Template>
+            <SuccessBadge Text="Goal met" Icon="IconName.Check" />
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <SuccessBadge Text="Record" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <SuccessBadge Text="Record" />
+            </div>
+        </Template>
+    </Story>
+
+</Stories>

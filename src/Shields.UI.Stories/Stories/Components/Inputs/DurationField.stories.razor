@@ -1,0 +1,39 @@
+@attribute [Stories("Components/Inputs/DurationField")]
+
+<Stories TComponent="DurationField" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Duration">
+        <Template>
+            <DurationField Label="Duration" Required Value="0:20:00" />
+        </Template>
+    </Story>
+
+    <Story Name="Compact, three in a row">
+        <Template>
+            <div class="three">
+                <DurationField Label="Warm-up" Compact="true" Value="0:01:00" TestId="example-duration-a" />
+                <DurationField Label="Main set" Compact="true" Value="0:20:00" TestId="example-duration-b" />
+                <DurationField Label="Cool-down" Compact="true" Value="0:00:00" TestId="example-duration-c" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Empty">
+        <Template>
+            <DurationField Label="Duration" Required />
+        </Template>
+    </Story>
+
+    <Story Name="Invalid">
+        <Template>
+            <DurationField Label="Duration" Required Value="0:00:75" InvalidMessage="Seconds must be under 60" />
+        </Template>
+    </Story>
+
+    <Story Name="Disabled">
+        <Template>
+            <DurationField Label="Duration" Value="0:20:00" Disabled />
+        </Template>
+    </Story>
+
+</Stories>

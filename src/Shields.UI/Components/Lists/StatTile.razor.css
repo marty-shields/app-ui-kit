@@ -1,0 +1,44 @@
+.tile {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    min-width: 0;
+    padding: var(--space-3);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-surface);
+}
+
+.label {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    overflow-wrap: anywhere;
+}
+
+.value {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    font-variant-numeric: tabular-nums;
+    line-height: var(--line-height-tight);
+    overflow-wrap: anywhere;
+}
+
+.tile ::deep .change {
+    flex-wrap: wrap;
+}
+
+.caption {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+    overflow-wrap: anywhere;
+}
+
+.compact {
+    padding: var(--stat-tile-compact-padding);
+}
+
+.compact .value {
+    font-size: var(--stat-tile-compact-value-size);
+    overflow-wrap: normal;
+    white-space: nowrap;
+}

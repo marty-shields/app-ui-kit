@@ -1,0 +1,160 @@
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.JSInterop
+@using Shields.UI.Components.Actions
+@using Shields.UI.Components.Layout
+
+<div class="search-field">
+    <div class="search input-box">
+        <Icon Name="IconName.Search" Tone="IconTone.Muted" />
+        <input type="search"
+               class="input"
+               value="@Value"
+               placeholder="@Placeholder"
+               aria-label="@AriaLabel"
+               autocomplete="off"
+               enterkeyhint="search"
+               maxlength="@MaxLength"
+               data-testid="@TestId"
+               @key="generation"
+               @ref="input"
+               @oninput="OnInput"
+               @onkeydown="OnKeyDown" />
+        @if (Trailing is not null)
+        {
+            <span class="divider-slot"><Divider Vertical Decorative /></span>
+            <span class="trailing">@Trailing</span>
+        }
+    </div>
+    @if (ResultText is not null)
+    {
+        <p class="results" role="status" aria-live="polite" data-testid="@(TestId is null ? null : $"{TestId}-results")">@ResultText</p>
+    }
+</div>
+
+@code {
+    private int generation;
+    private bool inputSettled;
+    private const int MaxStaleChecks = 10;
+    private bool restoreFocus;
+    private int staleChecks;
+    private string? staleInputId;
+    private string? previousValue;
+    private string typed = "";
+    private ElementReference input;
+
+    // Seam for tests: the browser hands out the new reference late, which bUnit does not do.
+    internal virtual ElementReference CurrentInput => input;
+
+    /// <summary>The text.</summary>
+    [Parameter]
+    public string? Value { get; set; }
+
+    /// <summary>Raised on every keystroke with the typed text.</summary>
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+
+    /// <summary>Raised when Enter is pressed in the field, the search key of a phone's keyboard. The key press is not cancelled, so inside a form Enter also submits the form.</summary>
+    [Parameter]
+    public EventCallback OnEnter { get; set; }
+
+    /// <summary>Hint shown while the field is empty.</summary>
+    [Parameter]
+    public string? Placeholder { get; set; }
+
+    /// <summary>Names the field for screen readers. The field has no visible label, so always set it.</summary>
+    [Parameter, EditorRequired]
+    public string AriaLabel { get; set; } = "";
+
+    /// <summary>Content at the end of the box after a vertical divider, such as an action <see cref="IconButton"/>. Null shows neither.</summary>
+    [Parameter]
+    public RenderFragment? Trailing { get; set; }
+
+    /// <summary>
+    /// A line under the box, such as "12 results", that screen readers announce politely when it changes. Null shows no line. An empty string shows an empty line that is already in the page,
+    /// so the first text set later is announced; set it from the start when results can appear after a search.
+    /// </summary>
+    [Parameter]
+    public string? ResultText { get; set; }
+
+    /// <summary>The most characters the input accepts. Null for no limit.</summary>
+    [Parameter]
+    public int? MaxLength { get; set; }
+
+    /// <summary>Moves focus into the input when the field first shows, for a screen opened to search.</summary>
+    [Parameter]
+    public bool FocusOnShow { get; set; }
+
+    /// <summary>Value of the data-testid attribute, on the input itself and not on the box. The result line has <c>{TestId}-results</c>.</summary>
+    [Parameter]
+    public string? TestId { get; set; }
+
+    private async Task OnInput(ChangeEventArgs e)
+    {
+        typed = e.Value?.ToString() ?? "";
+        previousValue = Value;
+        try
+        {
+            await ValueChanged.InvokeAsync(typed);
+        }
+        finally
+        {
+            inputSettled = true;
+        }
+    }
+
+    /// <summary>Redraws the input when the parent put the text back to what it was before the keystroke, so the browser drops the typed text, and puts focus back on it.</summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && FocusOnShow)
+        {
+            await input.FocusAsync();
+        }
+
+        if (restoreFocus)
+        {
+            // The reference only points at the new input once the browser has drawn it.
+            var current = CurrentInput;
+            if (current.Id != staleInputId)
+            {
+                restoreFocus = false;
+                try
+                {
+                    await current.FocusAsync();
+                }
+                catch (JSDisconnectedException)
+                {
+                    // The page is gone, and the input with it.
+                }
+            }
+            else if (++staleChecks <= MaxStaleChecks)
+            {
+                // Nothing else may render, so ask for another render to look again, a few times at most.
+                await Task.Yield();
+                StateHasChanged();
+            }
+            else
+            {
+                restoreFocus = false;
+            }
+
+            return;
+        }
+
+        if (!inputSettled)
+        {
+            return;
+        }
+
+        inputSettled = false;
+        if (Value == previousValue && typed != (Value ?? ""))
+        {
+            staleInputId = CurrentInput.Id;
+            generation++;
+            restoreFocus = true;
+            staleChecks = 0;
+            StateHasChanged();
+        }
+    }
+
+    private Task OnKeyDown(KeyboardEventArgs e) => e.Key == "Enter" ? OnEnter.InvokeAsync() : Task.CompletedTask;
+}

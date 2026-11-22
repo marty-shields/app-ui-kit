@@ -1,0 +1,65 @@
+@attribute [Stories("Components/Overlays/Sheet")]
+
+<Stories TComponent="Sheet" Layout="typeof(PhoneLayout)">
+
+    <Story Name="Opened by a button">
+        <Template>
+            <div class="themed">
+                <button type="button" class="opener" data-testid="open" @onclick="() => opened = true">Open sheet</button>
+                <Sheet Open="opened" Title="Add item" OnClose="() => opened = false" TestId="opened">
+                    <div class="tiles">
+                        <SheetAction Icon="IconName.Search" Label="Search" OnClick="() => opened = false" TestId="opened-search" />
+                        <SheetAction Icon="IconName.Scan" Label="Scan" OnClick="() => opened = false" TestId="opened-scan" />
+                    </div>
+                </Sheet>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Text body">
+        <Template>
+            <div class="themed">
+                <button type="button" class="opener" data-testid="text-open" @onclick="() => text = true">Open sheet</button>
+                <Sheet Open="text" Title="Details" OnClose="() => text = false" TestId="text">
+                    <p class="body">A sheet holds any body: text, a form or a list.</p>
+                </Sheet>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <button type="button" class="opener" data-testid="light-open" @onclick="() => light = true">Open sheet</button>
+                <Sheet Open="light" Title="Add item" OnClose="() => light = false" TestId="light">
+                    <div class="tiles">
+                        <SheetAction Icon="IconName.Search" Label="Search" OnClick="() => light = false" TestId="light-search" />
+                        <SheetAction Icon="IconName.Scan" Label="Scan" OnClick="() => light = false" TestId="light-scan" />
+                    </div>
+                </Sheet>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <button type="button" class="opener" data-testid="dark-open" @onclick="() => dark = true">Open sheet</button>
+                <Sheet Open="dark" Title="Add item" OnClose="() => dark = false" TestId="dark">
+                    <div class="tiles">
+                        <SheetAction Icon="IconName.Search" Label="Search" OnClick="() => dark = false" TestId="dark-search" />
+                        <SheetAction Icon="IconName.Scan" Label="Scan" OnClick="() => dark = false" TestId="dark-scan" />
+                    </div>
+                </Sheet>
+            </div>
+        </Template>
+    </Story>
+
+</Stories>
+
+@code {
+    private bool opened;
+    private bool text;
+    private bool light;
+    private bool dark;
+}

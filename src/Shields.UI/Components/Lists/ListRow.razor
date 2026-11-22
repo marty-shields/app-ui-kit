@@ -1,0 +1,92 @@
+@if (OnClick.HasDelegate)
+{
+    <button type="button" class="row clickable @Modifiers" data-testid="@TestId" @onclick="OnClick">
+        @Body
+        <span class="chevron"><Icon Name="IconName.Chevron" Tone="IconTone.Muted" /></span>
+    </button>
+}
+else
+{
+    <div class="row @Modifiers" data-testid="@TestId">
+        @Body
+    </div>
+}
+
+@code {
+    /// <summary>Main line of the row. Wraps when too long for one line.</summary>
+    [Parameter, EditorRequired]
+    public string Text { get; set; } = "";
+
+    /// <summary>Muted second line under the text.</summary>
+    [Parameter]
+    public string? Detail { get; set; }
+
+    /// <summary>Muted text at the right, before the chevron.</summary>
+    [Parameter]
+    public string? Aside { get; set; }
+
+    /// <summary>Raised when the row is tapped. The row is not tappable, and shows no chevron, when unset.</summary>
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    /// <summary>How the text, detail and aside are arranged. <see cref="ListRowLayout.Stacked"/> by default.</summary>
+    [Parameter]
+    public ListRowLayout Layout { get; set; }
+
+    /// <summary>Draws the line under the row. True by default; false for the last row of a card or a row that stands alone.</summary>
+    [Parameter]
+    public bool Divider { get; set; } = true;
+
+    /// <summary>Content before the text in a narrow column the width of an entry-grid index, centred and muted: a number, or an icon such as the record mark.</summary>
+    [Parameter]
+    public RenderFragment? Leading { get; set; }
+
+    /// <summary>How a value moved, after the aside: a coloured arrow with the amount, or a dash for no change, read out as "up", "down" or "no change". Null shows none.</summary>
+    [Parameter]
+    public StatChange? Change { get; set; }
+
+    /// <summary>Content at the end of the row, after the change and before the chevron, such as action buttons. A tappable row is a button, so keep this non-interactive when <see cref="OnClick"/> is set.</summary>
+    [Parameter]
+    public RenderFragment? Trailing { get; set; }
+
+    /// <summary>Value of the data-testid attribute.</summary>
+    [Parameter]
+    public string? TestId { get; set; }
+
+    private string Modifiers => string.Join(' ', new[]
+    {
+        Detail is not null ? "two-line" : null,
+        Layout == ListRowLayout.Headline ? "headline" : null,
+        Divider ? null : "no-divider",
+    }.Where(c => c is not null));
+
+    private RenderFragment Body =>
+        @<text>
+            @if (Leading is not null)
+            {
+                <span class="leading">@Leading</span>
+            }
+            @Texts
+            @if (Aside is not null)
+            {
+                <span class="aside">@Aside</span>
+            }
+            @if (Change is not null)
+            {
+                <ChangeIndicator Change="Change" />
+            }
+            @if (Trailing is not null)
+            {
+                <span class="trailing">@Trailing</span>
+            }
+        </text>;
+
+    private RenderFragment Texts =>
+        @<span class="texts">
+            <span class="text" data-wrap-ok>@Text</span>
+            @if (Detail is not null)
+            {
+                <span class="detail" data-wrap-ok>@Detail</span>
+            }
+        </span>;
+}

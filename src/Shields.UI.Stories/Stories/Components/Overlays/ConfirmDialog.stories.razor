@@ -1,0 +1,33 @@
+@attribute [Stories("Components/Overlays/ConfirmDialog")]
+
+<Stories TComponent="ConfirmDialog" Layout="typeof(PhoneLayout)">
+
+    <Story Name="Danger">
+        <Template>
+            <ConfirmDialog Title="Delete this item?" Message="This can't be undone." ConfirmText="Delete" Danger />
+        </Template>
+    </Story>
+
+    <Story Name="Plain">
+        <Template>
+            <ConfirmDialog Title="Discard changes?" ConfirmText="Discard" />
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <ConfirmDialog Title="Delete this item?" Message="This can't be undone." ConfirmText="Delete" Danger TestId="light" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <ConfirmDialog Title="Delete this item?" Message="This can't be undone." ConfirmText="Delete" Danger TestId="dark" />
+            </div>
+        </Template>
+    </Story>
+
+</Stories>

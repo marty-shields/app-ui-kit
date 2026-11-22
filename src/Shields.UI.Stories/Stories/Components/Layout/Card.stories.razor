@@ -1,0 +1,122 @@
+@attribute [Stories("Components/Layout/Card")]
+
+<Stories TComponent="Card" Layout="typeof(ThemeLayout)">
+
+    <Story Name="No title">
+        <Template>
+            <Card TestId="card"><p class="body" data-wrap-ok>Eaten 659 of 2,100 kcal</p></Card>
+        </Template>
+    </Story>
+
+    <Story Name="Title">
+        <Template>
+            <Card Title="Weeks" TestId="card"><p class="body" data-wrap-ok>Content goes here.</p></Card>
+        </Template>
+    </Story>
+
+    <Story Name="Compact">
+        <Template>
+            <Card Compact Title="This week" Aside="1 this week" TestId="compact"><p class="body padded" data-wrap-ok>Content goes here.</p></Card>
+        </Template>
+    </Story>
+
+    <Story Name="Title and aside">
+        <Template>
+            <Card Title="Records" Aside="1 this week" TestId="card"><p class="body" data-wrap-ok>Content goes here.</p></Card>
+        </Template>
+    </Story>
+
+    <Story Name="Heading level 3">
+        <Template>
+            <section>
+                <h2 class="body">Session</h2>
+                <Card Title="Bench press" HeadingLevel="3" TestId="heading-level"><p class="body" data-wrap-ok>The title is an h3, as the card sits under an h2.</p></Card>
+            </section>
+        </Template>
+    </Story>
+
+    <Story Name="Header actions">
+        <Template>
+            <Card Title="Bench press" TestId="card">
+                <HeaderActions>
+                    <IconButton Icon="IconName.Check" AriaLabel="Mark Bench press done" />
+                    <IconButton Icon="IconName.Edit" AriaLabel="Edit Bench press" Muted />
+                    <IconButton Icon="IconName.Delete" AriaLabel="Delete Bench press" Muted />
+                </HeaderActions>
+                <ChildContent><p class="body" data-wrap-ok>Content goes here.</p></ChildContent>
+            </Card>
+        </Template>
+    </Story>
+
+    <Story Name="Header only">
+        <Template>
+            <Card Title="Bench press" TestId="card">
+                <HeaderActions>
+                    <IconButton Icon="IconName.Check" AriaLabel="Mark Bench press open" />
+                    <IconButton Icon="IconName.Edit" AriaLabel="Edit Bench press" Muted />
+                    <IconButton Icon="IconName.Delete" AriaLabel="Delete Bench press" Muted />
+                </HeaderActions>
+            </Card>
+        </Template>
+    </Story>
+
+    <Story Name="Error">
+        <Template>
+            <Card Title="Bench press" Error TestId="card">
+                <HeaderActions>
+                    <IconButton Icon="IconName.Check" AriaLabel="Mark Bench press done" />
+                </HeaderActions>
+                <ChildContent>
+                    <InlineAlert Tone="AlertTone.Error" Message="Enter the weight for set 2." />
+                </ChildContent>
+            </Card>
+        </Template>
+    </Story>
+
+    <Story Name="Error, dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <Card Title="Bench press" Error>
+                    <ChildContent>
+                        <InlineAlert Tone="AlertTone.Error" Message="Enter the weight for set 2." />
+                    </ChildContent>
+                </Card>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Selected">
+        <Template>
+            <Card Title="Set 2" HeadingLevel="3" Selected TestId="selected">
+                <p class="body" data-wrap-ok>The open set, tinted. <SuccessBadge Text="Record" /></p>
+            </Card>
+        </Template>
+    </Story>
+
+    <Story Name="Selected, dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <Card Title="Set 2" Aside="Open" HeadingLevel="3" Selected>
+                    <p class="body" data-wrap-ok>The open set, tinted.</p>
+                </Card>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <Card Title="Records" Aside="1 this week"><p class="body" data-wrap-ok>Content goes here.</p></Card>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <Card Title="Records" Aside="1 this week"><p class="body" data-wrap-ok>Content goes here.</p></Card>
+            </div>
+        </Template>
+    </Story>
+
+</Stories>

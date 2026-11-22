@@ -1,0 +1,104 @@
+@attribute [CustomPage("Components/Inputs/Overview")]
+
+<h1>Inputs</h1>
+<p>Number inputs use the phone's numeric keyboard and 20px text. An invalid input has a red 2px border.</p>
+
+<h2><code>SegmentedControl</code></h2>
+<p>A full-width row of 2–4 segments; one is chosen and filled with <code>--color-selected</code>. For choosing between a few views or ranges. Each segment is a radio with a 48px touch target; <code>Label</code> names the group for screen readers only. An option's <code>AriaLabel</code>, when set, is what screen readers read instead of its label, e.g. <em>Last month</em> for <em>1M</em>. When <code>Value</code> matches no option, no segment is chosen.</p>
+<ul>
+    <li><code>data-testid</code>: <code>TestId</code> on the control; each option's <code>TestId</code> on its radio.</li>
+</ul>
+
+<h2><code>FilterChips</code></h2>
+<p>A row of rounded chips that wraps onto more lines when it must; one is chosen and filled with <code>--color-selected</code>. Each chip is a radio with a 48px touch target; <code>Label</code> names the group for screen readers only.</p>
+<ul>
+    <li><code>data-testid</code>: <code>TestId</code> on the group; each option's <code>TestId</code> on its radio.</li>
+</ul>
+
+<h2><code>FieldInput</code></h2>
+<p>Wraps an input: shows the field's label above it (kept for screen readers only when <code>ShowLabel</code> is off), an asterisk when <code>Required</code>, and an error <code>Message</code> under it in the error tone, announced to screen readers.</p>
+<ul>
+    <li><code>data-testid</code>: <code>MessageTestId</code> on the message.</li>
+</ul>
+
+<h2><code>NumberField</code></h2>
+<p>A numeric input for amounts and targets. <code>Unit</code> (e.g. <em>g</em>, <em>kcal</em>) sits after the number. <code>Stepper</code> adds − and + buttons that move the number by <code>Step</code>; they never go below <code>Minimum</code>, and − is off once the number reaches it. Typing is not clamped: the field raises <code>ValueChanged</code> on every keystroke with the typed number (null when the text isn't one) and the parent decides whether it is valid. <code>TextChanged</code> raises the typed text itself, just before <code>ValueChanged</code>, for a parent that must tell an empty field from unreadable text; the stepper raises it only when <code>Text</code> is set. <code>Text</code> (two-way, <code>@@bind-Text</code>) shows the text exactly as typed, such as "abc", "22,75" or "007": when it is not null it wins over <code>Value</code> for what is shown, so the parent updates both together; null (the default) leaves <code>Value</code> in charge. <code>Compact</code> trims the padding either side of the number (to <code>--input-box-padding-inline-compact</code>) so "62.5" fits one of three fields in a 328px row. The bordered box is the shared <code>.input-box</code> class in <code>base.css</code> (padding from <code>--input-box-padding-inline</code>, kit focus outline on <code>:focus-within</code>), for other fields that draw their own box. A phone shows the numeric keypad. <code>InvalidMessage</code> shows an error under the field in the error tone (<code>--color-error</code>, a thicker border) and is announced to screen readers (<code>role="alert"</code>, <code>aria-invalid</code>, <code>aria-describedby</code>). <code>Disabled</code> greys out the input and both buttons. <code>AutoFocus</code> puts the cursor in the field when it first appears. <code>Label</code> names the field for screen readers only. The input and each button have a 48px touch target.</p>
+<ul>
+    <li><code>data-testid</code>: <code>TestId</code> on the input; the buttons, unit, message and box add <code>-minus</code>, <code>-plus</code>, <code>-unit</code>, <code>-error</code> and <code>-box</code>.</li>
+</ul>
+
+<h2><code>RadioGroup</code></h2>
+<p>A labelled group of choices; one is chosen. Each choice is a full-width row with a radio, its label and an optional hint under it. The chosen row is highlighted. <code>Disabled</code> dims every row and ignores taps. When the parent doesn't take a tapped value the radios are drawn again to show the chosen one, and focus returns to it.</p>
+<ul>
+    <li><code>data-testid</code>: <code>TestId</code> on the group; each option's <code>TestId</code> on its radio.</li>
+</ul>
+
+<h2><code>TextField</code></h2>
+<p>A single-line text input for a short name. Left-aligned in the same bordered box as <code>NumberField</code>, 48px touch target. <code>ValueChanged</code> is raised on every keystroke with the typed text. <code>MaxLength</code> stops the phone's keyboard at that many characters (the parent still checks the text); <code>Placeholder</code> shows while it is empty. <code>InvalidMessage</code> shows an error under the field in the error tone (<code>--color-error</code>, a thicker border) and is announced to screen readers (<code>role="alert"</code>, <code>aria-invalid</code>, <code>aria-describedby</code>). <code>Disabled</code> greys it out. <code>Label</code> names the field for screen readers only.</p>
+<ul>
+    <li><code>data-testid</code>: <code>TestId</code> on the input; the message adds <code>-error</code>.</li>
+</ul>
+
+<h2><code>SelectField</code></h2>
+<p>A drop-down list for choosing one of a few named options. A native <code>&lt;select&gt;</code> in a bordered box with a 48px touch target, in the same bold text as <code>NumberField</code>. <code>Options</code> are <code>RadioOption</code>s; only each option's <code>Value</code> and <code>Label</code> are used. <code>Value</code> picks the shown option; when it matches none the browser shows the first. <code>ValueChanged</code> is raised with the option picked; when the parent doesn't take the value the list redraws to show the chosen one again. <code>Disabled</code> greys it out. <code>Label</code> names the list for screen readers only. Long labels are cut with an ellipsis in the closed list.</p>
+<ul>
+    <li><code>data-testid</code>: <code>TestId</code> on the <code>&lt;select&gt;</code>.</li>
+</ul>
+
+<h2><code>DateStrip</code></h2>
+<p>A previous button, a label and a next button on one row, for moving between days. The label reads <em>Today, 15 Nov</em>, <em>Yesterday, 14 Nov</em>, <em>Tomorrow, 16 Nov</em> or the weekday and date (with the year when it is not this year). Tapping the label raises <code>OnToday</code> from any day. There is no limit in either direction. The caller passes <code>Date</code> and <code>Today</code>, so the strip never reads the clock; the parent changes <code>Date</code> in the callbacks. Every target is 48px: the buttons are named <em>Previous day</em> and <em>Next day</em>, the label <em>&lt;label&gt;, go to today</em>.</p>
+<ul>
+    <li><code>data-testid</code>: <code>TestId</code> (default <code>date-strip</code>) on the strip, with <code>-previous</code>, <code>-label</code> and <code>-next</code> on its buttons.</li>
+</ul>
+
+<h2><code>RangeCalendar</code></h2>
+<p>Picks a range of days. <em>From</em> and <em>To</em> boxes show the ends; the box that is next is outlined. The first tap sets <em>From</em> and clears <em>To</em>, the second sets <em>To</em> (an earlier day swaps the ends; the same day twice picks one day). Tapping a box shows its month. The month name opens a month grid with the year's arrows. <code>Min</code> and <code>Max</code> bound what can be picked; <code>DayCounts</code> puts a dot on days with items and a total on each month; <code>Today</code> (or the clock) rings the current day. Days are buttons in a labelled group, 48px tall, named with their date and whether they start or end the range or carry a dot (<code>MarkedDayText</code>). <code>OnApply</code> raises a <code>DateRange</code> (both ends the same for one day); <code>OnCancel</code> throws the range away. The grid starts on Monday.</p>
+<ul>
+    <li><code>data-testid</code>: <code>TestId</code> (default <code>range</code>) on the calendar, with <code>-from</code>, <code>-to</code>, <code>-day-{yyyy-MM-dd}</code>, <code>-month-{yyyy-MM}</code>, <code>-apply</code>, <code>-cancel</code> and more listed on the parameter.</li>
+</ul>
+
+<h2><code>DurationField</code></h2>
+<p>Three boxes for hours, minutes and seconds in the same bordered box as <code>NumberField</code> (it shows the focus outline while a box has focus), 48px touch targets, numeric keyboard, two digits each. <code>Value</code> is the text as <em>h:mm:ss</em>, kept as typed so a part-filled field such as <em>1::</em> survives; <code>ValueChanged</code> is raised on every keystroke (null when every box is empty). When focus leaves a part-filled field it is raised again with the gaps filled: an empty hour becomes 0, minutes and seconds get two digits. <code>InvalidMessage</code> shows an error under the boxes (<code>role="alert"</code>, <code>aria-describedby</code>); <code>Invalid</code> marks the boxes without one. <code>Label</code> names the group for screen readers. Its boxes use the shared <code>.input-box-compact</code> padding. <code>Compact</code> goes tighter still: no padding either side of the digits, no gap around the separators, a smaller separator and a smaller digit size, so "01" and "00" fit three fields in a 328px row. <code>DurationField.FocusMoveWait</code> is the public read-only 10ms the field waits after focus leaves a box before filling in; a test that fakes <code>TimeProvider</code> advances it by that much.</p>
+<ul>
+    <li><code>data-testid</code>: <code>TestId</code> (default <code>duration</code>) plus <code>-h</code>, <code>-mm</code>, <code>-ss</code> on the boxes and <code>-error</code> on the message.</li>
+</ul>
+
+<h2><code>ValueField</code></h2>
+<p>One field that picks its control by <code>Kind</code>: <code>Whole</code> and <code>Fractional</code> show a <code>NumberField</code> (whole-number or decimal keyboard), <code>Duration</code> shows a <code>DurationField</code>, all with the label and error message of the kit. <code>Value</code> is the text as typed, so a parent that validates a form never loses what the user typed (<em>1.</em>, <em>abc</em>); an empty field is null. It is named for what it holds, not for any screen that uses it.</p>
+<ul>
+    <li><code>Compact</code> goes to both controls: the tighter number box, and for a duration the tighter boxes of <code>DurationField.Compact</code>. False by default for both.</li>
+    <li><code>data-testid</code>: <code>TestId</code> as on <code>NumberField</code> or <code>DurationField</code>, by kind.</li>
+</ul>
+
+<h2><code>SearchField</code></h2>
+<p>A search box: a muted search <code>Icon</code>, an <code>&lt;input type="search"&gt;</code> and, when <code>Trailing</code> is set, a vertical <code>Divider</code> and that content, such as an action <code>IconButton</code>. The box is the shared <code>.input-box</code> look with the kit focus outline, and the input is a 48px touch target. The input has <code>autocomplete="off"</code> and <code>enterkeyhint="search"</code>.</p>
+<ul>
+    <li><code>Value</code> and <code>ValueChanged</code>: the text; <code>ValueChanged</code> fires on every keystroke. <code>OnEnter</code> fires when Enter is pressed.</li>
+    <li><code>Placeholder</code> and <code>AriaLabel</code>: the hint, and the name for screen readers. The field has no visible label, so <code>AriaLabel</code> is required.</li>
+    <li><code>data-testid</code>: <code>TestId</code>, on the input itself and not on the box, so a test types into it directly.</li>
+    <li><code>ResultText</code>: a muted line under the box, such as "12 results", in a polite live region (<code>role="status"</code>) so screen readers announce it when it changes. Null shows no line; an empty string shows an empty line that is already in the page, so set it from the start when results can appear later. <code>data-testid</code>: <code>{TestId}-results</code>.</li>
+    <li><code>MaxLength</code> limits the input; <code>FocusOnShow</code> moves focus into it when the field first shows.</li>
+</ul>
+
+<h2><code>NoteField</code></h2>
+<p>A multi-line note that collapses to one line. While <code>Editing</code> it shows <code>Label</code>, a character count (with <code>MaxLength</code> as "12/500") and a text box; the count turns bold in the error colour over the limit, and an <code>Error</code> draws the box with a <code>--border-width-error</code> error outline and the message under it, announced as an alert. When focus leaves, the note is trimmed and collapses to one line (with the same outline for an error); tapping the line opens the box with focus. With no note and the box closed nothing shows.</p>
+<ul>
+    <li><code>Value</code> and <code>ValueChanged</code>: the note, null when blank. <code>Editing</code> and <code>EditingChanged</code>: whether the box shows. <code>FocusAsync()</code> opens it and focuses it.</li>
+    <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>-count</code>, <code>-input</code>, <code>-open</code> (the collapsed line) and <code>-error</code>.</li>
+</ul>
+
+<h2><code>DateRangeField</code></h2>
+<p>A collapsed date-range field: a button with a calendar <code>Icon</code>, the dates, an optional <code>Count</code> and a chevron. Tapping it raises <code>ExpandedChanged</code>; while <code>Expanded</code> it shows a <code>RangeCalendar</code> under it and Android back closes it. Apply closes the calendar and raises <code>DatesChanged</code>; Cancel only closes it.</p>
+<ul>
+    <li><code>Dates</code>, <code>DateFormat</code> (default <code>d MMM yyyy</code>) and <code>Label</code> (the start of the button's accessible name, "Dates shown" by default; the count follows, worded by <code>CountText</code>).</li>
+    <li><code>Min</code>, <code>Max</code>, <code>Today</code>, <code>DayCounts</code>, <code>MarkedDayText</code>, <code>ApplyLabel</code> and <code>OpenOnMonths</code> go to the calendar.</li>
+    <li><code>data-testid</code>: <code>TestId</code>, <code>{TestId}-dates</code>, <code>{TestId}-count</code>, and the calendar's under <code>{TestId}-calendar</code>.</li>
+</ul>
+
+<h2><code>EntryGridRow</code></h2>
+<p>One row of a grid of entry fields, so the fields of every row line up: a narrow <code>Index</code> column (<code>--entry-grid-index-width</code>), an optional <code>Aside</code> column (<code>--entry-grid-aside-width</code>, for last time's value), <code>FieldCount</code> equal columns for <code>Fields</code>, and an optional <code>Actions</code> column one touch target wide. <code>Header</code> makes a row of column titles, muted, small and hidden from screen readers. Give each field cell its own accessible name, as the header is not read out.</p>
+<ul>
+    <li><code>data-testid</code>: <code>TestId</code>.</li>
+</ul>
+
+<p>Stories: <a href="./?path=/docs/components-inputs-segmentedcontrol--docs">SegmentedControl</a>, <a href="./?path=/docs/components-inputs-filterchips--docs">FilterChips</a>, <a href="./?path=/docs/components-inputs-fieldinput--docs">FieldInput</a>, <a href="./?path=/docs/components-inputs-numberfield--docs">NumberField</a>, <a href="./?path=/docs/components-inputs-radiogroup--docs">RadioGroup</a>, <a href="./?path=/docs/components-inputs-textfield--docs">TextField</a>, <a href="./?path=/docs/components-inputs-selectfield--docs">SelectField</a>, <a href="./?path=/docs/components-inputs-datestrip--docs">DateStrip</a>, <a href="./?path=/docs/components-inputs-rangecalendar--docs">RangeCalendar</a>, <a href="./?path=/docs/components-inputs-durationfield--docs">DurationField</a>, <a href="./?path=/docs/components-inputs-valuefield--docs">ValueField</a>, <a href="./?path=/docs/components-inputs-searchfield--docs">SearchField</a>, <a href="./?path=/docs/components-inputs-notefield--docs">NoteField</a>, <a href="./?path=/docs/components-inputs-daterangefield--docs">DateRangeField</a>, <a href="./?path=/docs/components-inputs-entrygridrow--docs">EntryGridRow</a></p>

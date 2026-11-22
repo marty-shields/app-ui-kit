@@ -1,0 +1,56 @@
+/* Every variant sets its own colour, so a Strong inside Muted text reads in the normal text colour. */
+.text {
+    margin: 0;
+    color: var(--color-text);
+    font-size: inherit;
+    font-weight: inherit;
+}
+
+.label {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: var(--letter-spacing-label);
+    text-transform: uppercase;
+}
+
+.muted {
+    color: var(--color-text-muted);
+}
+
+.muted-small {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+}
+
+.strong {
+    color: var(--color-text);
+    font-weight: var(--font-weight-bold);
+}
+
+.figure {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+}
+
+.error {
+    color: var(--color-error);
+}
+
+.heading {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+}
+
+.muted-small-strong {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    font-variant-numeric: tabular-nums;
+}
+
+.success-small {
+    color: var(--color-success);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+}

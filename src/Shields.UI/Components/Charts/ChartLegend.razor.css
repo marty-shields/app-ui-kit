@@ -1,0 +1,107 @@
+.legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    min-width: 0;
+}
+
+.swatch {
+    width: var(--legend-swatch-size);
+    height: var(--legend-swatch-size);
+    border-radius: var(--radius-round);
+    box-sizing: border-box;
+    flex: none;
+}
+
+.swatch.accent {
+    background-color: var(--color-accent);
+}
+
+.swatch.chip {
+    background-color: var(--color-chip);
+}
+
+.swatch.error {
+    background-color: var(--color-error);
+}
+
+.swatch.past {
+    background-color: var(--color-chart-past);
+}
+
+.swatch.primary {
+    background-color: var(--color-primary);
+}
+
+.swatch.today {
+    border: var(--border-width-error) solid var(--color-text);
+}
+
+.swatch.outline {
+    /* Six even dashes: a CSS border style breaks into uneven pieces on a circle this small, so a ring is cut by a conic mask instead. */
+    background-color: var(--color-border-strong);
+    mask-image:
+        radial-gradient(closest-side, transparent calc(100% - var(--border-width-error) * 1.5), var(--color-text) 0),
+        repeating-conic-gradient(var(--color-text) 0 30deg, transparent 30deg 60deg);
+    mask-composite: intersect;
+}
+
+.swatch.line {
+    width: calc(var(--legend-swatch-size) * 2);
+    height: var(--border-width-error);
+    border-radius: 0;
+    background-color: var(--color-text-muted);
+    mask-image: repeating-linear-gradient(to right, var(--color-text) 0 var(--chart-dash-on), transparent var(--chart-dash-on) calc(var(--chart-dash-on) + var(--chart-dash-off)));
+}
+
+.swatch.band {
+    width: calc(var(--legend-swatch-size) * 2);
+    box-shadow: inset 0 0 0 var(--border-width) var(--color-chart-band);
+    border-radius: calc(var(--radius-sm) / 4);
+}
+
+/* The calendar's on-target and over cells in miniature: the cell's fill with its glyph in the colour the calendar draws it. */
+.swatch.check,
+.swatch.triangle {
+    display: grid;
+    place-items: center;
+    border-radius: calc(var(--radius-sm) / 4);
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-tight);
+}
+
+.swatch.check {
+    background-color: var(--color-accent);
+    color: var(--color-on-primary);
+}
+
+.swatch.check::before {
+    content: "✓";
+}
+
+.swatch.triangle {
+    background-color: var(--color-error);
+    color: var(--color-on-danger);
+}
+
+.swatch.triangle::before {
+    content: "▲";
+}
+
+.marker {
+    flex: none;
+    color: var(--color-text);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-tight);
+}

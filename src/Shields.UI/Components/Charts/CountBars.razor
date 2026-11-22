@@ -1,0 +1,86 @@
+@using System.Globalization
+@if (!Counts.Any(count => count > 0))
+{
+    <p class="none" data-testid="@Id("none")">@EmptyText</p>
+}
+else
+{
+    <figure class="bars" aria-label="@Label" data-testid="@TestId">
+        <svg class="plot" viewBox="0 0 @Number(Counts.Count * Slot) @Number(Height + Baseline)" aria-hidden="true" focusable="false">
+            @for (var i = 0; i < Counts.Count; i++)
+            {
+                if (Counts[i] > 0)
+                {
+                    var height = Counts[i] * Height / Max;
+                    <rect class="@(i == Counts.Count - 1 ? "bar current" : "bar")"
+                          x="@Number(i * Slot + (Slot - BarWidth) / 2)"
+                          y="@Number(Height - height)"
+                          width="@Number(BarWidth)"
+                          height="@Number(height)"
+                          rx="@Number(Corner)" />
+                }
+            }
+            <line class="baseline" x1="0" x2="@Number(Counts.Count * Slot)" y1="@Number(Height + Baseline / 2)" y2="@Number(Height + Baseline / 2)" />
+        </svg>
+        <div class="axis" aria-hidden="true">
+            @if (StartLabel is not null)
+            {
+                <span>@StartLabel</span>
+            }
+            @if (EndLabel is not null)
+            {
+                <span class="end">@EndLabel</span>
+            }
+        </div>
+        <ul class="visually-hidden" data-testid="@Id("values")">
+            @for (var i = 0; i < Counts.Count; i++)
+            {
+                <li>@ItemText(i, Counts[i])</li>
+            }
+        </ul>
+    </figure>
+}
+
+@code {
+    private const double Slot = 20;
+    private const double BarWidth = 12;
+    private const double Height = 60;
+    private const double Baseline = 2;
+    private const double Corner = 2;
+
+    /// <summary>One count per bar, left to right. The last bar is the current one, in the accent colour; the others use the past colour. Zero draws no bar. All zero shows <see cref="EmptyText"/> instead of the chart.</summary>
+    [Parameter, EditorRequired]
+    public IReadOnlyList<int> Counts { get; set; } = [];
+
+    /// <summary>The accessible name of the chart.</summary>
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = "";
+
+    /// <summary>Muted text under the left end of the bars, such as "4 weeks ago". Null shows none.</summary>
+    [Parameter]
+    public string? StartLabel { get; set; }
+
+    /// <summary>Muted text under the right end of the bars, such as "This week". Null shows none.</summary>
+    [Parameter]
+    public string? EndLabel { get; set; }
+
+    /// <summary>The text alternative of one bar, from its position (from 0) and its count, e.g. <c>(i, n) => $"{n} items"</c>. Read out in a list that is not shown. The count by itself when null.</summary>
+    [Parameter]
+    public Func<int, int, string>? ValueText { get; set; }
+
+    /// <summary>Shown instead of the chart when every count is zero, or there are none.</summary>
+    [Parameter]
+    public string EmptyText { get; set; } = "Nothing recorded yet";
+
+    /// <summary>Value of the data-testid attribute, <c>{TestId}-values</c> on the text alternative, and <c>{TestId}-none</c> on the empty text.</summary>
+    [Parameter]
+    public string? TestId { get; set; }
+
+    private int Max => Counts.Count == 0 ? 0 : Counts.Max();
+
+    private string ItemText(int index, int count) => ValueText?.Invoke(index, count) ?? count.ToString(CultureInfo.InvariantCulture);
+
+    private string? Id(string part) => TestId is null ? null : $"{TestId}-{part}";
+
+    private static string Number(double value) => value.ToString("0.##", CultureInfo.InvariantCulture);
+}

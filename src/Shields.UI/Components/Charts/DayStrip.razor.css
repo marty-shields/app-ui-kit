@@ -1,0 +1,54 @@
+/* Columns are set inline, one per day. */
+.days {
+    display: grid;
+    gap: var(--space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+}
+
+.name {
+    white-space: nowrap;
+}
+
+.dot {
+    display: grid;
+    place-items: center;
+    box-sizing: border-box;
+    width: var(--calendar-day-size);
+    height: var(--calendar-day-size);
+    border: var(--border-width) dashed var(--color-border-strong);
+    border-radius: var(--radius-round);
+    font-variant-numeric: tabular-nums;
+}
+
+/* A done day is solid and ticked; a day not done is dashed and shows its date. */
+.done .dot {
+    border-style: solid;
+    border-color: var(--color-primary);
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+}
+
+.today {
+    color: var(--color-text);
+    font-weight: var(--font-weight-bold);
+}
+
+.today .dot {
+    outline: var(--border-width-error) solid var(--color-text);
+    outline-offset: var(--focus-offset);
+}
+
+.future .dot {
+    opacity: var(--opacity-disabled);
+}

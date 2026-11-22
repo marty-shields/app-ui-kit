@@ -69,6 +69,15 @@
         </Template>
     </Story>
 
+    <Story Name="Heading rows with attributes">
+        <Template>
+            <div class="stack">
+                <ListRow Text="Barbell Back Squat" Detail="3 sets · 70kg × 3" HeadingLevel="3" data-kind="exercise" TestId="heading-row" />
+                <ListRow Text="Bench Press" Detail="3 sets · 60kg × 5" HeadingLevel="3" Divider="false" />
+            </div>
+        </Template>
+    </Story>
+
     <Story Name="Light">
         <Template>
             <div class="themed" data-theme="light">
@@ -81,6 +90,23 @@
         <Template>
             <div class="themed" data-theme="dark">
                 <ListRow Text="Barbell Back Squat" Detail="Last Tue 20 Oct · 70kg × 3" Aside="Strength" OnClick="() => { }" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Leading without aside, dark">
+        <Template>
+            <div class="themed stack" data-theme="dark">
+                <ListRow Text="Barbell Back Squat · 70kg × 3" HeadingLevel="3">
+                    <Leading><Icon Name="IconName.Record" Tone="IconTone.Success" /></Leading>
+                </ListRow>
+                <ListRow Text="70kg · 5 reps" Divider="false">
+                    <Leading>2</Leading>
+                    <Trailing>
+                        <IconButton Icon="IconName.Edit" AriaLabel="Edit set 2" Muted Compact />
+                        <IconButton Icon="IconName.Delete" AriaLabel="Delete set 2" Muted Compact />
+                    </Trailing>
+                </ListRow>
             </div>
         </Template>
     </Story>

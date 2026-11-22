@@ -4,3 +4,9 @@
     background-color: var(--color-surface);
     color: var(--color-text);
 }
+
+.themed:has(> :nth-child(2)) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}

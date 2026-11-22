@@ -282,4 +282,78 @@ public class ListRowTests : ComponentTestBase
 
         Assert.That(cut.Find("button").Children.TakeLast(3).Select(c => c.ClassName), Is.EqualTo(new[] { "aside", "trailing", "chevron" }));
     }
+
+    [TestCase(2)]
+    [TestCase(6)]
+    public void HeadingLevel_MakesTheTextAHeadingOfThatLevel(int level)
+    {
+        var cut = Context.Render<ListRow>(p => p.Add(x => x.Text, "Bench Press").Add(x => x.HeadingLevel, level));
+
+        var text = cut.Find(".text");
+        Assert.Multiple(() =>
+        {
+            Assert.That(text.GetAttribute("role"), Is.EqualTo("heading"));
+            Assert.That(text.GetAttribute("aria-level"), Is.EqualTo(level.ToString(System.Globalization.CultureInfo.InvariantCulture)));
+            Assert.That(text.TextContent, Is.EqualTo("Bench Press"));
+        });
+    }
+
+    [Test]
+    public void HeadingLevel_Unset_LeavesTheTextPlain()
+    {
+        var cut = Context.Render<ListRow>(p => p.Add(x => x.Text, "Bench Press"));
+
+        var text = cut.Find(".text");
+        Assert.Multiple(() =>
+        {
+            Assert.That(text.HasAttribute("role"), Is.False);
+            Assert.That(text.HasAttribute("aria-level"), Is.False);
+        });
+    }
+
+    [TestCase(1)]
+    [TestCase(7)]
+    public void HeadingLevel_OutsideTwoToSix_Throws(int level)
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => Context.Render<ListRow>(p => p.Add(x => x.Text, "Bench Press").Add(x => x.HeadingLevel, level)));
+    }
+
+    [Test]
+    public void OtherAttributes_GoOnTheRoot_OfAStaticAndATappableRow()
+    {
+        var plain = Context.Render<ListRow>(p => p.Add(x => x.Text, "a").Add(x => x.TestId, "row").AddUnmatched("data-wrap-ok", "").AddUnmatched("data-kind", "set"));
+        var tappable = Context.Render<ListRow>(p => p.Add(x => x.Text, "a").Add(x => x.OnClick, () => { }).AddUnmatched("data-kind", "set"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(plain.Find("div.row").HasAttribute("data-wrap-ok"), Is.True);
+            Assert.That(plain.Find("div.row").GetAttribute("data-kind"), Is.EqualTo("set"));
+            Assert.That(plain.Find("div.row").GetAttribute("data-testid"), Is.EqualTo("row"));
+            Assert.That(tappable.Find("button.row").GetAttribute("data-kind"), Is.EqualTo("set"));
+        });
+    }
+
+    [Test]
+    public void OtherAttributes_DoNotReplaceTheRowsOwn()
+    {
+        var cut = Context.Render<ListRow>(p => p.Add(x => x.Text, "a").Add(x => x.OnClick, () => { }).Add(x => x.TestId, "row")
+            .AddUnmatched("type", "submit").AddUnmatched("class", "other").AddUnmatched("data-testid", "other"));
+
+        var row = cut.Find("button");
+        Assert.Multiple(() =>
+        {
+            Assert.That(row.GetAttribute("type"), Is.EqualTo("button"));
+            Assert.That(row.ClassList, Does.Contain("row").And.Not.Contain("other"));
+            Assert.That(row.GetAttribute("data-testid"), Is.EqualTo("row"));
+        });
+    }
+
+    [Test]
+    public void Texts_TakeTheFreeRoom_SoTheyStartAfterTheLeadingColumn()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Lists", "ListRow.razor.css");
+        var rule = System.Text.RegularExpressions.Regex.Match(css, @"(?m)^\.texts\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
+
+        Assert.That(rule, Does.Contain("flex: 1;"));
+    }
 }

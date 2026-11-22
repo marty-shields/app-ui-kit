@@ -5,7 +5,8 @@
 <h2><code>ListRow</code></h2>
 <p>A full-width row of text, at least <code>--touch-target</code> tall, with a bottom border. An optional muted <code>Detail</code> line goes under the text and optional muted <code>Aside</code> text at the right. With <code>OnClick</code> it is a button ending in a muted chevron <code>Icon</code>; without, it is plain text. Long text wraps.</p>
 <ul>
-    <li><code>data-testid</code>: <code>TestId</code>.</li>
+    <li><code>data-testid</code>: <code>TestId</code>. Other attributes, such as <code>data-*</code>, go on the row's root element (the button of a tappable row).</li>
+    <li><code>HeadingLevel</code>: 2 to 6 makes <code>Text</code> a heading (<code>role="heading"</code>, <code>aria-level</code>) without changing its look, for a row that starts a section. Use it on rows that are not tappable. The texts take the free room, so with no aside they start right after <code>Leading</code>.</li>
     <li><code>Divider</code>: true by default; false drops the line under the row, for the last row of a card or a row on its own.</li>
     <li><code>Layout</code>: <code>ListRowLayout.Stacked</code> (default) or <code>Headline</code>, which puts a bold <code>Text</code> and a bold <code>Aside</code> on one line (a date and its headline) with the muted <code>Detail</code> on a full-width line under them. <code>Detail</code> is muted in every layout.</li>
     <li><code>Leading</code>: content in a narrow centred muted column before the text, the width of <code>--entry-grid-index-width</code>: a number for a numbered line, or an <code>Icon</code> such as the record mark.</li>

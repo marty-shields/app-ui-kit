@@ -1,0 +1,82 @@
+@using System.Globalization
+@inject TimeProvider Time
+<ul class="days" style="grid-template-columns: repeat(@Math.Max(Days.Count, 1), minmax(0, 1fr))" aria-label="@Label" data-testid="@TestId">
+    @foreach (var date in Days)
+    {
+        var done = Done.Contains(date);
+        var today = date == now;
+        var future = date > now;
+        <li class="day @(done ? "done" : null) @(today ? "today" : null) @(future ? "future" : null)"
+            aria-current="@(today ? "date" : null)"
+            data-testid="@Id(date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture))">
+            <span class="name" aria-hidden="true">@date.ToString("ddd", FormatCulture)</span>
+            <span class="dot" aria-hidden="true">
+                @if (done)
+                {
+                    <Icon Name="IconName.Check" />
+                }
+                else
+                {
+                    @date.Day
+                }
+            </span>
+            <span class="visually-hidden">@Describe(date, done, today, future)</span>
+        </li>
+    }
+</ul>
+
+@code {
+    /// <summary>The days to show, in order, one column each, such as a week from Monday to Sunday.</summary>
+    [Parameter, EditorRequired]
+    public IReadOnlyList<DateOnly> Days { get; set; } = [];
+
+    /// <summary>The days marked done: each shows a tick on <c>--color-primary</c> in place of its date. A date that is not in <see cref="Days"/> is ignored.</summary>
+    [Parameter]
+    public IReadOnlyCollection<DateOnly> Done { get; set; } = [];
+
+    /// <summary>The current day, which gets a ring and <c>aria-current="date"</c>; the days after it are dimmed as coming up. Null means today by the clock.</summary>
+    [Parameter]
+    public DateOnly? Today { get; set; }
+
+    /// <summary>The accessible name of the strip, such as "Days this week".</summary>
+    [Parameter]
+    public string Label { get; set; } = "Days";
+
+    /// <summary>Read after the date of a done day, such as "trained".</summary>
+    [Parameter]
+    public string DoneText { get; set; } = "done";
+
+    /// <summary>Read after the date of a day up to today that is not done, such as "no workout".</summary>
+    [Parameter]
+    public string EmptyText { get; set; } = "not done";
+
+    /// <summary>Read after the date of a day after today that is not done.</summary>
+    [Parameter]
+    public string FutureText { get; set; } = "coming up";
+
+    /// <summary>Read last for the current day, after its state.</summary>
+    [Parameter]
+    public string TodayText { get; set; } = "today";
+
+    /// <summary>The culture of the day names, shown and read. Null means the invariant culture (English names), whatever the device's culture.</summary>
+    [Parameter]
+    public CultureInfo? Culture { get; set; }
+
+    /// <summary>Value of the data-testid attribute, and the prefix of each day's: <c>{TestId}-{date}</c>, the date as yyyy-MM-dd. None are rendered without it.</summary>
+    [Parameter]
+    public string? TestId { get; set; }
+
+    private DateOnly now;
+
+    private CultureInfo FormatCulture => Culture ?? CultureInfo.InvariantCulture;
+
+    protected override void OnParametersSet() => now = Today ?? DateOnly.FromDateTime(Time.GetLocalNow().DateTime);
+
+    private string Describe(DateOnly date, bool done, bool today, bool future)
+    {
+        var state = done ? DoneText : future ? FutureText : EmptyText;
+        return $"{date.ToString("dddd d MMMM", FormatCulture)}, {state}{(today ? $", {TodayText}" : "")}";
+    }
+
+    private string? Id(string part) => TestId is null ? null : $"{TestId}-{part}";
+}

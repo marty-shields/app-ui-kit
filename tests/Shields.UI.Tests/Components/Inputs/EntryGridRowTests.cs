@@ -69,4 +69,50 @@ public class EntryGridRowTests : ComponentTestBase
             Assert.That(row.Find("[data-testid=row]").HasAttribute("aria-hidden"), Is.False);
         });
     }
+
+    [Test]
+    public void AsideWidth_Wide_UsesTheWideAsideToken_AndNormalIsTheDefault()
+    {
+        IRenderedComponent<EntryGridRow> Row(EntryGridAsideWidth? width) => Context.Render<EntryGridRow>(p =>
+        {
+            p.Add(x => x.Aside, Text("57.25kg×12")).Add(x => x.FieldCount, 1);
+            if (width is { } w)
+            {
+                p.Add(x => x.AsideWidth, w);
+            }
+        });
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(Row(EntryGridAsideWidth.Wide).Find(".row").GetAttribute("style"), Is.EqualTo("grid-template-columns: var(--entry-grid-index-width) var(--entry-grid-aside-width-wide) minmax(0, 1fr)"));
+            Assert.That(Row(null).Find(".row").GetAttribute("style"), Is.EqualTo("grid-template-columns: var(--entry-grid-index-width) var(--entry-grid-aside-width) minmax(0, 1fr)"));
+        });
+    }
+
+    [Test]
+    public void AsideWidth_Wide_HeaderAndRowHaveTheSameColumns()
+    {
+        var header = Context.Render<EntryGridRow>(p => p.Add(x => x.Header, true).Add(x => x.Aside, Text("Last")).Add(x => x.FieldCount, 2).Add(x => x.Actions, Text("")).Add(x => x.AsideWidth, EntryGridAsideWidth.Wide));
+        var row = Context.Render<EntryGridRow>(p => p.Add(x => x.Aside, Text("57.25kg×12")).Add(x => x.FieldCount, 2).Add(x => x.Actions, Text("x")).Add(x => x.AsideWidth, EntryGridAsideWidth.Wide));
+
+        Assert.That(header.Find(".row").GetAttribute("style"), Is.EqualTo(row.Find(".row").GetAttribute("style")));
+    }
+
+    [Test]
+    public void AsideWidth_Wide_HasNoEffectWithoutAnAside()
+    {
+        var cut = Context.Render<EntryGridRow>(p => p.Add(x => x.FieldCount, 1).Add(x => x.AsideWidth, EntryGridAsideWidth.Wide));
+
+        Assert.That(cut.Find(".row").GetAttribute("style"), Is.EqualTo("grid-template-columns: var(--entry-grid-index-width) minmax(0, 1fr)"));
+    }
+
+    [Test]
+    public void WideAsideToken_IsWiderThanTheNormalOne()
+    {
+        Assert.Multiple(() =>
+        {
+            Assert.That(DesignTokens.Value("--entry-grid-aside-width"), Is.EqualTo("3.5rem"));
+            Assert.That(DesignTokens.Value("--entry-grid-aside-width-wide"), Is.EqualTo("6rem"));
+        });
+    }
 }

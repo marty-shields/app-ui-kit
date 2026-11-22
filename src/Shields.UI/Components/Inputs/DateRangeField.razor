@@ -9,7 +9,14 @@
             data-testid="@TestId"
             @onclick="() => ExpandedChanged.InvokeAsync(!Expanded)">
         <Icon Name="IconName.Calendar" />
-        <span class="dates" data-testid="@Id("dates")">@DatesText</span>
+        @if (Display == DateRangeDisplay.SharedYear)
+        {
+            <span class="dates kept-whole" data-testid="@Id("dates")" data-wrap-ok>@KeptWhole(DatesText)</span>
+        }
+        else
+        {
+            <span class="dates" data-testid="@Id("dates")">@DatesText</span>
+        }
         @if (Count is not null)
         {
             <span class="count" data-testid="@Id("count")">@Count</span>
@@ -25,13 +32,21 @@
 </div>
 
 @code {
-    /// <summary>The range shown in the field, and the one the calendar opens on. Each end is shown with <see cref="DateFormat"/>; one day shows once.</summary>
+    /// <summary>The range shown in the field, and the one the calendar opens on. <see cref="Display"/> sets how it is written.</summary>
     [Parameter]
     public DateRange Dates { get; set; }
 
-    /// <summary>Format of each date in the field, a .NET date format. Dates are formatted in the invariant culture.</summary>
+    /// <summary>Format of each date in the field, a .NET date format, with <see cref="DateRangeDisplay.EachEnd"/>. Dates are formatted in <see cref="Culture"/>.</summary>
     [Parameter]
     public string DateFormat { get; set; } = "d MMM yyyy";
+
+    /// <summary>How the range is written in the field and its accessible name. <see cref="DateRangeDisplay.EachEnd"/> by default.</summary>
+    [Parameter]
+    public DateRangeDisplay Display { get; set; }
+
+    /// <summary>The culture of the month and day names in the field. Null means the invariant culture (English names), whatever the device's culture.</summary>
+    [Parameter]
+    public CultureInfo? Culture { get; set; }
 
     /// <summary>A number at the end of the field, such as the entries in the range. Null shows none.</summary>
     [Parameter]
@@ -89,11 +104,30 @@
     [Parameter]
     public string? TestId { get; set; }
 
-    private string DatesText => Dates.From == Dates.To ? Format(Dates.From) : $"{Format(Dates.From)} – {Format(Dates.To)}";
+    private string DatesText => Display == DateRangeDisplay.SharedYear ? SharedYearText : Dates.From == Dates.To ? Format(Dates.From) : $"{Format(Dates.From)} – {Format(Dates.To)}";
+
+    private CultureInfo FormatCulture => Culture ?? CultureInfo.InvariantCulture;
+
+    private string SharedYearText
+    {
+        get
+        {
+            var to = Dates.To.ToString("d MMM yyyy", FormatCulture);
+            if (Dates.From == Dates.To)
+            {
+                return $"{Dates.From.ToString("ddd", FormatCulture)} {to}";
+            }
+
+            return $"{Dates.From.ToString(Dates.From.Year == Dates.To.Year ? "d MMM" : "d MMM yyyy", FormatCulture)} – {to}";
+        }
+    }
+
+    /// <summary>No-break spaces inside each date, and ordinary spaces either side of the dash, so the text wraps only at the dash.</summary>
+    private static string KeptWhole(string text) => text.Replace(' ', '\u00A0').Replace("\u00A0–\u00A0", " – ", StringComparison.Ordinal);
 
     private string AccessibleName => $"{Label}: {DatesText}" + (Count is { } count ? $". {(CountText is null ? count.ToString(CultureInfo.InvariantCulture) : CountText(count))}" : "");
 
-    private string Format(DateOnly date) => date.ToString(DateFormat, CultureInfo.InvariantCulture);
+    private string Format(DateOnly date) => date.ToString(DateFormat, FormatCulture);
 
     private string? Id(string part) => TestId is null ? null : $"{TestId}-{part}";
 

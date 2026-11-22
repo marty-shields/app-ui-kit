@@ -19,8 +19,10 @@
     cursor: pointer;
 }
 
+/* The texts take the free room, so with no aside they start right after the leading column instead of being pushed apart from it. */
 .texts {
     display: flex;
+    flex: 1;
     flex-direction: column;
     min-width: 0;
 }

@@ -1,0 +1,59 @@
+@attribute [Stories("Components/Charts/DayStrip")]
+
+<Stories TComponent="DayStrip" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Wednesday">
+        <Template>
+            <div class="card">
+                <DayStrip Days="Week" Done="Trained" Today="Wednesday" Label="Days this week" DoneText="trained" EmptyText="no workout" TestId="day-strip" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Monday, nothing done">
+        <Template>
+            <div class="card">
+                <DayStrip Days="Week" Today="Monday" Label="Days this week" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Sunday">
+        <Template>
+            <div class="card">
+                <DayStrip Days="Week" Done="Trained" Today="Monday.AddDays(6)" Label="Days this week" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <div class="card">
+                    <DayStrip Days="Week" Done="Trained" Today="Wednesday" Label="Days this week" />
+                </div>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <div class="card">
+                    <DayStrip Days="Week" Done="Trained" Today="Wednesday" Label="Days this week" />
+                </div>
+            </div>
+        </Template>
+    </Story>
+
+</Stories>
+
+@code {
+    private static readonly DateOnly Monday = new(2026, 11, 16);
+
+    private static readonly DateOnly Wednesday = Monday.AddDays(2);
+
+    private static readonly IReadOnlyList<DateOnly> Week = [.. Enumerable.Range(0, 7).Select(Monday.AddDays)];
+
+    private static readonly IReadOnlyCollection<DateOnly> Trained = [Monday, Wednesday, Monday.AddDays(5)];
+}

@@ -35,6 +35,12 @@
     font-variant-numeric: tabular-nums;
 }
 
+/* SharedYear: each date is kept whole with no-break spaces, so a long range wraps at the dash instead of ellipsising. */
+.dates.kept-whole {
+    overflow: visible;
+    white-space: normal;
+}
+
 .count {
     color: var(--color-text-muted);
     font-size: var(--font-size-sm);

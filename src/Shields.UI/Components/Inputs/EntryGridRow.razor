@@ -16,9 +16,16 @@
     [Parameter]
     public RenderFragment? Index { get; set; }
 
-    /// <summary>A narrow column after the index, before the fields, such as last time's value: muted, small, on one line. Its width is <c>--entry-grid-aside-width</c>. Null leaves the column out.</summary>
+    /// <summary>A narrow column after the index, before the fields, such as last time's value: muted, small, on one line. Its width is set by <see cref="AsideWidth"/>. Null leaves the column out.</summary>
     [Parameter]
     public RenderFragment? Aside { get; set; }
+
+    /// <summary>
+    /// The width of the <see cref="Aside"/> column: <see cref="EntryGridAsideWidth.Normal"/> (<c>--entry-grid-aside-width</c>, 3.5rem) by default,
+    /// or <see cref="EntryGridAsideWidth.Wide"/> (<c>--entry-grid-aside-width-wide</c>) for a longer text such as 57.25kg×12. Give the header row and every data row the same value, so the columns line up.
+    /// </summary>
+    [Parameter]
+    public EntryGridAsideWidth AsideWidth { get; set; }
 
     /// <summary>The fields, one grid cell each: write exactly <see cref="FieldCount"/> elements. Each cell takes an equal share of the room left.</summary>
     [Parameter]
@@ -47,7 +54,7 @@
             var columns = new List<string> { "var(--entry-grid-index-width)" };
             if (Aside is not null)
             {
-                columns.Add("var(--entry-grid-aside-width)");
+                columns.Add(AsideWidth == EntryGridAsideWidth.Wide ? "var(--entry-grid-aside-width-wide)" : "var(--entry-grid-aside-width)");
             }
 
             columns.AddRange(Enumerable.Repeat("minmax(0, 1fr)", Math.Max(FieldCount, 0)));

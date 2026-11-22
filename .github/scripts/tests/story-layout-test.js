@@ -9,6 +9,9 @@ const scripts = {
   'components-layout-apperrorboundary--error': "console.error('fail: Shields.UI.Components.Layout.AppErrorBoundary[9101]\\n      logged on purpose');",
   // The parser accepts `class="x""` and makes an attribute named `"`.
   'components-layout-card--light': "document.getElementById('app').innerHTML = '<div class=\"x\"\" >styled</div>';",
+  // A one-line clamp hides the wrapped lines, so it passes; the same text unclamped wraps and fails.
+  'components-layout-card--no-title': "document.getElementById('app').innerHTML = '<span style=\"display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:1;overflow-wrap:anywhere;overflow:hidden;width:50px\">Breakfastlonglonglong</span>';",
+  'components-layout-card--heading-level-3': "document.getElementById('app').innerHTML = '<span style=\"display:block;overflow-wrap:anywhere;width:50px\">Breakfastlonglonglong</span>';",
 };
 
 const server = createServer((request, response) => {

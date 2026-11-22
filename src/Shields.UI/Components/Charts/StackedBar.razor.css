@@ -40,7 +40,7 @@
     white-space: nowrap;
 }
 
-/* The text is the only part that shrinks, so the value always stays visible. A one-line clamp ends a cut name with an ellipsis, and letting it break anywhere makes the label's smallest size a few characters instead of the whole name (a nowrap ellipsis would keep the full name as the smallest size, and a fixed width would stop the label growing to the full name). 3ch keeps at least a few characters of every name, since an ellipsis alone says nothing. ch is the width of the text's own font. */
+/* The text is the only part that shrinks, so the value always stays visible. A one-line clamp ends a cut name with an ellipsis, and letting it break anywhere makes the label's smallest size a few characters instead of the whole name (a nowrap ellipsis would keep the full name as the smallest size, and a fixed width would stop the label growing to the full name). 4ch keeps a name readable (a few characters and the ellipsis), since an ellipsis alone says nothing, and it is the widest minimum that still keeps three short names with long values on one row at 346px; a larger one wraps the legend before then. ch is the width of the text's own font. */
 .label-text {
     display: -webkit-box;
     -webkit-box-orient: vertical;
@@ -49,7 +49,7 @@
     overflow-wrap: anywhere;
     white-space: normal;
     flex: 1 1 auto;
-    min-width: 3ch;
+    min-width: 4ch;
     overflow: hidden;
 }
 

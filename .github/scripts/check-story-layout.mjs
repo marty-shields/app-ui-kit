@@ -112,7 +112,9 @@ function inspect() {
     if (el.childElementCount === 0 && el.textContent.trim() && !el.closest(PROSE) && style.whiteSpace !== 'nowrap') {
       const range = document.createRange();
       range.selectNodeContents(el);
-      const lines = new Set([...range.getClientRects()].map((r) => Math.round(r.top)));
+      // Text clipped by overflow (a line-clamp) keeps its hidden lines' rects below the box; only the lines inside the box are seen.
+      const clipped = style.overflowY !== 'visible';
+      const lines = new Set([...range.getClientRects()].filter((r) => !clipped || r.top < box.bottom - 1).map((r) => Math.round(r.top)));
       if (lines.size > 1) findings.push(`${label(el)} wraps onto ${lines.size} lines: "${el.textContent.trim().slice(0, 60)}"`);
     }
   }

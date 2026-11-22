@@ -27,16 +27,18 @@ port="$(cat "$log")"
 
 output=$(node "$here/../check-story-layout.mjs" "http://127.0.0.1:$port" "$chrome" Components/Layout/Card Components/Layout/AppErrorBoundary 2>&1)
 # The stub has no preview box, so every story also gets a layout finding; keep each story heading only above its error and attribute lines.
-actual=$(printf '%s\n' "$output" | awk '/^Components\// { heading = $0 } /^  (page exception|console error|.* has an invalid attribute name)/ { if (heading) print heading; heading = ""; print }')
+actual=$(printf '%s\n' "$output" | awk '/^Components\// { heading = $0 } /^  (page exception|console error|.* has an invalid attribute name|.* wraps onto)/ { if (heading) print heading; heading = ""; print }')
 
 expected='Components/Layout/Card / Compact
   console error: Unhandled exception rendering component: bad attribute
 Components/Layout/Card / Dark
   console error: fail: Shields.UI.Components.Layout.AppErrorBoundary[9101]
+Components/Layout/Card / Heading level 3
+  span wraps onto 4 lines: "Breakfastlonglonglong"
 Components/Layout/Card / Light
   div.x has an invalid attribute name: "\""
 Components/Layout/Card / Title
   page exception: Error: boom from the page'
 
-check "a page exception and a console error fail their story with the first error line; an allowed error is skipped only for its own story; an attribute named a double quote fails" "$expected" "$actual"
+check "a page exception and a console error fail their story with the first error line; an allowed error is skipped only for its own story; an attribute named a double quote fails; clipped clamped text passes and the same text unclamped fails as wrapping" "$expected" "$actual"
 finish

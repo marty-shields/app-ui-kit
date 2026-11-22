@@ -9,8 +9,9 @@
     max-width: var(--stories-narrow-card-width);
 }
 
-.phone-card {
+.phone-screen {
     box-sizing: border-box;
     width: var(--stories-phone-width);
     max-width: 100%;
+    padding: var(--space-4);
 }

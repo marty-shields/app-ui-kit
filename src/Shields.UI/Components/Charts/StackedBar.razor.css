@@ -33,7 +33,6 @@
 
 .label {
     display: flex;
-    flex: 0 1 auto;
     align-items: center;
     max-width: 100%;
     min-width: 0;

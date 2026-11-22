@@ -26,8 +26,8 @@ for _ in $(seq 50); do [ -s "$log" ] && break; sleep 0.1; done
 port="$(cat "$log")"
 
 output=$(node "$here/../check-story-layout.mjs" "http://127.0.0.1:$port" "$chrome" Components/Layout/Card Components/Layout/AppErrorBoundary 2>&1)
-# The stub has no preview box, so every story also gets a layout finding; keep each story heading only above its error and attribute lines.
-actual=$(printf '%s\n' "$output" | awk '/^Components\// { heading = $0 } /^  (page exception|console error|.* has an invalid attribute name|.* wraps onto)/ { if (heading) print heading; heading = ""; print }')
+# The stub has no preview box, so every story also gets a layout finding; keep each story heading only above its error and attribute lines. Header only's late errors are checked below.
+actual=$(printf '%s\n' "$output" | awk '/^Components\// { heading = $0 } /^  (page exception|console error|.* has an invalid attribute name|.* wraps onto)/ && !/left over/ { if (heading) print heading; heading = ""; print }')
 
 expected='Components/Layout/Card / Compact
   console error: Unhandled exception rendering component: bad attribute
@@ -41,4 +41,7 @@ Components/Layout/Card / Title
   page exception: Error: boom from the page'
 
 check "a page exception and a console error fail their story with the first error line; an allowed error is skipped only for its own story; an attribute named a double quote fails; clipped clamped text passes and the same text unclamped fails as wrapping" "$expected" "$actual"
+# One tab checks every story in file order, so Header only's tab moves on to Error. Header only may catch its own first errors; no other story may.
+leak=$(STORY_CONCURRENCY=1 node "$here/../check-story-layout.mjs" "http://127.0.0.1:$port" "$chrome" Components/Layout/Card 2>&1 | awk '/^Components\// { story = $0 } /^  console error: left over/ && story != "Components/Layout/Card / Header only" { print story }')
+check "an error logged after a story's check, while its reused tab moves on, is not blamed on the next story" "" "$leak"
 finish

@@ -9,6 +9,8 @@ const scripts = {
   'components-layout-apperrorboundary--error': "console.error('fail: Shields.UI.Components.Layout.AppErrorBoundary[9101]\\n      logged on purpose');",
   // The parser accepts `class="x""` and makes an attribute named `"`.
   'components-layout-card--light': "document.getElementById('app').innerHTML = '<div class=\"x\"\" >styled</div>';",
+  // Starts logging once the checker has looked at the page (its placeholder probe is the signal) and keeps on until the tab moves on, so the story that tab checks next must not be blamed for it.
+  'components-layout-card--header-only': "document.getElementById('app').innerHTML = '<input placeholder=\"x\">'; new MutationObserver(() => setInterval(() => console.error('left over from Header only'), 1)).observe(document.body, { childList: true });",
   // A one-line clamp hides the wrapped lines, so it passes; the same text unclamped wraps and fails.
   'components-layout-card--no-title': "document.getElementById('app').innerHTML = '<span style=\"display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:1;overflow-wrap:anywhere;overflow:hidden;width:50px\">Breakfastlonglonglong</span>';",
   'components-layout-card--heading-level-3': "document.getElementById('app').innerHTML = '<span style=\"display:block;overflow-wrap:anywhere;width:50px\">Breakfastlonglonglong</span>';",

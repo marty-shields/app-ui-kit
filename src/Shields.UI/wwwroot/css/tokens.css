@@ -162,6 +162,9 @@
     --stacked-bar-gap: 0.25rem;
     /* StackedBar: the narrowest a drawn segment gets, so a tiny share stays visible. */
     --stacked-bar-segment-min-width: 0.25rem;
+    /* StackedBar legend: its swatch and its text (names and values), smaller than the other legends so three names with their values fit on one line in a phone card. */
+    --stacked-bar-swatch-size: 0.5rem;
+    --stacked-bar-font-size: 0.8125rem;
     /* AppScreen: extra room under the content when the bottom navigation bar's raised button overlaps its foot. */
     --app-screen-nav-clearance: 0.75rem;
     /* StatTile compact: the tile's padding and value size, so a row of small tiles stays short. */

@@ -16,7 +16,7 @@
             @for (var i = 0; i < Segments.Count; i++)
             {
                 var segment = Segments[i];
-                <span class="label @segment.Series.CssClass()" data-testid="@Id($"label-{i}")"><span class="label-text">@segment.Label</span> <strong>@ValueText(segment)</strong></span>
+                <span class="label @segment.Series.CssClass()" data-testid="@Id($"label-{i}")"><span class="label-text" style="@LabelMin(segment.Label)">@segment.Label</span> <strong>@ValueText(segment)</strong></span>
             }
         </div>
     }
@@ -96,6 +96,10 @@
         var number = Counted(segment.Value).ToString("#,0.#", CultureInfo.InvariantCulture);
         return string.IsNullOrEmpty(Unit) ? number : $"{number} {Unit}";
     }
+
+    // About five characters of a cut name stay readable; a shorter name needs no more than its own length, so it is not padded.
+    private static string LabelMin(string? label) =>
+        $"--label-min: min(5ch, {new StringInfo((label ?? "").Trim()).LengthInTextElements.ToString(CultureInfo.InvariantCulture)}ch)";
 
     private string? Id(string part) => TestId is null ? null : $"{TestId}-{part}";
 }

@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.RegularExpressions;
 using Shields.UI.Components.Charts;
 
@@ -215,7 +216,7 @@ public class StackedBarTests : ComponentTestBase
 
         Assert.Multiple(() =>
         {
-            Assert.That(Rule(".label-text"), Does.Contain("min-width: 4ch;").And.Contain("overflow: hidden;").And.Contain("-webkit-line-clamp: 1;"));
+            Assert.That(Rule(".label-text"), Does.Contain("overflow: hidden;").And.Contain("-webkit-line-clamp: 1;"));
             Assert.That(Rule(".label"), Does.Not.Contain("overflow").And.Not.Contain("line-clamp"));
             Assert.That(Rule(".label strong"), Does.Contain("flex-shrink: 0;"));
             Assert.That(Rule(".label::before"), Does.Contain("flex-shrink: 0;"));
@@ -236,7 +237,7 @@ public class StackedBarTests : ComponentTestBase
     }
 
     [Test]
-    public void Css_LabelsWrapOnlyWhenTheShrunkLabelsDoNotFit_AndNamesKeepFourCharacters()
+    public void Css_LabelsWrapOnlyWhenTheShrunkLabelsDoNotFit_AndNamesKeepTheirPerLabelMinimum()
     {
         var css = RepoFiles.Read("src", "Shields.UI", "Components", "Charts", "StackedBar.razor.css");
         string Rule(string selector) => Regex.Match(css, Regex.Escape(selector) + @"\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
@@ -246,10 +247,47 @@ public class StackedBarTests : ComponentTestBase
             Assert.That(css, Does.Not.Contain("@container"));
             Assert.That(Rule(".labels"), Does.Contain("flex-wrap: wrap;"));
             Assert.That(Rule(".label"), Does.Contain("flex: 1 1 min-content;").And.Contain("max-width: max-content;"));
-            Assert.That(Rule(".label-text"), Does.Contain("overflow-wrap: anywhere;").And.Contain("white-space: normal;").And.Contain("min-width: 4ch;").And.Not.Contain("nowrap"));
+            Assert.That(Rule(".label-text"), Does.Contain("overflow-wrap: anywhere;").And.Contain("white-space: normal;").And.Not.Contain("nowrap"));
+            // The plain minimum comes first, as the fallback for a browser without calc-size().
+            Assert.That(Rule(".label-text"), Does.Contain("--label-min: 5ch;"));
+            Assert.That(Rule(".label-text"), Does.Match(@"min-width: var\(--label-min\);\s*min-width: calc-size\(max-content, min\(size, var\(--label-min\)\)\);"));
+            Assert.That(css, Does.Not.Contain("4ch"));
+            Assert.That(Rule(".labels"), Does.Contain("gap: var(--space-1);"));
             Assert.That(Rule(".label strong"), Does.Contain("margin-left: var(--space-1);"));
-            Assert.That(Rule(".label::before"), Does.Contain("width: var(--legend-swatch-size);"));
+            Assert.That(Rule(".label::before"), Does.Contain("width: var(--stacked-bar-swatch-size);").And.Contain("height: var(--stacked-bar-swatch-size);"));
+            Assert.That(Rule(".labels"), Does.Contain("font-size: var(--stacked-bar-font-size);"));
         });
+    }
+
+    [TestCase("Fat", "min(5ch, 3ch)")]
+    [TestCase("Carbs", "min(5ch, 5ch)")]
+    [TestCase("Protein", "min(5ch, 7ch)")]
+    [TestCase("  Fat  ", "min(5ch, 3ch)")]
+    [TestCase("e\u0301te\u0301", "min(5ch, 3ch)")]
+    [TestCase("", "min(5ch, 0ch)")]
+    [TestCase("   ", "min(5ch, 0ch)")]
+    public void Render_EachName_GetsAMinimumOfFiveCharactersCappedAtItsOwnLength(string name, string expected)
+    {
+        var cut = Render([new(name, 10, DataSeries.One)]);
+
+        Assert.That(cut.Find("[data-testid=bar-label-0] .label-text").GetAttribute("style"), Is.EqualTo($"--label-min: {expected}"));
+    }
+
+    [Test]
+    public void Render_LabelMinimum_UsesTheInvariantCulture()
+    {
+        var previous = CultureInfo.CurrentCulture;
+        try
+        {
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("de-DE");
+            var cut = Render([new(new string('a', 1234), 10, DataSeries.One)]);
+
+            Assert.That(cut.Find("[data-testid=bar-label-0] .label-text").GetAttribute("style"), Is.EqualTo("--label-min: min(5ch, 1234ch)"));
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = previous;
+        }
     }
 
     [TestCase(1, 1, 1, "North 1 g, 34%", "South 1 g, 33%; East 1 g, 33%")]

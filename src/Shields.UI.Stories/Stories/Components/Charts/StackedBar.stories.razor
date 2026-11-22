@@ -40,7 +40,13 @@
 
     <Story Name="Card width legend">
         <Template>
-            <div class="phone-screen"><div class="themed card-stand-in"><StackedBar Label="Average macros" Unit="g" Segments="@([new StackedBarSegment("Protein", 182.6, DataSeries.One), new StackedBarSegment("Carbs", 245.0, DataSeries.Two), new StackedBarSegment("Fat", 91.3, DataSeries.Three)])" TestId="bar" /></div></div>
+            <div class="phone-screen"><div class="themed card-stand-in"><StackedBar Label="Average macros" Unit="g" Segments="@([new StackedBarSegment("Protein", 182.6, DataSeries.One), new StackedBarSegment("Carbs", 365.3, DataSeries.Two), new StackedBarSegment("Fat", 91.3, DataSeries.Three)])" TestId="bar" /></div></div>
+        </Template>
+    </Story>
+
+    <Story Name="Card width legend with wider values">
+        <Template>
+            <div class="phone-screen"><div class="themed card-stand-in"><StackedBar Label="Average macros" Unit="g" Segments="@([new StackedBarSegment("Protein", 188.8, DataSeries.One), new StackedBarSegment("Carbs", 388.8, DataSeries.Two), new StackedBarSegment("Fat", 188.8, DataSeries.Three)])" TestId="bar" /></div></div>
         </Template>
     </Story>
 

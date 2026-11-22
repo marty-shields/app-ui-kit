@@ -216,10 +216,49 @@ public class NoteFieldTests : ComponentTestBase
         {
             Assert.That(textarea.ClassList, Does.Contain("invalid"));
             Assert.That(textarea.GetAttribute("aria-invalid"), Is.EqualTo("true"));
-            Assert.That(textarea.GetAttribute("aria-describedby"), Is.EqualTo("note-error"));
+            Assert.That(textarea.GetAttribute("aria-describedby"), Does.EndWith(error.GetAttribute("id")!));
             Assert.That(error.GetAttribute("role"), Is.EqualTo("alert"));
-            Assert.That(error.GetAttribute("id"), Is.EqualTo("note-error"));
+            Assert.That(error.GetAttribute("id"), Does.Contain("-error"));
             Assert.That(error.TextContent, Is.EqualTo("Note must be 500 characters or less"));
+        });
+    }
+
+    [Test]
+    public void ErrorId_IsPerInstance_EvenWithoutATestId()
+    {
+        var first = Context.Render<NoteField>(p => p.Add(x => x.Label, "Note").Add(x => x.Editing, true).Add(x => x.Error, "Too long"));
+        var second = Context.Render<NoteField>(p => p.Add(x => x.Label, "Note").Add(x => x.Editing, true).Add(x => x.Error, "Too long"));
+
+        Assert.That(first.Find("p.error").GetAttribute("id"), Is.Not.EqualTo(second.Find("p.error").GetAttribute("id")));
+    }
+
+    [Test]
+    public void Typing_OnlyWhitespace_KeepsItInTheTextBox_WhileTheValueIsNull()
+    {
+        string? value = "Belt on";
+        var cut = Render(p => p.Add(x => x.Editing, true).Add(x => x.Value, "Belt on").Add(x => x.ValueChanged, (string? v) => value = v));
+
+        cut.Find("textarea").Input("   ");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(value, Is.Null);
+            Assert.That(cut.Find("textarea").GetAttribute("value"), Is.EqualTo("   "));
+        });
+    }
+
+    [Test]
+    public void Count_IsOutsideTheLabel_AndDescribesTheTextBox()
+    {
+        var cut = Render(p => p.Add(x => x.Editing, true).Add(x => x.Value, "Belt on"));
+
+        var count = cut.Find("[data-testid=note-count]");
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.FindAll("label [data-testid=note-count]"), Is.Empty);
+            Assert.That(cut.Find("label").TextContent, Is.EqualTo("Note"));
+            Assert.That(cut.Find("label").GetAttribute("for"), Is.EqualTo(cut.Find("textarea").GetAttribute("id")));
+            Assert.That(cut.Find("textarea").GetAttribute("aria-describedby"), Does.Contain(count.GetAttribute("id")!));
         });
     }
 

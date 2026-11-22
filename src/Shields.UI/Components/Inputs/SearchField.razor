@@ -3,31 +3,33 @@
 @using Shields.UI.Components.Actions
 @using Shields.UI.Components.Layout
 
-<div class="search input-box">
-    <Icon Name="IconName.Search" Tone="IconTone.Muted" />
-    <input type="search"
-           class="input"
-           value="@Value"
-           placeholder="@Placeholder"
-           aria-label="@AriaLabel"
-           autocomplete="off"
-           enterkeyhint="search"
-           maxlength="@MaxLength"
-           data-testid="@TestId"
-           @key="generation"
-           @ref="input"
-           @oninput="OnInput"
-           @onkeydown="OnKeyDown" />
-    @if (Trailing is not null)
+<div class="search-field">
+    <div class="search input-box">
+        <Icon Name="IconName.Search" Tone="IconTone.Muted" />
+        <input type="search"
+               class="input"
+               value="@Value"
+               placeholder="@Placeholder"
+               aria-label="@AriaLabel"
+               autocomplete="off"
+               enterkeyhint="search"
+               maxlength="@MaxLength"
+               data-testid="@TestId"
+               @key="generation"
+               @ref="input"
+               @oninput="OnInput"
+               @onkeydown="OnKeyDown" />
+        @if (Trailing is not null)
+        {
+            <span class="divider-slot"><Divider Vertical Decorative /></span>
+            <span class="trailing">@Trailing</span>
+        }
+    </div>
+    @if (ResultText is not null)
     {
-        <span class="divider-slot"><Divider Vertical Decorative /></span>
-        <span class="trailing">@Trailing</span>
+        <p class="results" role="status" aria-live="polite" data-testid="@(TestId is null ? null : $"{TestId}-results")">@ResultText</p>
     }
 </div>
-@if (ResultText is not null)
-{
-    <p class="results" role="status" aria-live="polite" data-testid="@(TestId is null ? null : $"{TestId}-results")">@ResultText</p>
-}
 
 @code {
     private int generation;

@@ -4,21 +4,22 @@
     <div class="note-field" data-testid="@TestId">
         @if (Editing)
         {
-            <label class="field">
-                <span class="heading">
-                    <span class="label">@Label</span>
-                    <span class="count @(Over ? "over" : null)" data-testid="@Id("count")">@(Value?.Length ?? 0)@(MaxLength is { } max ? $"/{max}" : null)</span>
-                </span>
+            <div class="field">
+                <div class="heading">
+                    <label class="label" for="@InputId">@Label</label>
+                    <span class="count @(Over ? "over" : null)" id="@CountId" data-testid="@Id("count")">@(Value?.Length ?? 0)@(MaxLength is { } max ? $"/{max}" : null)</span>
+                </div>
                 <textarea @ref="input"
+                          id="@InputId"
                           rows="3"
                           class="input @(Error is not null ? "invalid" : null)"
                           aria-invalid="@(Error is not null || Over ? "true" : null)"
-                          aria-describedby="@(Error is not null ? ErrorId : null)"
+                          aria-describedby="@(Error is not null ? $"{CountId} {ErrorId}" : CountId)"
                           data-testid="@Id("input")"
-                          value="@Value"
+                          value="@draft"
                           @oninput="OnInput"
                           @onblur="OnBlur"></textarea>
-            </label>
+            </div>
         }
         else
         {
@@ -72,7 +73,14 @@
     private bool wasShown;
     private bool focusRequested;
 
-    private string ErrorId => $"{TestId ?? "note"}-error";
+    private readonly string instanceId = $"note-field-{Guid.NewGuid():N}";
+    private string? draft;
+
+    private string ErrorId => $"{instanceId}-error";
+
+    private string CountId => $"{instanceId}-count";
+
+    private string InputId => $"{instanceId}-input";
 
     private bool Visible => Editing || !string.IsNullOrWhiteSpace(Value);
 
@@ -111,16 +119,27 @@
         await EditingChanged.InvokeAsync(editing);
     }
 
+    protected override void OnParametersSet()
+    {
+        if (BlankToNull(draft) != Value)
+        {
+            draft = Value;
+        }
+    }
+
+    private static string? BlankToNull(string? text) => string.IsNullOrWhiteSpace(text) ? null : text;
+
     private Task OnInput(ChangeEventArgs e)
     {
-        var text = e.Value as string;
-        Value = string.IsNullOrWhiteSpace(text) ? null : text;
+        draft = e.Value as string;
+        Value = BlankToNull(draft);
         return ValueChanged.InvokeAsync(Value);
     }
 
     private async Task OnBlur()
     {
         var trimmed = Value?.Trim();
+        draft = trimmed;
         if (trimmed != Value)
         {
             Value = trimmed;

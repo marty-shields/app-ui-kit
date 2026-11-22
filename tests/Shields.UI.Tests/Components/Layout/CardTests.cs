@@ -50,6 +50,29 @@ public class CardTests : ComponentTestBase
         });
     }
 
+    [Test]
+    public void Heading_CarriesTheCardsScopeAttribute_SoTheTitleStyleApplies()
+    {
+        var cut = Context.Render<Card>(p => p.Add(x => x.Title, "Records").Add(x => x.HeadingLevel, 4));
+
+        var scope = cut.Find(".card").Attributes.Single(a => a.Name.StartsWith("b-", StringComparison.Ordinal)).Name;
+        Assert.That(cut.Find("h4.title").HasAttribute(scope), Is.True);
+    }
+
+    [Test]
+    public void Css_Selected_UsesTheSelectedAndAccentColours_AndTheErrorBorderWins()
+    {
+        var selected = CssRules.Declarations("Card", ".card.selected");
+        var selectedError = CssRules.Declarations("Card", ".card.selected.error");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(selected["background-color"], Is.EqualTo("var(--color-card-selected)"));
+            Assert.That(selected["border-color"], Is.EqualTo("var(--color-accent)"));
+            Assert.That(selectedError["border-color"], Is.EqualTo("var(--color-error)"));
+        });
+    }
+
     [TestCase(0, "H1")]
     [TestCase(9, "H6")]
     public void HeadingLevel_OutsideOneToSix_IsClamped(int level, string tag)

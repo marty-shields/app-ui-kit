@@ -219,5 +219,29 @@ public class SearchFieldTests : ComponentTestBase
         });
     }
 
+    [Test]
+    public void FocusOnShow_DoesNotFocusAgainOnLaterRenders()
+    {
+        Context.JSInterop.Mode = JSRuntimeMode.Loose;
+        var cut = Context.Render<SearchField>(p => p.Add(x => x.AriaLabel, "Search").Add(x => x.FocusOnShow, true));
+
+        cut.Render(p => p.Add(x => x.AriaLabel, "Find").Add(x => x.FocusOnShow, true));
+
+        Assert.That(FocusCalls(), Is.EqualTo(1));
+    }
+
+    [Test]
+    public void BoxAndResultLine_ShareOneRoot()
+    {
+        var cut = Context.Render<SearchField>(p => p.Add(x => x.AriaLabel, "Search").Add(x => x.ResultText, "3 results"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Nodes.Length, Is.EqualTo(1));
+            Assert.That(cut.Find(".search-field > .search"), Is.Not.Null);
+            Assert.That(cut.Find(".search-field > .results").TextContent, Is.EqualTo("3 results"));
+        });
+    }
+
     private int FocusCalls() => Context.JSInterop.Invocations.Count(i => i.Identifier == "Blazor._internal.domWrapper.focus");
 }

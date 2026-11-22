@@ -60,13 +60,6 @@ else
         Divider ? null : "no-divider",
     }.Where(c => c is not null));
 
-    private string ChangeClass => Change?.Direction switch
-    {
-        ChangeDirection.Up => "up",
-        ChangeDirection.Down => "down",
-        _ => "same",
-    };
-
     private RenderFragment Body =>
         @<text>
             @if (Leading is not null)
@@ -80,19 +73,7 @@ else
             }
             @if (Change is not null)
             {
-                <span class="change @ChangeClass" data-wrap-ok>
-                    @if (Change.Direction == ChangeDirection.None)
-                    {
-                        <span aria-hidden="true">—</span>
-                        <span class="visually-hidden">no change</span>
-                    }
-                    else
-                    {
-                        <Icon Name="Change.Direction == ChangeDirection.Up ? IconName.Up : IconName.Down" Tone="Change.Direction == ChangeDirection.Up ? IconTone.Success : IconTone.Error" Size="IconSize.Small" />
-                        <span class="visually-hidden">@(Change.Direction == ChangeDirection.Up ? "up " : "down ")</span>
-                        @Change.Amount
-                    }
-                </span>
+                <ChangeIndicator Change="Change" />
             }
             @if (Trailing is not null)
             {

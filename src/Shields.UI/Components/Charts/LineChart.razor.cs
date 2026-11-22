@@ -27,7 +27,7 @@ public partial class LineChart
     private const double CharWidth = 10;
     private const double LineHeight = 14;
 
-    // Smallest tick step: the 0.1 a weight shows; time steps start at 1 second.
+    // Smallest tick step: the 0.1 a value shows; time steps start at 1 second.
     private const decimal MinStep = 0.1m;
 
     private static readonly decimal[] NiceSteps = [1m, 2m, 5m, 10m];
@@ -57,7 +57,7 @@ public partial class LineChart
     [Parameter]
     public bool TimeScale { get; set; }
 
-    /// <summary>Accessible name of the chart, such as "Top set, last 3 months".</summary>
+    /// <summary>Accessible name of the chart, such as "Average, last 3 months".</summary>
     [Parameter, EditorRequired]
     public string Label { get; set; } = "";
 

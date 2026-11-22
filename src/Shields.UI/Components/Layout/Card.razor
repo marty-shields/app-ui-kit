@@ -39,14 +39,30 @@ else
         ChildContent is null && HeaderActions is not null ? "header-only-actions" : null,
     }.Where(c => c is not null));
 
-    private RenderFragment Heading => builder =>
-    {
-        builder.OpenElement(0, $"h{Math.Clamp(HeadingLevel, 1, 6)}");
-        builder.AddAttribute(1, "class", "title");
-        builder.AddAttribute(2, "data-wrap-ok", true);
-        builder.AddContent(3, Title);
-        builder.CloseElement();
-    };
+    private RenderFragment Heading =>
+        @<text>
+            @switch (Math.Clamp(HeadingLevel, 1, 6))
+            {
+                case 1:
+                    <h1 class="title" data-wrap-ok>@Title</h1>
+                    break;
+                case 2:
+                    <h2 class="title" data-wrap-ok>@Title</h2>
+                    break;
+                case 3:
+                    <h3 class="title" data-wrap-ok>@Title</h3>
+                    break;
+                case 4:
+                    <h4 class="title" data-wrap-ok>@Title</h4>
+                    break;
+                case 5:
+                    <h5 class="title" data-wrap-ok>@Title</h5>
+                    break;
+                default:
+                    <h6 class="title" data-wrap-ok>@Title</h6>
+                    break;
+            }
+        </text>;
 
     /// <summary>Heading of the card. Null shows a plain card with no heading, and no aside.</summary>
     [Parameter]

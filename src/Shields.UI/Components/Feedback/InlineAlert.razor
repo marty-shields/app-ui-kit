@@ -1,11 +1,11 @@
-@if (!string.IsNullOrEmpty(Message) || ChildContent is not null || Shown.Count > 0)
+@if (!string.IsNullOrEmpty(Message) || ChildContent is not null || shown.Count > 0)
 {
     <div class="alert @ToneClass" role="alert" data-testid="@TestId">
         @Message
-        @if (Shown.Count > 0)
+        @if (shown.Count > 0)
         {
             <ul class="messages" data-testid="@(TestId is null ? null : $"{TestId}-messages")">
-                @foreach (var message in Shown)
+                @foreach (var message in shown)
                 {
                     <li>@message</li>
                 }
@@ -36,7 +36,9 @@
     [Parameter]
     public string? TestId { get; set; }
 
-    private IReadOnlyList<string> Shown => Messages?.Where(m => !string.IsNullOrWhiteSpace(m)).ToList() ?? [];
+    private IReadOnlyList<string> shown = [];
+
+    protected override void OnParametersSet() => shown = Messages?.Where(m => !string.IsNullOrWhiteSpace(m)).ToList() ?? [];
 
     private string ToneClass => Tone switch
     {

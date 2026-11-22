@@ -1,5 +1,5 @@
 @using System.Globalization
-@if (Counts.All(count => count == 0))
+@if (!Counts.Any(count => count > 0))
 {
     <p class="none" data-testid="@Id("none")">@EmptyText</p>
 }
@@ -64,7 +64,7 @@ else
     [Parameter]
     public string? EndLabel { get; set; }
 
-    /// <summary>The text alternative of one bar, from its position (from 0) and its count, e.g. <c>(i, n) => $"{n} sessions"</c>. Read out in a list that is not shown. The count by itself when null.</summary>
+    /// <summary>The text alternative of one bar, from its position (from 0) and its count, e.g. <c>(i, n) => $"{n} items"</c>. Read out in a list that is not shown. The count by itself when null.</summary>
     [Parameter]
     public Func<int, int, string>? ValueText { get; set; }
 

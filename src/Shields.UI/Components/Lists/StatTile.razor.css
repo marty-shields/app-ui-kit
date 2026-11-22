@@ -23,24 +23,8 @@
     overflow-wrap: anywhere;
 }
 
-.change {
-    display: flex;
+.tile ::deep .change {
     flex-wrap: wrap;
-    align-items: center;
-    font-size: var(--font-size-sm);
-    font-variant-numeric: tabular-nums;
-}
-
-.up {
-    color: var(--color-success);
-}
-
-.down {
-    color: var(--color-error);
-}
-
-.same {
-    color: var(--color-text-muted);
 }
 
 .caption {

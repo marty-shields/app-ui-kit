@@ -181,6 +181,32 @@ public class ListRowTests : ComponentTestBase
     }
 
     [Test]
+    public void Css_Headline_GivesEveryPartItsOwnGridCell()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Lists", "ListRow.razor.css");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(css, Does.Contain("grid-template-columns: auto minmax(0, 1fr) auto auto auto auto;"));
+            Assert.That(css, Does.Contain(".headline .leading {\n    grid-column: 1;"));
+            Assert.That(css, Does.Contain(".headline .text {\n    grid-column: 2;"));
+            Assert.That(css, Does.Contain(".headline .aside {\n    grid-column: 3;"));
+            Assert.That(css, Does.Contain(".headline .change {\n    grid-column: 4;"));
+            Assert.That(css, Does.Contain(".headline .trailing {\n    grid-column: 5;"));
+            Assert.That(css, Does.Contain(".headline .chevron {\n    grid-column: 6;"));
+            Assert.That(css, Does.Contain(".headline .detail {\n    grid-column: 2 / -1;"));
+        });
+    }
+
+    [Test]
+    public void Change_RootHasItsOwnScopeAttribute_SoTheChangeStyleApplies()
+    {
+        var cut = Context.Render<ListRow>(p => p.Add(x => x.Text, "Squat").Add(x => x.Change, new StatChange(ChangeDirection.Up, "5kg")));
+
+        Assert.That(cut.Find(".change").Attributes.Any(a => a.Name.StartsWith("b-", StringComparison.Ordinal)), Is.True);
+    }
+
+    [Test]
     public void HeadlineLayout_PutsTheTextAndAsideOnOneLine_AndTheDetailUnderThem()
     {
         var cut = Context.Render<ListRow>(p => p

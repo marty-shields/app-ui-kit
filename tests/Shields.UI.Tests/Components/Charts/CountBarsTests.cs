@@ -45,6 +45,12 @@ public class CountBarsTests : ComponentTestBase
     }
 
     [Test]
+    public void AllZeroOrNegative_ShowsTheEmptyText()
+    {
+        Assert.That(Render([0, -1]).FindAll("[data-testid=bars-none]"), Has.Count.EqualTo(1));
+    }
+
+    [Test]
     public void AllZero_ShowsTheEmptyTextInsteadOfTheChart()
     {
         var cut = Render([0, 0], p => p.Add(x => x.EmptyText, "No sessions yet"));

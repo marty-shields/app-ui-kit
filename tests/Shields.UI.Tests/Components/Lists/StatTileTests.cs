@@ -57,14 +57,14 @@ public class StatTileTests : ComponentTestBase
     {
         var change = new StatChange(direction, "35m");
         var compact = Context.Render<StatTile>(p => p.Add(x => x.Label, "Time").Add(x => x.Value, "3").Add(x => x.Change, change).Add(x => x.Compact, true).Add(x => x.TestId, "tile"));
-        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Lists", "StatTile.razor.css");
+        var changeCss = RepoFiles.Read("src", "Shields.UI", "Components", "Lists", "ChangeIndicator.razor.css");
 
         Assert.Multiple(() =>
         {
             Assert.That(compact.Find("[data-testid=tile-change]").ClassList, Does.Contain(changeClass));
             Assert.That(compact.Find(".change svg").ClassList, Does.Contain(iconClass));
             Assert.That(compact.Find(".change svg").ClassList, Does.Not.Contain("muted"));
-            Assert.That(css, Does.Contain($".{changeClass} {{\n    color: var(--color-{iconClass});"));
+            Assert.That(changeCss, Does.Contain($".{changeClass} {{\n    color: var(--color-{iconClass});"));
         });
     }
 

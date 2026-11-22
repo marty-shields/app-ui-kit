@@ -23,4 +23,13 @@ public enum TextVariant
 
     /// <summary>Text in the error colour.</summary>
     Error,
+
+    /// <summary>Large bold heading in the normal text colour, smaller than <see cref="Figure"/>.</summary>
+    Heading,
+
+    /// <summary>Muted, small, bold text with figures of equal width, for a total.</summary>
+    MutedSmallStrong,
+
+    /// <summary>Bold text in the success colour in the small size.</summary>
+    SuccessSmall,
 }

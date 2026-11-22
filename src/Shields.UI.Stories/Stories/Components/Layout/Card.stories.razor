@@ -26,6 +26,15 @@
         </Template>
     </Story>
 
+    <Story Name="Heading level 3">
+        <Template>
+            <section>
+                <h2 class="body">Session</h2>
+                <Card Title="Bench press" HeadingLevel="3" TestId="heading-level"><p class="body" data-wrap-ok>The title is an h3, as the card sits under an h2.</p></Card>
+            </section>
+        </Template>
+    </Story>
+
     <Story Name="Header actions">
         <Template>
             <Card Title="Bench press" TestId="card">
@@ -71,6 +80,24 @@
                     <ChildContent>
                         <InlineAlert Tone="AlertTone.Error" Message="Enter the weight for set 2." />
                     </ChildContent>
+                </Card>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Selected">
+        <Template>
+            <Card Title="Set 2" HeadingLevel="3" Selected TestId="selected">
+                <p class="body" data-wrap-ok>The open set, tinted. <SuccessBadge Text="Record" /></p>
+            </Card>
+        </Template>
+    </Story>
+
+    <Story Name="Selected, dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <Card Title="Set 2" Aside="Open" HeadingLevel="3" Selected>
+                    <p class="body" data-wrap-ok>The open set, tinted.</p>
                 </Card>
             </div>
         </Template>

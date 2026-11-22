@@ -1,0 +1,38 @@
+@using Shields.UI.Components.Actions
+<button type="button" class="note @(Expanded ? "open" : null)" aria-expanded="@(Expanded ? "true" : "false")" data-testid="@TestId" @onclick="Toggle">
+    <Icon Name="Icon" Tone="IconTone.Muted" Size="IconSize.Small" />
+    <span class="visually-hidden">@Label: </span>
+    <span class="text" data-wrap-ok>@Text</span>
+</button>
+
+@code {
+    /// <summary>The note.</summary>
+    [Parameter, EditorRequired]
+    public string Text { get; set; } = "";
+
+    /// <summary>What the note is, read out before it by screen readers and not shown, such as "Last note".</summary>
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = "";
+
+    /// <summary>The icon before the text. The note icon by default.</summary>
+    [Parameter]
+    public IconName Icon { get; set; } = IconName.Note;
+
+    /// <summary>Shows the whole note, wrapped, instead of one line cut with an ellipsis.</summary>
+    [Parameter]
+    public bool Expanded { get; set; }
+
+    /// <summary>Raised with the new value when the note is tapped. Makes <see cref="Expanded"/> two-way bindable; the note also toggles itself without a handler.</summary>
+    [Parameter]
+    public EventCallback<bool> ExpandedChanged { get; set; }
+
+    /// <summary>Value of the data-testid attribute.</summary>
+    [Parameter]
+    public string? TestId { get; set; }
+
+    private Task Toggle()
+    {
+        Expanded = !Expanded;
+        return ExpandedChanged.InvokeAsync(Expanded);
+    }
+}

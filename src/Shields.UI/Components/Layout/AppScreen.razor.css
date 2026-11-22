@@ -151,3 +151,7 @@
 .with-nav:has(.status-slot > *) .content {
     padding-bottom: calc(var(--space-4) + var(--raised) + var(--app-screen-nav-clearance) + 2 * var(--touch-target));
 }
+
+.toolbar.divided {
+    border-bottom: var(--border-width) solid var(--color-border);
+}

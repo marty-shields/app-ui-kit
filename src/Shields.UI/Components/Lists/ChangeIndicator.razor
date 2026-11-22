@@ -1,0 +1,30 @@
+<span class="change @ChangeClass" data-wrap-ok data-testid="@TestId">
+    @if (Change.Direction == ChangeDirection.None)
+    {
+        <span aria-hidden="true">—</span>
+        <span class="visually-hidden">no change</span>
+    }
+    else
+    {
+        <Icon Name="Change.Direction == ChangeDirection.Up ? IconName.Up : IconName.Down" Tone="Change.Direction == ChangeDirection.Up ? IconTone.Success : IconTone.Error" Size="IconSize.Small" />
+        <span class="visually-hidden">@(Change.Direction == ChangeDirection.Up ? "up " : "down ")</span>
+        @Change.Amount
+    }
+</span>
+
+@code {
+    /// <summary>How the value moved. Shown as a coloured arrow with the amount, or a dash for no change, read out as "up", "down" or "no change".</summary>
+    [Parameter, EditorRequired]
+    public StatChange Change { get; set; } = null!;
+
+    /// <summary>Value of the data-testid attribute.</summary>
+    [Parameter]
+    public string? TestId { get; set; }
+
+    private string ChangeClass => Change.Direction switch
+    {
+        ChangeDirection.Up => "up",
+        ChangeDirection.Down => "down",
+        _ => "same",
+    };
+}

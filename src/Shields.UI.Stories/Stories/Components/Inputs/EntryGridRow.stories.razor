@@ -1,0 +1,76 @@
+@attribute [Stories("Components/Inputs/EntryGridRow")]
+
+<Stories TComponent="EntryGridRow" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Rows with a header">
+        <Template>
+            <EntryGridRow Header FieldCount="2">
+                <Index>#</Index>
+                <Fields><span>Weight (kg)</span><span>Reps</span></Fields>
+            </EntryGridRow>
+            <div class="rows">
+                <EntryGridRow FieldCount="2" TestId="row-1">
+                    <Index>1</Index>
+                    <Fields>
+                        <ValueField Kind="ValueKind.Fractional" Label="Weight (kg), set 1" ShowLabel="false" Compact Value="60" />
+                        <ValueField Kind="ValueKind.Whole" Label="Reps, set 1" ShowLabel="false" Compact Value="8" />
+                    </Fields>
+                    <Actions><IconButton Icon="IconName.Close" AriaLabel="Remove set 1" Muted Size="IconSize.Small" /></Actions>
+                </EntryGridRow>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="With a last-time column">
+        <Template>
+            <EntryGridRow Header FieldCount="2">
+                <Index>#</Index>
+                <Aside>Last</Aside>
+                <Fields><span>Weight</span><span>Reps</span></Fields>
+            </EntryGridRow>
+            <div class="rows">
+                <EntryGridRow FieldCount="2">
+                    <Index>2</Index>
+                    <Aside>60×8</Aside>
+                    <Fields>
+                        <ValueField Kind="ValueKind.Fractional" Label="Weight (kg), set 2" ShowLabel="false" Compact Value="62.5" />
+                        <ValueField Kind="ValueKind.Whole" Label="Reps, set 2" ShowLabel="false" Compact />
+                    </Fields>
+                    <Actions><IconButton Icon="IconName.Close" AriaLabel="Remove set 2" Muted Size="IconSize.Small" /></Actions>
+                </EntryGridRow>
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Three fields">
+        <Template>
+            <EntryGridRow FieldCount="3">
+                <Index>1</Index>
+                <Fields>
+                    <ValueField Kind="ValueKind.Fractional" Label="Distance (km)" ShowLabel="false" Compact Value="5" />
+                    <ValueField Kind="ValueKind.Duration" Label="Time" ShowLabel="false" Compact Value="0:25:00" />
+                    <ValueField Kind="ValueKind.Whole" Label="Heart rate" ShowLabel="false" Compact Value="150" />
+                </Fields>
+            </EntryGridRow>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <EntryGridRow Header FieldCount="2">
+                    <Index>#</Index>
+                    <Fields><span>Weight</span><span>Reps</span></Fields>
+                </EntryGridRow>
+                <EntryGridRow FieldCount="2">
+                    <Index>1</Index>
+                    <Fields>
+                        <ValueField Kind="ValueKind.Fractional" Label="Weight, set 1" ShowLabel="false" Compact Value="60" />
+                        <ValueField Kind="ValueKind.Whole" Label="Reps, set 1" ShowLabel="false" Compact Value="8" />
+                    </Fields>
+                </EntryGridRow>
+            </div>
+        </Template>
+    </Story>
+
+</Stories>

@@ -11,6 +11,8 @@
     <li><code>HeaderActions</code>: content at the end of the header row, after the title and aside, such as <code>IconButton</code>s: a name and its Done, Edit and Delete buttons share one row. The title stays the heading; the buttons keep their own 48px touch targets. Setting it draws the header row even without a title. The row is pulled up into the card's top padding (8px), as the buttons' own space already clears the edge.</li>
     <li>No <code>ChildContent</code> (a card with only a header, such as a collapsed one): no gap under the header, and with <code>HeaderActions</code> the card's top and bottom padding shrink to 4px, so the card is 58px tall at 48px buttons. Content written between the tags is never null, even when it renders nothing, so a collapsible card passes <code>ChildContent="@@(open ? body : null)"</code> rather than an <code>@@if</code> inside the tags.</li>
     <li><code>Error</code>: the border and an inset ring turn <code>--color-error</code> (at least 3:1 on both the page and the card). The ring is drawn inside the border, so the card keeps its size. The error text itself goes inside the card, e.g. in an <code>InlineAlert</code>.</li>
+    <li><code>Selected</code>: tints the card with <code>--color-card-selected</code> and draws its border in <code>--color-accent</code>, for the open or chosen card. Text, muted text, error and success text keep at least 4.5:1 on the tint in both themes. With <code>Error</code> the error border wins.</li>
+    <li><code>HeadingLevel</code>: the level of the title's heading element, 2 by default (1 to 6); use 3 for a card inside a section that has an h2. The look does not change.</li>
     <li><code>data-testid</code>: <code>TestId</code>, <code>{TestId}-aside</code> on the aside and <code>{TestId}-actions</code> on the actions.</li>
 </ul>
 
@@ -35,6 +37,7 @@
     <li><code>Status</code> sits in a polite live region above the bar, and above the raised button when there is one. Without a bar it floats over the foot of the content.</li>
     <li>The content ends clear of the raised button and the status message, so screens add no bottom padding of their own.</li>
     <li><code>OnRefresh</code> adds pull-to-refresh to the content; a failure to set it up is logged (9701) and the screen works without it.</li>
+    <li><code>ToolbarDivider</code>: draws a <code>--border-width</code> line in <code>--color-border</code> under the <code>Toolbar</code>, setting a pinned search or filters apart from the scrolling content.</li>
     <li><code>data-testid</code>: <code>screen-title</code>, <code>screen-subtitle</code>, <code>bottom-bar</code> and <code>pull-refresh</code>.</li>
 </ul>
 
@@ -56,6 +59,7 @@
 <p>Text in one of the kit's looks, so a screen sets only layout. The tag is <code>Typography</code>, not <code>Text</code>, because Razor reads <code>&lt;Text&gt;</code> at the start of a code block as its own <code>&lt;text&gt;</code> tag (RZ1023). <code>Variant</code> (<code>TextVariant</code>): <code>Body</code> (default), <code>Label</code> (muted, small, bold, upper case, <code>--letter-spacing-label</code>), <code>Muted</code>, <code>MutedSmall</code>, <code>Strong</code> (bold, normal text colour, also inside muted text), <code>Figure</code> (<code>--font-size-xl</code>, bold) and <code>Error</code> (<code>--color-error</code>). Every variant reads at 4.5:1 on the page and on cards in both themes.</p>
 <ul>
     <li><code>As</code> (<code>TextElement</code>): the element, <code>Span</code> by default; <code>P</code>, <code>Div</code> and <code>H2</code> to <code>H6</code> let a label be a heading of the right level.</li>
+    <li><code>Variant</code> (<code>TextVariant</code>) also has <code>Heading</code> (<code>--font-size-lg</code>, bold), <code>MutedSmallStrong</code> (muted, small, bold, equal-width figures, for a total) and <code>SuccessSmall</code> (bold small <code>--color-success</code>). Each is at least 4.5:1 on the page and cards.</li>
     <li>Other attributes (an <code>id</code>, a <code>class</code>) go on the element; a <code>class</code> is added to the component's own. A class from the caller's scoped CSS does not match the element, so use <code>::deep</code> or a global class.</li>
     <li><code>data-testid</code>: <code>TestId</code>.</li>
 </ul>

@@ -3,3 +3,7 @@
     background-color: var(--color-bg);
     color: var(--color-text);
 }
+
+.tools {
+    padding: var(--space-4) var(--space-4) var(--space-3);
+}

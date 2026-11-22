@@ -1,0 +1,23 @@
+@attribute [Stories("Components/Lists/ChangeIndicator")]
+
+<Stories TComponent="ChangeIndicator" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Up">
+        <Template>
+            <ChangeIndicator Change="@(new StatChange(ChangeDirection.Up, "35m"))" TestId="change" />
+        </Template>
+    </Story>
+
+    <Story Name="Down">
+        <Template>
+            <ChangeIndicator Change="@(new StatChange(ChangeDirection.Down, "6"))" TestId="change" />
+        </Template>
+    </Story>
+
+    <Story Name="No change">
+        <Template>
+            <ChangeIndicator Change="@(new StatChange(ChangeDirection.None, ""))" TestId="change" />
+        </Template>
+    </Story>
+
+</Stories>

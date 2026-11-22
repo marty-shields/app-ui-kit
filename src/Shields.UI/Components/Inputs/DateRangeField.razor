@@ -1,0 +1,107 @@
+@using System.Globalization
+@using Shields.UI.Components.Actions
+@using Shields.UI.Components.Navigation
+<div class="date-range">
+    <button type="button"
+            class="field"
+            aria-expanded="@(Expanded ? "true" : "false")"
+            aria-label="@AccessibleName"
+            data-testid="@TestId"
+            @onclick="() => ExpandedChanged.InvokeAsync(!Expanded)">
+        <Icon Name="IconName.Calendar" />
+        <span class="dates" data-testid="@Id("dates")">@DatesText</span>
+        @if (Count is not null)
+        {
+            <span class="count" data-testid="@Id("count")">@Count</span>
+        }
+        <Icon Name="IconName.Down" Tone="IconTone.Muted" />
+    </button>
+    @if (Expanded)
+    {
+        <BackHandler OnBack="Close" />
+        <RangeCalendar Min="Min" Max="Max" Today="Today" Dates="Dates" DayCounts="DayCounts" CountText="CountText" MarkedDayText="@MarkedDayText"
+                       ApplyLabel="@ApplyLabel" OpenOnMonths="OpenOnMonths" OnApply="Apply" OnCancel="Close" TestId="@(TestId is null ? "range" : $"{TestId}-calendar")" />
+    }
+</div>
+
+@code {
+    /// <summary>The range shown in the field, and the one the calendar opens on. Each end is shown with <see cref="DateFormat"/>; one day shows once.</summary>
+    [Parameter]
+    public DateRange Dates { get; set; }
+
+    /// <summary>Format of each date in the field, a .NET date format. Dates are formatted in the invariant culture.</summary>
+    [Parameter]
+    public string DateFormat { get; set; } = "d MMM yyyy";
+
+    /// <summary>A number at the end of the field, such as the entries in the range. Null shows none.</summary>
+    [Parameter]
+    public int? Count { get; set; }
+
+    /// <summary>Words for <see cref="Count"/> in the field's accessible name and the calendar's month totals, e.g. <c>n => $"{n} entries"</c>. Null says the bare number.</summary>
+    [Parameter]
+    public Func<int, string>? CountText { get; set; }
+
+    /// <summary>Starts the field's accessible name, before the dates, such as "Dates shown".</summary>
+    [Parameter]
+    public string Label { get; set; } = "Dates shown";
+
+    /// <summary>The first day the calendar lets the user pick.</summary>
+    [Parameter]
+    public DateOnly Min { get; set; }
+
+    /// <summary>The last day the calendar lets the user pick.</summary>
+    [Parameter]
+    public DateOnly Max { get; set; }
+
+    /// <summary>The current day, ringed in the calendar. Null means today by the clock.</summary>
+    [Parameter]
+    public DateOnly? Today { get; set; }
+
+    /// <summary>Items per day for the calendar's dots and month totals. Null shows neither.</summary>
+    [Parameter]
+    public IReadOnlyDictionary<DateOnly, int>? DayCounts { get; set; }
+
+    /// <summary>Read after the date of a day with a dot in the calendar, such as "entry logged".</summary>
+    [Parameter]
+    public string MarkedDayText { get; set; } = "marked";
+
+    /// <summary>Text of the calendar's apply button.</summary>
+    [Parameter]
+    public string ApplyLabel { get; set; } = "Apply";
+
+    /// <summary>Opens the calendar on the month and year grid instead of the days.</summary>
+    [Parameter]
+    public bool OpenOnMonths { get; set; }
+
+    /// <summary>Shows the calendar under the field, and registers Android back to close it. The field is a disclosure button: its <c>aria-expanded</c> follows this.</summary>
+    [Parameter]
+    public bool Expanded { get; set; }
+
+    /// <summary>Raised with true when the field is tapped while closed, and false to close it, by tapping again, Cancel, Apply or Android back.</summary>
+    [Parameter]
+    public EventCallback<bool> ExpandedChanged { get; set; }
+
+    /// <summary>Raised by the apply button with the range picked, after the calendar closes.</summary>
+    [Parameter]
+    public EventCallback<DateRange> DatesChanged { get; set; }
+
+    /// <summary>Value of the field's data-testid attribute, and the prefix of <c>-dates</c>, <c>-count</c> and the calendar's own test ids (<c>{TestId}-calendar</c>).</summary>
+    [Parameter]
+    public string? TestId { get; set; }
+
+    private string DatesText => Dates.From == Dates.To ? Format(Dates.From) : $"{Format(Dates.From)} – {Format(Dates.To)}";
+
+    private string AccessibleName => $"{Label}: {DatesText}" + (Count is { } count ? $". {(CountText is null ? count.ToString(CultureInfo.InvariantCulture) : CountText(count))}" : "");
+
+    private string Format(DateOnly date) => date.ToString(DateFormat, CultureInfo.InvariantCulture);
+
+    private string? Id(string part) => TestId is null ? null : $"{TestId}-{part}";
+
+    private Task Close() => ExpandedChanged.InvokeAsync(false);
+
+    private async Task Apply(DateRange range)
+    {
+        await Close();
+        await DatesChanged.InvokeAsync(range);
+    }
+}

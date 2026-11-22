@@ -1,0 +1,30 @@
+.row {
+    display: grid;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.index {
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+}
+
+.aside {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header {
+    align-items: end;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+}

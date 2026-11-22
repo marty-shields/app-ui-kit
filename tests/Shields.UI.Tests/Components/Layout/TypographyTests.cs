@@ -23,6 +23,9 @@ public class TypographyTests : ComponentTestBase
     [TestCase(TextVariant.Strong, "strong")]
     [TestCase(TextVariant.Figure, "figure")]
     [TestCase(TextVariant.Error, "error")]
+    [TestCase(TextVariant.Heading, "heading")]
+    [TestCase(TextVariant.MutedSmallStrong, "muted-small-strong")]
+    [TestCase(TextVariant.SuccessSmall, "success-small")]
     public void Variant_PutsItsClassOnTheElement(TextVariant variant, string expected)
     {
         var cut = Context.Render<Typography>(p => p.Add(x => x.Variant, variant).AddChildContent("x"));

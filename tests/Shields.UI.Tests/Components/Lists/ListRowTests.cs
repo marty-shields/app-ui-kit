@@ -158,4 +158,128 @@ public class ListRowTests : ComponentTestBase
 
     private static string Rule(string css, string selector) =>
         System.Text.RegularExpressions.Regex.Match(css, System.Text.RegularExpressions.Regex.Escape(selector) + @"\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
+
+    [Test]
+    public void Divider_IsOnByDefault_AndFalseDropsIt()
+    {
+        var plain = Context.Render<ListRow>(p => p.Add(x => x.Text, "A"));
+        var without = Context.Render<ListRow>(p => p.Add(x => x.Text, "A").Add(x => x.Divider, false));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(plain.Find(".row").ClassList, Does.Not.Contain("no-divider"));
+            Assert.That(without.Find(".row").ClassList, Does.Contain("no-divider"));
+        });
+    }
+
+    [Test]
+    public void DividerFalse_AlsoDropsItOnATappableRow()
+    {
+        var cut = Context.Render<ListRow>(p => p.Add(x => x.Text, "A").Add(x => x.Divider, false).Add(x => x.OnClick, () => { }));
+
+        Assert.That(cut.Find("button").ClassList, Does.Contain("no-divider"));
+    }
+
+    [Test]
+    public void Css_Headline_GivesEveryPartItsOwnGridCell()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Lists", "ListRow.razor.css");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(css, Does.Contain("grid-template-columns: auto minmax(0, 1fr) auto auto auto auto;"));
+            Assert.That(css, Does.Contain(".headline .leading {\n    grid-column: 1;"));
+            Assert.That(css, Does.Contain(".headline .text {\n    grid-column: 2;"));
+            Assert.That(css, Does.Contain(".headline .aside {\n    grid-column: 3;"));
+            Assert.That(css, Does.Contain(".headline .change {\n    grid-column: 4;"));
+            Assert.That(css, Does.Contain(".headline .trailing {\n    grid-column: 5;"));
+            Assert.That(css, Does.Contain(".headline .chevron {\n    grid-column: 6;"));
+            Assert.That(css, Does.Contain(".headline .detail {\n    grid-column: 2 / -1;"));
+        });
+    }
+
+    [Test]
+    public void Change_RootHasItsOwnScopeAttribute_SoTheChangeStyleApplies()
+    {
+        var cut = Context.Render<ListRow>(p => p.Add(x => x.Text, "Squat").Add(x => x.Change, new StatChange(ChangeDirection.Up, "5kg")));
+
+        Assert.That(cut.Find(".change").Attributes.Any(a => a.Name.StartsWith("b-", StringComparison.Ordinal)), Is.True);
+    }
+
+    [Test]
+    public void HeadlineLayout_PutsTheTextAndAsideOnOneLine_AndTheDetailUnderThem()
+    {
+        var cut = Context.Render<ListRow>(p => p
+            .Add(x => x.Layout, ListRowLayout.Headline)
+            .Add(x => x.Text, "Tue 20 Oct")
+            .Add(x => x.Aside, "70kg × 3")
+            .Add(x => x.Detail, "60×8 · 62.5×8 · 70×3"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find(".row").ClassList, Does.Contain("headline"));
+            Assert.That(cut.Find(".text").TextContent, Is.EqualTo("Tue 20 Oct"));
+            Assert.That(cut.Find(".aside").TextContent, Is.EqualTo("70kg × 3"));
+            Assert.That(cut.Find(".detail").TextContent, Is.EqualTo("60×8 · 62.5×8 · 70×3"));
+        });
+    }
+
+    [Test]
+    public void StackedLayout_IsTheDefault()
+    {
+        var cut = Context.Render<ListRow>(p => p.Add(x => x.Text, "A"));
+
+        Assert.That(cut.Find(".row").ClassList, Does.Not.Contain("headline"));
+    }
+
+    [Test]
+    public void Leading_ComesBeforeTheText()
+    {
+        var cut = Context.Render<ListRow>(p => p.Add(x => x.Text, "70kg × 3").Add(x => x.Leading, "<b>2</b>"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find(".row").Children.First().ClassName, Is.EqualTo("leading"));
+            Assert.That(cut.Find(".leading").TextContent, Is.EqualTo("2"));
+        });
+    }
+
+    [TestCase(ChangeDirection.Up, "up", "up 5kg")]
+    [TestCase(ChangeDirection.Down, "down", "down 5kg")]
+    public void Change_ShowsAnArrowWithTheAmount_AndReadsAsUpOrDown(ChangeDirection direction, string cssClass, string spoken)
+    {
+        var cut = Context.Render<ListRow>(p => p.Add(x => x.Text, "Squat").Add(x => x.Change, new StatChange(direction, "5kg")));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find(".change").ClassList, Does.Contain(cssClass));
+            Assert.That(cut.Find(".change").TextContent.Trim(), Does.Contain("5kg"));
+            Assert.That(cut.Find(".change .visually-hidden").TextContent + "5kg", Is.EqualTo(spoken));
+            Assert.That(cut.FindComponent<Icon>().Instance.Tone, Is.EqualTo(direction == ChangeDirection.Up ? IconTone.Success : IconTone.Error));
+        });
+    }
+
+    [Test]
+    public void Change_None_ShowsADashReadAsNoChange()
+    {
+        var cut = Context.Render<ListRow>(p => p.Add(x => x.Text, "Squat").Add(x => x.Change, new StatChange(ChangeDirection.None, "")));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cut.Find(".change").ClassList, Does.Contain("same"));
+            Assert.That(cut.Find(".change .visually-hidden").TextContent, Is.EqualTo("no change"));
+        });
+    }
+
+    [Test]
+    public void Trailing_IsAfterTheAside_AndBeforeTheChevron()
+    {
+        var cut = Context.Render<ListRow>(p => p
+            .Add(x => x.Text, "Set 1")
+            .Add(x => x.Aside, "a")
+            .Add(x => x.Trailing, "<i>x</i>")
+            .Add(x => x.OnClick, () => { }));
+
+        Assert.That(cut.Find("button").Children.TakeLast(3).Select(c => c.ClassName), Is.EqualTo(new[] { "aside", "trailing", "chevron" }));
+    }
 }

@@ -59,6 +59,9 @@
                 TextVariant.Strong => "text strong",
                 TextVariant.Figure => "text figure",
                 TextVariant.Error => "text error",
+                TextVariant.Heading => "text heading",
+                TextVariant.MutedSmallStrong => "text muted-small-strong",
+                TextVariant.SuccessSmall => "text success-small",
                 _ => "text",
             };
             return AdditionalAttributes is not null && AdditionalAttributes.TryGetValue("class", out var extra) ? $"{own} {extra}" : own;

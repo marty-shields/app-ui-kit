@@ -37,6 +37,65 @@ public class CardTests : ComponentTestBase
     }
 
     [Test]
+    public void HeadingLevel_IsH2ByDefault_AndSetsTheTitleElement()
+    {
+        var plain = Context.Render<Card>(p => p.Add(x => x.Title, "Records"));
+        var level3 = Context.Render<Card>(p => p.Add(x => x.Title, "Set 1").Add(x => x.HeadingLevel, 3));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(plain.Find(".title").TagName, Is.EqualTo("H2"));
+            Assert.That(level3.Find(".title").TagName, Is.EqualTo("H3"));
+            Assert.That(level3.Find("h3").TextContent, Is.EqualTo("Set 1"));
+        });
+    }
+
+    [Test]
+    public void Heading_CarriesTheCardsScopeAttribute_SoTheTitleStyleApplies()
+    {
+        var cut = Context.Render<Card>(p => p.Add(x => x.Title, "Records").Add(x => x.HeadingLevel, 4));
+
+        var scope = cut.Find(".card").Attributes.Single(a => a.Name.StartsWith("b-", StringComparison.Ordinal)).Name;
+        Assert.That(cut.Find("h4.title").HasAttribute(scope), Is.True);
+    }
+
+    [Test]
+    public void Css_Selected_UsesTheSelectedAndAccentColours_AndTheErrorBorderWins()
+    {
+        var selected = CssRules.Declarations("Card", ".card.selected");
+        var selectedError = CssRules.Declarations("Card", ".card.selected.error");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(selected["background-color"], Is.EqualTo("var(--color-card-selected)"));
+            Assert.That(selected["border-color"], Is.EqualTo("var(--color-accent)"));
+            Assert.That(selectedError["border-color"], Is.EqualTo("var(--color-error)"));
+        });
+    }
+
+    [TestCase(0, "H1")]
+    [TestCase(9, "H6")]
+    public void HeadingLevel_OutsideOneToSix_IsClamped(int level, string tag)
+    {
+        var cut = Context.Render<Card>(p => p.Add(x => x.Title, "T").Add(x => x.HeadingLevel, level));
+
+        Assert.That(cut.Find(".title").TagName, Is.EqualTo(tag));
+    }
+
+    [Test]
+    public void Selected_AddsTheSelectedClass_AndIsOffByDefault()
+    {
+        var selected = Context.Render<Card>(p => p.Add(x => x.Title, "T").Add(x => x.Selected, true));
+        var normal = Context.Render<Card>(p => p.Add(x => x.Title, "T"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(selected.Find(".card").ClassList, Does.Contain("selected"));
+            Assert.That(normal.Find(".card").ClassList, Does.Not.Contain("selected"));
+        });
+    }
+
+    [Test]
     public void Css_Compact_UsesTheCompactTokens()
     {
         var css = RepoFiles.Read("src", "Shields.UI", "Components", "Layout", "Card.razor.css");

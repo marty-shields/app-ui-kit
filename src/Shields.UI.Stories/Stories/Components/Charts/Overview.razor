@@ -102,4 +102,20 @@
     <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>-day-{date}</code> and <code>-marker-{date}</code>, the date as yyyy-MM-dd.</li>
 </ul>
 
-<p>Stories: <a href="./?path=/docs/components-charts-chartlegend--docs">ChartLegend</a>, <a href="./?path=/docs/components-charts-progressring--docs">ProgressRing</a>, <a href="./?path=/docs/components-charts-barlist--docs">BarList</a>, <a href="./?path=/docs/components-charts-stackedbar--docs">StackedBar</a>, <a href="./?path=/docs/components-charts-trendbarchart--docs">TrendBarChart</a>, <a href="./?path=/docs/components-charts-monthcalendar--docs">MonthCalendar</a></p>
+<h2><code>LineChart</code></h2>
+<p>A line of values along an x-axis, drawn as an SVG that scales to the width of its card. Evenly spaced points, y-axis ticks on whole 1, 2 or 5 steps, the first and last <code>LineChartPoint.XLabel</code> under the axis, and a label over the best and the latest point (the best has a ring; the latest is filled and larger). The line is <code>--chart-line-width</code> wide. A point with no value is skipped and the line joins across. A visually hidden list repeats every value as the text alternative.</p>
+<ul>
+    <li><code>Points</code> and <code>Format</code> (value text) are required, and so is <code>Label</code>, the accessible name.</li>
+    <li><code>LowerIsBetter</code>: the lowest value is the best and is drawn at the top. <code>TimeScale</code>: values are seconds and ticks step on whole times, m:ss, or h:mm:ss from an hour.</li>
+    <li><code>data-testid</code>: <code>TestId</code>, and <code>{TestId}-values</code> on the text alternative.</li>
+</ul>
+
+<h2><code>CountBars</code></h2>
+<p>A small row of unlabelled bars, one per <code>Counts</code> entry, sized against the largest; the last is the current one in the accent colour and the others use <code>--color-chart-past</code>. <code>StartLabel</code> and <code>EndLabel</code> sit under the ends. <code>ValueText</code> words each bar for the hidden text alternative. All zero shows <code>EmptyText</code> instead.</p>
+<ul>
+    <li><code>Label</code> (required) names the chart. <code>data-testid</code>: <code>TestId</code>, <code>{TestId}-values</code> and <code>{TestId}-none</code>.</li>
+</ul>
+
+<p>Week rows with a proportional bar need no new part: <code>BarList</code> with <code>Inline</code>, <code>ValueText</code> and <code>OnSelect</code> draws them.</p>
+
+<p>Stories: <a href="./?path=/docs/components-charts-chartlegend--docs">ChartLegend</a>, <a href="./?path=/docs/components-charts-progressring--docs">ProgressRing</a>, <a href="./?path=/docs/components-charts-barlist--docs">BarList</a>, <a href="./?path=/docs/components-charts-stackedbar--docs">StackedBar</a>, <a href="./?path=/docs/components-charts-trendbarchart--docs">TrendBarChart</a>, <a href="./?path=/docs/components-charts-monthcalendar--docs">MonthCalendar</a>, <a href="./?path=/docs/components-charts-linechart--docs">LineChart</a>, <a href="./?path=/docs/components-charts-countbars--docs">CountBars</a></p>

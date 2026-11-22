@@ -8,6 +8,7 @@
                    Invalid="Invalid"
                    InvalidMessage="@InvalidMessage"
                    Disabled="Disabled"
+                   Compact="Compact"
                    Value="@Value"
                    ValueChanged="SetValue"
                    TestId="@TestId" />
@@ -67,7 +68,7 @@ else
     [Parameter]
     public string? Unit { get; set; }
 
-    /// <summary>Less padding either side of the number, so a long one fits a narrow cell. Ignored for a duration, whose boxes are always compact.</summary>
+    /// <summary>Less padding either side of the number, so a long one fits a narrow cell. For a duration it is the tighter box of <see cref="DurationField.Compact"/>.</summary>
     [Parameter]
     public bool Compact { get; set; }
 

@@ -6,6 +6,11 @@
 <p>A full-width row of text, at least <code>--touch-target</code> tall, with a bottom border. An optional muted <code>Detail</code> line goes under the text and optional muted <code>Aside</code> text at the right. With <code>OnClick</code> it is a button ending in a muted chevron <code>Icon</code>; without, it is plain text. Long text wraps.</p>
 <ul>
     <li><code>data-testid</code>: <code>TestId</code>.</li>
+    <li><code>Divider</code>: true by default; false drops the line under the row, for the last row of a card or a row on its own.</li>
+    <li><code>Layout</code>: <code>ListRowLayout.Stacked</code> (default) or <code>Headline</code>, which puts a bold <code>Text</code> and a bold <code>Aside</code> on one line (a date and its headline) with the muted <code>Detail</code> on a full-width line under them. <code>Detail</code> is muted in every layout.</li>
+    <li><code>Leading</code>: content in a narrow centred muted column before the text, the width of <code>--entry-grid-index-width</code>: a number for a numbered line, or an <code>Icon</code> such as the record mark.</li>
+    <li><code>Change</code>: a <code>StatChange</code> after the aside: an up or down <code>Icon</code> in the success or error colour with the amount, or a dash for none, read out as "up", "down" or "no change".</li>
+    <li><code>Trailing</code>: content at the end, such as edit and delete <code>IconButton</code>s. A tappable row is a button, so keep it non-interactive there. Together these cover the date, headline and detail row, the record and change rows, and the numbered summary line.</li>
 </ul>
 
 <h2><code>EmptyState</code></h2>
@@ -24,11 +29,27 @@
     <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>{TestId}-label</code>, <code>{TestId}-value</code>, <code>{TestId}-change</code>, <code>{TestId}-caption</code>, <code>{TestId}-note</code>.</li>
 </ul>
 
+<h2><code>ChangeIndicator</code></h2>
+<p>The coloured change on its own, for a list row or a table cell: how a value moved on the period before. It is the same indicator <code>StatTile</code> shows.</p>
+<ul>
+    <li><code>Change</code> (required): a <code>StatChange</code>. Up is an up <code>Icon</code> and the amount in <code>--color-success</code>, Down a down <code>Icon</code> in <code>--color-error</code>, None a muted dash. Screen readers hear "up 35m", "down 1" or "no change".</li>
+    <li><code>data-testid</code>: <code>TestId</code>.</li>
+</ul>
+
 <h2><code>SectionHeader</code></h2>
 <p>A small upper-case heading over a section, with an optional <code>Badge</code> chip after the title, an optional smaller muted <code>Hint</code> (such as "from 11:00") before the total, and optional <code>Total</code> text at the trailing edge. With <code>@@bind-Expanded</code> (an <code>ExpandedChanged</code> callback) it is a button with <code>aria-expanded</code> and a chevron <code>Icon</code>, at least <code>--touch-target</code> tall; without, it is a plain heading.</p>
 <ul>
     <li><code>ControlsId</code>: the <code>id</code> of the section it folds, written to <code>aria-controls</code>.</li>
     <li><code>data-testid</code>: <code>TestId</code>, and as a prefix: <code>{TestId}-title</code>, <code>{TestId}-badge</code>, <code>{TestId}-hint</code>, <code>{TestId}-total</code>, <code>{TestId}-toggle</code>.</li>
+    <li><code>Sticky</code>: keeps the header at the top of the scrolling area on the page colour, with a strong line under it, while its section is in view. Put each header and its rows in one <code>&lt;section&gt;</code>, as it sticks within its parent. It sits clear of <code>AppScreen</code>'s content padding through <code>--section-header-sticky-top</code>. With <code>Total</code> it is a sticky month header with a count.</li>
 </ul>
 
-<p>Stories: <a href="./?path=/docs/components-lists-listrow--docs">ListRow</a>, <a href="./?path=/docs/components-lists-emptystate--docs">EmptyState</a>, <a href="./?path=/docs/components-lists-stattile--docs">StatTile</a>, <a href="./?path=/docs/components-lists-sectionheader--docs">SectionHeader</a></p>
+<h2><code>CollapsibleNote</code></h2>
+<p>A one-line note with an icon that expands to the whole note when tapped, in a button of at least <code>--touch-target</code> height. The text is muted and small; a long note is cut with an ellipsis until expanded.</p>
+<ul>
+    <li><code>Text</code> is the note; <code>Label</code> (required) is read out before it by screen readers and not shown, such as "Last note". <code>Icon</code> is the note icon by default.</li>
+    <li><code>Expanded</code> and <code>ExpandedChanged</code>: whether the whole note shows (<code>aria-expanded</code>). The note toggles itself when tapped, and raises <code>ExpandedChanged</code>, so a binding is optional.</li>
+    <li><code>data-testid</code>: <code>TestId</code>, on the button.</li>
+</ul>
+
+<p>Stories: <a href="./?path=/docs/components-lists-listrow--docs">ListRow</a>, <a href="./?path=/docs/components-lists-emptystate--docs">EmptyState</a>, <a href="./?path=/docs/components-lists-stattile--docs">StatTile</a>, <a href="./?path=/docs/components-lists-changeindicator--docs">ChangeIndicator</a>, <a href="./?path=/docs/components-lists-sectionheader--docs">SectionHeader</a>, <a href="./?path=/docs/components-lists-collapsiblenote--docs">CollapsibleNote</a></p>

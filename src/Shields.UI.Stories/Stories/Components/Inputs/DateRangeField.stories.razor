@@ -1,0 +1,55 @@
+@attribute [Stories("Components/Inputs/DateRangeField")]
+
+<Stories TComponent="DateRangeField" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Collapsed">
+        <Template>
+            <DateRangeField Dates="new DateRange(new DateOnly(2026, 8, 6), Today)" Count="38" CountText="Entries" Min="Earliest" Max="Today" Today="Today" TestId="dates" />
+        </Template>
+    </Story>
+
+    <Story Name="One day">
+        <Template>
+            <DateRangeField Dates="new DateRange(Today, Today)" Count="1" Min="Earliest" Max="Today" Today="Today" />
+        </Template>
+    </Story>
+
+    <Story Name="Open">
+        <Template>
+            <DateRangeField Dates="new DateRange(new DateOnly(2026, 8, 6), Today)" Count="38" CountText="Entries" Min="Earliest" Max="Today" Today="Today" DayCounts="Counts"
+                            MarkedDayText="entry logged" ApplyLabel="Show entries" Expanded TestId="dates" />
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <DateRangeField Dates="new DateRange(new DateOnly(2026, 8, 6), Today)" Count="38" Min="Earliest" Max="Today" Today="Today" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <DateRangeField Dates="new DateRange(new DateOnly(2026, 8, 6), Today)" Count="38" Min="Earliest" Max="Today" Today="Today" />
+            </div>
+        </Template>
+    </Story>
+
+</Stories>
+
+@code {
+    private static readonly DateOnly Today = new(2026, 11, 6);
+
+    private static readonly DateOnly Earliest = new(2025, 3, 12);
+
+    private static readonly IReadOnlyDictionary<DateOnly, int> Counts = new Dictionary<DateOnly, int>
+    {
+        [new DateOnly(2026, 11, 2)] = 1,
+        [new DateOnly(2026, 11, 4)] = 2,
+        [new DateOnly(2026, 10, 28)] = 1,
+    };
+
+    private static string Entries(int count) => $"{count} entries";
+}

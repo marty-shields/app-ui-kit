@@ -3,19 +3,7 @@
     <span class="value" data-wrap-ok data-testid="@Id("value")">@(NotEnoughData ? "–" : Value)</span>
     @if (Change is not null && !NotEnoughData)
     {
-        <span class="change @ChangeClass" data-wrap-ok data-testid="@Id("change")">
-            @if (Change.Direction == ChangeDirection.None)
-            {
-                <span aria-hidden="true">—</span>
-                <span class="visually-hidden">no change</span>
-            }
-            else
-            {
-                <Icon Name="Change.Direction == ChangeDirection.Up ? IconName.Up : IconName.Down" Tone="Change.Direction == ChangeDirection.Up ? IconTone.Success : IconTone.Error" Size="IconSize.Small" />
-                <span class="visually-hidden">@(Change.Direction == ChangeDirection.Up ? "up " : "down ")</span>
-                @Change.Amount
-            }
-        </span>
+        <ChangeIndicator Change="Change" TestId="@Id("change")" />
     }
     @if (Caption is not null)
     {
@@ -59,13 +47,6 @@
     /// <summary>Value of the data-testid attribute, and the prefix of <c>-label</c>, <c>-value</c>, <c>-change</c>, <c>-caption</c> and <c>-note</c>. None are rendered when unset.</summary>
     [Parameter]
     public string? TestId { get; set; }
-
-    private string? ChangeClass => Change?.Direction switch
-    {
-        ChangeDirection.Up => "up",
-        ChangeDirection.Down => "down",
-        _ => "same",
-    };
 
     private string? Id(string part) => TestId is null ? null : $"{TestId}-{part}";
 }

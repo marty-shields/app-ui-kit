@@ -28,3 +28,10 @@
     display: flex;
     align-items: center;
 }
+
+.results {
+    margin: var(--space-1) 0 0;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+    font-variant-numeric: tabular-nums;
+}

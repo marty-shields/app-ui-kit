@@ -32,6 +32,43 @@
         </Template>
     </Story>
 
+    <Story Name="Without divider">
+        <Template>
+            <ListRow Text="Last row of a card" Detail="No line under it" Divider="false" />
+        </Template>
+    </Story>
+
+    <Story Name="Headline layout">
+        <Template>
+            <ListRow Layout="ListRowLayout.Headline" Text="Tue 20 Oct" Aside="70kg × 3" Detail="60×8 · 62.5×8 · 70×3" />
+        </Template>
+    </Story>
+
+    <Story Name="Record and change">
+        <Template>
+            <div class="stack">
+                <ListRow Text="Barbell Back Squat · 70kg × 3">
+                    <Leading><Icon Name="IconName.Record" Tone="IconTone.Success" /></Leading>
+                </ListRow>
+                <ListRow Text="Bench Press" Detail="60kg × 5" Change='new StatChange(ChangeDirection.Up, "2.5kg")' />
+                <ListRow Text="Deadlift" Detail="100kg × 3" Change='new StatChange(ChangeDirection.Down, "5kg")' />
+                <ListRow Text="Row" Detail="50kg × 8" Change='new StatChange(ChangeDirection.None, "")' Divider="false" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Numbered with actions">
+        <Template>
+            <ListRow Text="70kg · 5 reps" Divider="false">
+                <Leading>2</Leading>
+                <Trailing>
+                    <IconButton Icon="IconName.Edit" AriaLabel="Edit set 2" Muted Compact />
+                    <IconButton Icon="IconName.Delete" AriaLabel="Delete set 2" Muted Compact />
+                </Trailing>
+            </ListRow>
+        </Template>
+    </Story>
+
     <Story Name="Light">
         <Template>
             <div class="themed" data-theme="light">

@@ -23,7 +23,7 @@
     </header>
     @if (Toolbar is not null)
     {
-        <div class="toolbar">
+        <div class="toolbar @(ToolbarDivider ? "divided" : null)">
             @Toolbar
         </div>
     }
@@ -126,6 +126,10 @@
     /// </summary>
     [Parameter]
     public RenderFragment? Toolbar { get; set; }
+
+    /// <summary>Draws a line under the <see cref="Toolbar"/>, in the border colour, to set it apart from the scrolling content. Nothing changes without a toolbar. False by default.</summary>
+    [Parameter]
+    public bool ToolbarDivider { get; set; }
 
     /// <summary>Scrolling screen content. With the bottom navigation bar it ends clear of the raised button, so the content needs no bottom padding of its own.</summary>
     [Parameter]

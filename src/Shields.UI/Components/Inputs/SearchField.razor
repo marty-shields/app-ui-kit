@@ -3,24 +3,31 @@
 @using Shields.UI.Components.Actions
 @using Shields.UI.Components.Layout
 
-<div class="search input-box">
-    <Icon Name="IconName.Search" Tone="IconTone.Muted" />
-    <input type="search"
-           class="input"
-           value="@Value"
-           placeholder="@Placeholder"
-           aria-label="@AriaLabel"
-           autocomplete="off"
-           enterkeyhint="search"
-           data-testid="@TestId"
-           @key="generation"
-           @ref="input"
-           @oninput="OnInput"
-           @onkeydown="OnKeyDown" />
-    @if (Trailing is not null)
+<div class="search-field">
+    <div class="search input-box">
+        <Icon Name="IconName.Search" Tone="IconTone.Muted" />
+        <input type="search"
+               class="input"
+               value="@Value"
+               placeholder="@Placeholder"
+               aria-label="@AriaLabel"
+               autocomplete="off"
+               enterkeyhint="search"
+               maxlength="@MaxLength"
+               data-testid="@TestId"
+               @key="generation"
+               @ref="input"
+               @oninput="OnInput"
+               @onkeydown="OnKeyDown" />
+        @if (Trailing is not null)
+        {
+            <span class="divider-slot"><Divider Vertical Decorative /></span>
+            <span class="trailing">@Trailing</span>
+        }
+    </div>
+    @if (ResultText is not null)
     {
-        <span class="divider-slot"><Divider Vertical Decorative /></span>
-        <span class="trailing">@Trailing</span>
+        <p class="results" role="status" aria-live="polite" data-testid="@(TestId is null ? null : $"{TestId}-results")">@ResultText</p>
     }
 </div>
 
@@ -62,7 +69,22 @@
     [Parameter]
     public RenderFragment? Trailing { get; set; }
 
-    /// <summary>Value of the data-testid attribute, on the input itself and not on the box.</summary>
+    /// <summary>
+    /// A line under the box, such as "12 results", that screen readers announce politely when it changes. Null shows no line. An empty string shows an empty line that is already in the page,
+    /// so the first text set later is announced; set it from the start when results can appear after a search.
+    /// </summary>
+    [Parameter]
+    public string? ResultText { get; set; }
+
+    /// <summary>The most characters the input accepts. Null for no limit.</summary>
+    [Parameter]
+    public int? MaxLength { get; set; }
+
+    /// <summary>Moves focus into the input when the field first shows, for a screen opened to search.</summary>
+    [Parameter]
+    public bool FocusOnShow { get; set; }
+
+    /// <summary>Value of the data-testid attribute, on the input itself and not on the box. The result line has <c>{TestId}-results</c>.</summary>
     [Parameter]
     public string? TestId { get; set; }
 
@@ -83,6 +105,11 @@
     /// <summary>Redraws the input when the parent put the text back to what it was before the keystroke, so the browser drops the typed text, and puts focus back on it.</summary>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (firstRender && FocusOnShow)
+        {
+            await input.FocusAsync();
+        }
+
         if (restoreFocus)
         {
             // The reference only points at the new input once the browser has drawn it.

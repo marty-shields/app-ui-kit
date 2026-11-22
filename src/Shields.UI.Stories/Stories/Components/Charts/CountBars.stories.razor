@@ -1,0 +1,47 @@
+@attribute [Stories("Components/Charts/CountBars")]
+
+<Stories TComponent="CountBars" Layout="typeof(ThemeLayout)">
+
+    <Story Name="Twelve weeks">
+        <Template>
+            <CountBars Counts="Twelve" Label="Sessions per week, last 12 weeks" StartLabel="11 weeks ago" EndLabel="This week" ValueText="Describe" TestId="bars" />
+        </Template>
+    </Story>
+
+    <Story Name="Gaps">
+        <Template>
+            <CountBars Counts="Gappy" Label="Sessions per week, last 6 weeks" StartLabel="5 weeks ago" EndLabel="This week" ValueText="Describe" />
+        </Template>
+    </Story>
+
+    <Story Name="Nothing recorded">
+        <Template>
+            <CountBars Counts="@(new[] { 0, 0, 0 })" Label="Sessions per week" EmptyText="No sessions in the last 3 weeks" TestId="empty" />
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <CountBars Counts="Twelve" Label="Sessions per week" StartLabel="11 weeks ago" EndLabel="This week" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <CountBars Counts="Twelve" Label="Sessions per week" StartLabel="11 weeks ago" EndLabel="This week" />
+            </div>
+        </Template>
+    </Story>
+
+</Stories>
+
+@code {
+    private static readonly IReadOnlyList<int> Twelve = [2, 3, 3, 1, 4, 3, 2, 0, 3, 4, 3, 2];
+
+    private static readonly IReadOnlyList<int> Gappy = [3, 0, 2, 0, 1, 2];
+
+    private static string Describe(int index, int count) => $"{count} {(count == 1 ? "session" : "sessions")}";
+}

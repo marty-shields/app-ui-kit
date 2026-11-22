@@ -139,6 +139,21 @@ public class AppScreenTests : ComponentTestBase
     }
 
     [Test]
+    public void ToolbarDivider_AddsTheDividedClassToTheToolbarOnly_AndIsOffByDefault()
+    {
+        var plain = Render("Screen title", p => p.Add(x => x.Toolbar, "<p>Filters</p>"));
+        var divided = Render("Screen title", p => p.Add(x => x.Toolbar, "<p>Filters</p>").Add(x => x.ToolbarDivider, true));
+        var noToolbar = Render("Screen title", p => p.Add(x => x.ToolbarDivider, true));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(plain.Find(".toolbar").ClassList, Does.Not.Contain("divided"));
+            Assert.That(divided.Find(".toolbar").ClassList, Does.Contain("divided"));
+            Assert.That(noToolbar.FindAll(".toolbar"), Is.Empty);
+        });
+    }
+
+    [Test]
     public void ChildContent_ShowsInTheMainRegion()
     {
         var cut = Render("Screen title", p => p.AddChildContent("<p data-testid=\"shown\">Rows</p>"));

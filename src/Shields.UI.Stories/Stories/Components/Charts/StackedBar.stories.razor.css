@@ -15,3 +15,12 @@
     max-width: 100%;
     padding: var(--space-4);
 }
+
+/* Stands in for a Card, which a StackedBar story may not use: the Card's border takes the same width from the content box, so it is 412 - 2*16 - 2*16 - 2*1 = 346px. */
+.card-stand-in {
+    border: var(--border-width) solid transparent;
+}
+
+.mid {
+    max-width: var(--stories-mid-width);
+}

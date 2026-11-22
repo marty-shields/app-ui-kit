@@ -215,10 +215,40 @@ public class StackedBarTests : ComponentTestBase
 
         Assert.Multiple(() =>
         {
-            Assert.That(Rule(".label-text"), Does.Contain("min-width: 0;").And.Contain("overflow: hidden;").And.Contain("text-overflow: ellipsis;"));
-            Assert.That(Rule(".label"), Does.Not.Contain("overflow").And.Not.Contain("text-overflow"));
+            Assert.That(Rule(".label-text"), Does.Contain("min-width: 4ch;").And.Contain("overflow: hidden;").And.Contain("-webkit-line-clamp: 1;"));
+            Assert.That(Rule(".label"), Does.Not.Contain("overflow").And.Not.Contain("line-clamp"));
             Assert.That(Rule(".label strong"), Does.Contain("flex-shrink: 0;"));
             Assert.That(Rule(".label::before"), Does.Contain("flex-shrink: 0;"));
+        });
+    }
+
+    [Test]
+    public void Css_LabelIsFlex_SoTheWhitespaceBeforeTheValueIsNotRendered_AndTheMarginIsTheOnlyGap()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Charts", "StackedBar.razor.css");
+        string Rule(string selector) => Regex.Match(css, Regex.Escape(selector) + @"\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(Rule(".label"), Does.Contain("display: flex;"));
+            Assert.That(Rule(".label strong"), Does.Contain("margin-left: var(--space-1);"));
+        });
+    }
+
+    [Test]
+    public void Css_LabelsWrapOnlyWhenTheShrunkLabelsDoNotFit_AndNamesKeepFourCharacters()
+    {
+        var css = RepoFiles.Read("src", "Shields.UI", "Components", "Charts", "StackedBar.razor.css");
+        string Rule(string selector) => Regex.Match(css, Regex.Escape(selector) + @"\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(css, Does.Not.Contain("@container"));
+            Assert.That(Rule(".labels"), Does.Contain("flex-wrap: wrap;"));
+            Assert.That(Rule(".label"), Does.Contain("flex: 1 1 min-content;").And.Contain("max-width: max-content;"));
+            Assert.That(Rule(".label-text"), Does.Contain("overflow-wrap: anywhere;").And.Contain("white-space: normal;").And.Contain("min-width: 4ch;").And.Not.Contain("nowrap"));
+            Assert.That(Rule(".label strong"), Does.Contain("margin-left: var(--space-1);"));
+            Assert.That(Rule(".label::before"), Does.Contain("width: var(--legend-swatch-size);"));
         });
     }
 
@@ -291,7 +321,7 @@ public class StackedBarTests : ComponentTestBase
     }
 
     [Test]
-    public void Legend_UsesTheSmallestSpaceTokenForEveryGap_AndTheTextMayShrink()
+    public void Legend_UsesTheSmallestSpaceTokenForEveryGap()
     {
         var css = RepoFiles.Read("src", "Shields.UI", "Components", "Charts", "StackedBar.razor.css");
         var labels = Regex.Match(css, @"\.labels\s*\{(?<rule>[^}]*)\}").Groups["rule"].Value;
@@ -300,7 +330,6 @@ public class StackedBarTests : ComponentTestBase
         Assert.Multiple(() =>
         {
             Assert.That(labels, Does.Contain("gap: var(--space-1);"));
-            Assert.That(label, Does.Contain("min-width: 0;"));
             Assert.That(css, Does.Contain("margin-left: var(--space-1);"));
             Assert.That(css, Does.Contain("margin-right: var(--space-1);"));
         });

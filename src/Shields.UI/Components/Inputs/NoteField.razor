@@ -17,8 +17,7 @@
                           aria-describedby="@(Error is not null ? $"{CountId} {ErrorId}" : CountId)"
                           data-testid="@Id("input")"
                           value="@draft"
-                          @oninput="OnInput"
-                          @onblur="OnBlur"></textarea>
+                          @oninput="OnInput"></textarea>
             </div>
         }
         else
@@ -48,7 +47,7 @@
     [Parameter]
     public EventCallback<string?> ValueChanged { get; set; }
 
-    /// <summary>Shows the text box. A parent sets it from its own button; the field sets it when the collapsed line is tapped and when focus leaves.</summary>
+    /// <summary>Shows the text box. A parent sets it from its own button, which is the only way to collapse the text box: the field does not collapse when focus leaves. The field sets it when the collapsed line is tapped.</summary>
     [Parameter]
     public bool Editing { get; set; }
 
@@ -134,19 +133,6 @@
         draft = e.Value as string;
         Value = BlankToNull(draft);
         return ValueChanged.InvokeAsync(Value);
-    }
-
-    private async Task OnBlur()
-    {
-        var trimmed = Value?.Trim();
-        draft = trimmed;
-        if (trimmed != Value)
-        {
-            Value = trimmed;
-            await ValueChanged.InvokeAsync(trimmed);
-        }
-
-        await SetEditingAsync(false);
     }
 
     private string? Id(string part) => TestId is null ? null : $"{TestId}-{part}";

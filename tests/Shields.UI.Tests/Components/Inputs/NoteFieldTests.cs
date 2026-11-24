@@ -116,52 +116,31 @@ public class NoteFieldTests : ComponentTestBase
     }
 
     [Test]
-    public void Blur_TrimsTheNoteAndCollapsesToOneLine()
+    public void TextBox_HasNoBlurHandler_SoLeavingItNeverCollapsesIt()
     {
-        string? value = null;
         var editing = new List<bool>();
-        var cut = Render(p => p
-            .Add(x => x.Editing, true)
-            .Add(x => x.ValueChanged, (string? v) => value = v)
-            .Add(x => x.EditingChanged, (bool e) => editing.Add(e)));
-        cut.Find("textarea").Input("  Belt on  ");
+        var cut = Render(p => p.Add(x => x.Editing, true).Add(x => x.Value, "Belt on").Add(x => x.EditingChanged, (bool e) => editing.Add(e)));
 
-        cut.Find("textarea").Blur();
+        Assert.Throws<MissingEventHandlerException>(() => cut.Find("textarea").Blur());
+        Assert.Multiple(() =>
+        {
+            Assert.That(editing, Is.Empty);
+            Assert.That(cut.FindAll("textarea"), Has.Count.EqualTo(1));
+        });
+    }
+
+    [Test]
+    public void ParentClearingEditing_CollapsesToOneLine()
+    {
+        var cut = Render(p => p.Add(x => x.Editing, true).Add(x => x.Value, "Belt on"));
+
+        cut.Render(p => p.Add(x => x.Label, "Note").Add(x => x.TestId, "note").Add(x => x.Editing, false).Add(x => x.Value, "Belt on"));
 
         Assert.Multiple(() =>
         {
-            Assert.That(value, Is.EqualTo("Belt on"));
-            Assert.That(editing, Is.EqualTo(new[] { false }));
             Assert.That(cut.FindAll("textarea"), Is.Empty);
             Assert.That(cut.Find("[data-testid=note-open] .text").TextContent, Is.EqualTo("Belt on"));
         });
-    }
-
-    [Test]
-    public void Blur_BlankNote_BecomesNullAndShowsNothing()
-    {
-        string? value = "Belt on";
-        var cut = Render(p => p.Add(x => x.Editing, true).Add(x => x.Value, "Belt on").Add(x => x.ValueChanged, (string? v) => value = v));
-        cut.Find("textarea").Input(" ");
-
-        cut.Find("textarea").Blur();
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(value, Is.Null);
-            Assert.That(cut.FindAll("*"), Is.Empty);
-        });
-    }
-
-    [Test]
-    public void Blur_UnchangedNote_RaisesNoValueChange()
-    {
-        var changes = 0;
-        var cut = Render(p => p.Add(x => x.Editing, true).Add(x => x.Value, "Belt on").Add(x => x.ValueChanged, (string? _) => changes++));
-
-        cut.Find("textarea").Blur();
-
-        Assert.That(changes, Is.Zero);
     }
 
     [Test]
@@ -192,17 +171,6 @@ public class NoteFieldTests : ComponentTestBase
             Assert.That(cut.Find("textarea").GetAttribute("value"), Is.EqualTo("Belt on"));
             Context.JSInterop.VerifyFocusAsyncInvoke().Arguments[0].ShouldBeElementReferenceTo(cut.Find("textarea"));
         });
-    }
-
-    [Test]
-    public void WithoutAParentBinding_OpensAndCollapsesOnItsOwn()
-    {
-        var cut = Render(p => p.Add(x => x.Editing, true));
-
-        cut.Find("textarea").Input("Belt on");
-        cut.Find("textarea").Blur();
-
-        Assert.That(cut.Find("[data-testid=note-open] .text").TextContent, Is.EqualTo("Belt on"));
     }
 
     [Test]

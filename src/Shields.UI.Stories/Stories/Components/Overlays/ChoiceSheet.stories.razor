@@ -1,0 +1,41 @@
+@attribute [Stories("Components/Overlays/ChoiceSheet")]
+
+<Stories TComponent="ChoiceSheet" Layout="typeof(PhoneLayout)">
+
+    <Story Name="Opened by a button">
+        <Template>
+            <div class="themed">
+                <button type="button" class="opener" data-testid="open" @onclick="() => opened = true">Open sheet</button>
+                <ChoiceSheet Open="opened" Title="Draft in progress" Message="Keep editing it, or discard it to start a new one." PrimaryText="Keep editing" DangerText="Discard and start new"
+                             OnPrimary="() => opened = false" OnDanger="() => opened = false" OnClose="() => opened = false" TestId="opened" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Light">
+        <Template>
+            <div class="themed" data-theme="light">
+                <button type="button" class="opener" data-testid="light-open" @onclick="() => light = true">Open sheet</button>
+                <ChoiceSheet Open="light" Title="Draft in progress" Message="Keep editing it, or discard it to start a new one." PrimaryText="Keep editing" DangerText="Discard and start new"
+                             OnPrimary="() => light = false" OnDanger="() => light = false" OnClose="() => light = false" TestId="light" />
+            </div>
+        </Template>
+    </Story>
+
+    <Story Name="Dark">
+        <Template>
+            <div class="themed" data-theme="dark">
+                <button type="button" class="opener" data-testid="dark-open" @onclick="() => dark = true">Open sheet</button>
+                <ChoiceSheet Open="dark" Title="Draft in progress" Message="Keep editing it, or discard it to start a new one." PrimaryText="Keep editing" DangerText="Discard and start new"
+                             OnPrimary="() => dark = false" OnDanger="() => dark = false" OnClose="() => dark = false" TestId="dark" />
+            </div>
+        </Template>
+    </Story>
+
+</Stories>
+
+@code {
+    private bool opened;
+    private bool light;
+    private bool dark;
+}

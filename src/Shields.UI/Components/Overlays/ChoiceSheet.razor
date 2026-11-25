@@ -1,0 +1,46 @@
+@using Shields.UI.Components.Layout
+<Sheet Open="Open" Title="@Title" OnClose="OnClose" TestId="@TestId">
+    <div class="choice">
+        <Typography Variant="TextVariant.Body" As="TextElement.P" TestId="@($"{TestId}-message")">@Message</Typography>
+        <AppButton FullWidth TestId="@($"{TestId}-primary")" OnClick="OnPrimary">@PrimaryText</AppButton>
+        <AppButton Variant="ButtonVariant.Danger" FullWidth TestId="@($"{TestId}-danger")" OnClick="OnDanger">@DangerText</AppButton>
+    </div>
+</Sheet>
+
+@code {
+    /// <summary>Shows the sheet. It stays open until the owner clears this, whatever was raised.</summary>
+    [Parameter]
+    public bool Open { get; set; }
+
+    /// <summary>Heading and accessible name of the sheet.</summary>
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = "";
+
+    /// <summary>Text under the title that explains the choice.</summary>
+    [Parameter]
+    public string? Message { get; set; }
+
+    /// <summary>Text of the first button, the safe way on.</summary>
+    [Parameter, EditorRequired]
+    public string PrimaryText { get; set; } = "";
+
+    /// <summary>Text of the destructive button under it.</summary>
+    [Parameter, EditorRequired]
+    public string DangerText { get; set; } = "";
+
+    /// <summary>Raised by the primary button.</summary>
+    [Parameter]
+    public EventCallback OnPrimary { get; set; }
+
+    /// <summary>Raised by the destructive button.</summary>
+    [Parameter]
+    public EventCallback OnDanger { get; set; }
+
+    /// <summary>Raised by a tap on the scrim, the Android back button and Escape, as for <see cref="Sheet"/>.</summary>
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+    /// <summary>Value of the sheet's data-testid; also the prefix for <c>-scrim</c>, <c>-handle</c>, <c>-message</c>, <c>-primary</c> and <c>-danger</c>.</summary>
+    [Parameter]
+    public string TestId { get; set; } = "choice-sheet";
+}

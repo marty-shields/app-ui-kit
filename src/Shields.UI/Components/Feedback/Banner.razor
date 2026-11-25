@@ -1,9 +1,19 @@
-<div class="banner @ToneClass" data-testid="@TestId">@ChildContent</div>
+<div class="banner @ToneClass @(Actions is null ? null : "with-actions")" data-testid="@TestId">
+    @ChildContent
+    @if (Actions is not null)
+    {
+        <div class="actions" data-testid="@(TestId is null ? null : $"{TestId}-actions")">@Actions</div>
+    }
+</div>
 
 @code {
     /// <summary>The text.</summary>
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>Buttons shown under the text, side by side, wrapping when they do not fit, such as <c>AppButton</c>s. None leaves the banner a short pill.</summary>
+    [Parameter]
+    public RenderFragment? Actions { get; set; }
 
     /// <summary>Background colour.</summary>
     [Parameter]

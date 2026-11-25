@@ -1,5 +1,7 @@
 .themed {
-    height: 100%;
+    box-sizing: border-box;
+    height: 100cqh;
+    padding-top: var(--space-8);
     background-color: var(--color-bg);
     color: var(--color-text);
 }

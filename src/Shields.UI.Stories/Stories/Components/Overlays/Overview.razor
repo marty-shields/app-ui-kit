@@ -2,6 +2,13 @@
 
 <h1>Overlays</h1>
 
+<h2><code>ChoiceSheet</code></h2>
+<p>A <code>Sheet</code> that puts a two-way choice to the user: a message, a primary button and a destructive one under it. Closing it (scrim, Escape, back button) raises <code>OnClose</code> and the sheet stays open until the owner clears <code>Open</code>.</p>
+<ul>
+    <li><code>Open</code>, <code>Title</code>, <code>Message</code>; <code>PrimaryText</code> with <code>OnPrimary</code>; <code>DangerText</code> with <code>OnDanger</code>; <code>OnClose</code>.</li>
+    <li><code>data-testid</code>: <code>TestId</code> on the sheet, with <code>-scrim</code>, <code>-handle</code>, <code>-message</code>, <code>-primary</code> and <code>-danger</code>.</li>
+</ul>
+
 <h2><code>ConfirmDialog</code></h2>
 <p>A question over a scrim with a cancel and a confirm button. Cancel takes focus when it opens, and the Android back button raises <code>OnCancel</code>.</p>
 <ul>
@@ -23,4 +30,4 @@
     <li><code>Icon</code>, <code>Label</code>, <code>OnClick</code>; <code>TestId</code> on the button.</li>
 </ul>
 
-<p>Stories: <a href="./?path=/docs/components-overlays-confirmdialog--docs">ConfirmDialog</a>, <a href="./?path=/docs/components-overlays-sheet--docs">Sheet</a>, <a href="./?path=/docs/components-overlays-sheetaction--docs">SheetAction</a></p>
+<p>Stories: <a href="./?path=/docs/components-overlays-choicesheet--docs">ChoiceSheet</a>, <a href="./?path=/docs/components-overlays-confirmdialog--docs">ConfirmDialog</a>, <a href="./?path=/docs/components-overlays-sheet--docs">Sheet</a>, <a href="./?path=/docs/components-overlays-sheetaction--docs">SheetAction</a></p>
